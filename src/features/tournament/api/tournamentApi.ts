@@ -171,3 +171,84 @@ export async function removePlayerFromTournament(
     throw new Error('Failed to remove player');
   }
 }
+
+// Function to create a couple in a tournament
+export async function createCouple(
+  callApi: ReturnType<typeof useApi>,
+  tournamentId: string,
+  firstPlayerId: number,
+  secondPlayerId: number,
+  name: string
+): Promise<Couple> {
+  const response = await callApi(`/tournament/${tournamentId}/couple/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      first_player_id: firstPlayerId,
+      second_player_id: secondPlayerId,
+      name
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Failed to create couple');
+  }
+
+  return data;
+}
+
+// Function to update a couple in a tournament
+export async function updateCouple(
+  callApi: ReturnType<typeof useApi>,
+  tournamentId: string,
+  coupleId: number,
+  firstPlayerId: number,
+  secondPlayerId: number,
+  name: string
+): Promise<Couple> {
+  const response = await callApi(
+    `/tournament/${tournamentId}/couple/${coupleId}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        tournament_id: parseInt(tournamentId),
+        first_player_id: firstPlayerId,
+        second_player_id: secondPlayerId,
+        name
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Failed to update couple');
+  }
+
+  return data;
+}
+
+// Function to delete a couple from a tournament
+export async function deleteCouple(
+  callApi: ReturnType<typeof useApi>,
+  tournamentId: string,
+  coupleId: number
+): Promise<void> {
+  const response = await callApi(
+    `/tournament/${tournamentId}/couple/${coupleId}`,
+    {
+      method: 'DELETE'
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to delete couple');
+  }
+}

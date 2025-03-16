@@ -24,13 +24,14 @@ export interface Player {
 }
 
 export interface TournamentPlayer {
+  id: number;
   tournament_id: number;
   player_id: number;
-  id: number;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
   player: Player;
+  couple_id: number | null;
 }
 
 export interface Couple {

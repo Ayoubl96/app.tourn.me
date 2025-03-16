@@ -59,7 +59,10 @@ import {
   fetchTournamentCouples,
   fetchAllPlayers,
   addPlayerToTournament,
-  removePlayerFromTournament
+  removePlayerFromTournament,
+  createCouple,
+  updateCouple,
+  deleteCouple
 } from '@/features/tournament/api/tournamentApi';
 import {
   getTournamentStatus,
@@ -74,6 +77,7 @@ import {
 } from '@/features/tournament/api/types';
 import { PlayerCard } from '@/features/tournament/components/PlayerCard';
 import { CoupleCard } from '@/features/tournament/components/CoupleCard';
+import { CoupleForm } from '@/features/tournament/components/CoupleForm';
 import { AddPlayerSelector } from '@/features/tournament/components/AddPlayerSelector';
 import { CreatePlayerForm } from '@/features/tournament/components/CreatePlayerForm';
 import { ImportPlaytomicPlayer } from '@/features/tournament/components/ImportPlaytomicPlayer';
@@ -87,6 +91,7 @@ export default function TournamentClientPage({
 }) {
   const t = useTranslations('Dashboard');
   const errorT = useTranslations('Errors');
+  const commonT = useTranslations('Common');
   const callApi = useApi();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -104,6 +109,15 @@ export default function TournamentClientPage({
   const [loadingAllPlayers, setLoadingAllPlayers] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [addingPlayer, setAddingPlayer] = useState(false);
+
+  // Add state for couple management
+  const [isCoupleFormOpen, setIsCoupleFormOpen] = useState(false);
+  const [editingCouple, setEditingCouple] = useState<Couple | undefined>(
+    undefined
+  );
+  const [isDeletingCouple, setIsDeletingCouple] = useState(false);
+  const [coupleToDelete, setCoupleToDelete] = useState<number | null>(null);
+  const [showDeleteCoupleDialog, setShowDeleteCoupleDialog] = useState(false);
 
   // Player creation/import state
   const [searchQuery, setSearchQuery] = useState('');
@@ -262,6 +276,26 @@ export default function TournamentClientPage({
   const isPlayerLimitReached = (): boolean => {
     return Boolean(
       tournament && tournamentPlayers.length >= tournament.players_number
+    );
+  };
+
+  // Calculate maximum possible couples (players / 2)
+  const getMaxPossibleCouples = (): number => {
+    if (!tournament || tournamentPlayers.length === 0) return 0;
+    return Math.floor(tournamentPlayers.length / 2);
+  };
+
+  // Calculate couple count percentage
+  const getCoupleCountProgress = () => {
+    const maxCouples = getMaxPossibleCouples();
+    if (maxCouples === 0) return 0;
+    return (couples.length / maxCouples) * 100;
+  };
+
+  // Check if couple limit is reached
+  const isCoupleLimitReached = (): boolean => {
+    return (
+      couples.length >= getMaxPossibleCouples() && tournamentPlayers.length >= 2
     );
   };
 
@@ -475,6 +509,55 @@ export default function TournamentClientPage({
       setIsDeletingPlayer(false);
       setShowDeleteDialog(false);
       setPlayerToDelete(null);
+    }
+  };
+
+  // Function to handle opening the couple form for creation
+  const handleOpenCoupleForm = () => {
+    setEditingCouple(undefined);
+    setIsCoupleFormOpen(true);
+  };
+
+  // Function to handle opening the couple form for editing
+  const handleEditCouple = (couple: Couple) => {
+    setEditingCouple(couple);
+    setIsCoupleFormOpen(true);
+  };
+
+  // Function to handle couple creation/update completion
+  const handleCoupleFormComplete = (couple: Couple) => {
+    setIsCoupleFormOpen(false);
+    loadTournamentPlayers();
+    loadTournamentCouples();
+  };
+
+  // Function to initiate couple deletion
+  const handleDeleteCouple = (coupleId: number) => {
+    setCoupleToDelete(coupleId);
+    setShowDeleteCoupleDialog(true);
+  };
+
+  // Function to confirm and execute couple deletion
+  const confirmDeleteCouple = async () => {
+    if (!coupleToDelete) return;
+
+    try {
+      setIsDeletingCouple(true);
+      await deleteCouple(callApi, tournamentId, coupleToDelete);
+      toast.success(t('coupleDeleted'));
+
+      // Refresh both players and couples lists
+      loadTournamentPlayers();
+      loadTournamentCouples();
+    } catch (error) {
+      console.error('Error deleting couple:', error);
+      toast.error(
+        error instanceof Error ? error.message : t('failedToDeleteCouple')
+      );
+    } finally {
+      setIsDeletingCouple(false);
+      setShowDeleteCoupleDialog(false);
+      setCoupleToDelete(null);
     }
   };
 
@@ -808,13 +891,38 @@ export default function TournamentClientPage({
             {/* Tournament Couples Card */}
             <Card>
               <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle>{t('couples')}</CardTitle>
-                <Button size='sm' className='gap-1'>
+                <div>
+                  <CardTitle>{t('couples')}</CardTitle>
+                  <CardDescription className='mt-1.5 flex items-center'>
+                    <Users className='mr-1 h-4 w-4' />
+                    {couples.length} / {getMaxPossibleCouples()}{' '}
+                    {t('couples').toLowerCase()}
+                  </CardDescription>
+                </div>
+                <Button
+                  size='sm'
+                  className='gap-1'
+                  onClick={handleOpenCoupleForm}
+                  disabled={
+                    tournamentPlayers.length < 2 || isCoupleLimitReached()
+                  }
+                >
                   <Plus className='h-4 w-4' />
                   {t('createCouple')}
                 </Button>
               </CardHeader>
               <CardContent>
+                <div className='mb-4'>
+                  <div className='mb-1 flex justify-between text-sm'>
+                    <span>
+                      {t('couples')}: {couples.length} /{' '}
+                      {getMaxPossibleCouples()}
+                    </span>
+                    <span>{Math.round(getCoupleCountProgress())}%</span>
+                  </div>
+                  <Progress value={getCoupleCountProgress()} className='h-2' />
+                </div>
+
                 {loadingCouples ? (
                   <div className='space-y-2'>
                     <Skeleton className='h-20 w-full' />
@@ -825,17 +933,45 @@ export default function TournamentClientPage({
                     <p className='mb-4 text-muted-foreground'>
                       {t('noCouplesCreated')}
                     </p>
-                    <Button size='sm' className='gap-1'>
+                    <Button
+                      size='sm'
+                      className='gap-1'
+                      onClick={handleOpenCoupleForm}
+                      disabled={
+                        tournamentPlayers.length < 2 || isCoupleLimitReached()
+                      }
+                    >
                       <Plus className='h-4 w-4' />
                       {t('createCouple')}
                     </Button>
+                    {tournamentPlayers.length < 2 && (
+                      <p className='mt-2 text-xs text-muted-foreground'>
+                        {t('needTwoPlayersForCouple')}
+                      </p>
+                    )}
                   </div>
                 ) : (
-                  <div className='grid grid-cols-1 gap-2'>
+                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
                     {couples.map((couple) => (
-                      <CoupleCard key={couple.id} couple={couple} t={t} />
+                      <CoupleCard
+                        key={couple.id}
+                        couple={couple}
+                        t={t}
+                        onEdit={handleEditCouple}
+                        onDelete={handleDeleteCouple}
+                        disableActions={isDeletingCouple}
+                      />
                     ))}
                   </div>
+                )}
+
+                {isCoupleLimitReached() && couples.length > 0 && (
+                  <Alert className='mt-4'>
+                    <AlertCircle className='h-4 w-4' />
+                    <AlertDescription>
+                      {t('coupleLimitReached')}
+                    </AlertDescription>
+                  </Alert>
                 )}
               </CardContent>
             </Card>
@@ -882,7 +1018,7 @@ export default function TournamentClientPage({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeletingPlayer}>
-              {t('cancel')}
+              {commonT('cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeletePlayer}
@@ -890,6 +1026,58 @@ export default function TournamentClientPage({
               className='bg-destructive hover:bg-destructive/90'
             >
               {isDeletingPlayer ? t('removing') : t('remove')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add the couple form sheet */}
+      <Sheet open={isCoupleFormOpen} onOpenChange={setIsCoupleFormOpen}>
+        <SheetContent
+          side='right'
+          className='w-full overflow-y-auto sm:max-w-md'
+        >
+          <SheetHeader>
+            <SheetTitle>
+              {editingCouple ? t('editCouple') : t('createCouple')}
+            </SheetTitle>
+          </SheetHeader>
+          <div className='mt-6'>
+            <CoupleForm
+              tournamentId={tournamentId}
+              tournamentPlayers={tournamentPlayers}
+              couples={couples}
+              existingCouple={editingCouple}
+              onComplete={handleCoupleFormComplete}
+              onCancel={() => setIsCoupleFormOpen(false)}
+              t={t}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Add the confirmation dialog for couple deletion */}
+      <AlertDialog
+        open={showDeleteCoupleDialog}
+        onOpenChange={setShowDeleteCoupleDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('deleteCouple')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('deleteCoupleConfirmation')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingCouple}>
+              {commonT('cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteCouple}
+              disabled={isDeletingCouple}
+              className='bg-destructive hover:bg-destructive/90'
+            >
+              {isDeletingCouple ? t('deleting') : commonT('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
