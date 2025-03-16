@@ -1,13 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"i18n-ally.localesPaths": [
-			"src/messages"
-		],
-		"i18n-ally.keystyle": "nested"
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "i18n-ally.localesPaths": ["src/messages"],
+    "i18n-ally.keystyle": "nested",
+    "liveServer.settings.port": 5501
+  }
 }
