@@ -138,7 +138,7 @@ export function CoupleForm({
       );
 
       if (firstPlayer && secondPlayer) {
-        coupleName = `${firstPlayer.player.nickname} / ${secondPlayer.player.nickname}`;
+        coupleName = `${firstPlayer.player?.nickname || 'Unknown'} / ${secondPlayer.player?.nickname || 'Unknown'}`;
       } else {
         coupleName = t('newCouple');
       }
@@ -191,7 +191,6 @@ export function CoupleForm({
   console.log(`Total tournament players: ${tournamentPlayers.length}`);
   console.log(`Available for first player: ${availableFirstPlayers.length}`);
   console.log(`Available for second player: ${availableSecondPlayers.length}`);
-  console.log(`Total couples: ${couples.length}`);
   console.log(
     'Players filtered out due to couples:',
     tournamentPlayers
@@ -202,7 +201,7 @@ export function CoupleForm({
             c.second_player_id === tp.player_id
         )
       )
-      .map((tp) => tp.player.nickname)
+      .map((tp) => tp.player?.nickname || 'Unknown')
   );
 
   return (
@@ -248,17 +247,17 @@ export function CoupleForm({
                   <div className='flex items-center gap-2'>
                     <Avatar className='h-6 w-6'>
                       <AvatarImage
-                        src={tp.player.picture || ''}
-                        alt={tp.player.nickname}
+                        src={tp.player?.picture || ''}
+                        alt={tp.player?.nickname}
                       />
                       <AvatarFallback>
-                        {getInitials(tp.player.nickname)}
+                        {getInitials(tp.player?.nickname || '')}
                       </AvatarFallback>
                     </Avatar>
-                    <span>{tp.player.nickname}</span>
-                    {tp.player.level && (
+                    <span>{tp.player?.nickname}</span>
+                    {tp.player?.level && (
                       <span className='text-xs text-muted-foreground'>
-                        ({formatPlayerLevel(tp.player.level)})
+                        ({formatPlayerLevel(tp.player?.level)})
                       </span>
                     )}
                   </div>
@@ -294,17 +293,17 @@ export function CoupleForm({
                   <div className='flex items-center gap-2'>
                     <Avatar className='h-6 w-6'>
                       <AvatarImage
-                        src={tp.player.picture || ''}
-                        alt={tp.player.nickname}
+                        src={tp.player?.picture || ''}
+                        alt={tp.player?.nickname}
                       />
                       <AvatarFallback>
-                        {getInitials(tp.player.nickname)}
+                        {getInitials(tp.player?.nickname || '')}
                       </AvatarFallback>
                     </Avatar>
-                    <span>{tp.player.nickname}</span>
-                    {tp.player.level && (
+                    <span>{tp.player?.nickname}</span>
+                    {tp.player?.level && (
                       <span className='text-xs text-muted-foreground'>
-                        ({formatPlayerLevel(tp.player.level)})
+                        ({formatPlayerLevel(tp.player?.level)})
                       </span>
                     )}
                   </div>

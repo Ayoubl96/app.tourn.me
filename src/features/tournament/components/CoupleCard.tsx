@@ -81,29 +81,29 @@ export function CoupleCard({
       <div className='mb-2 mt-2 flex items-center gap-2'>
         <Avatar className='h-8 w-8'>
           <AvatarImage
-            src={couple.first_player.picture || ''}
-            alt={couple.first_player.nickname}
+            src={couple.first_player?.picture || ''}
+            alt={couple.first_player?.nickname}
           />
           <AvatarFallback>
-            {getInitials(couple.first_player.nickname)}
+            {getInitials(couple.first_player?.nickname || '')}
           </AvatarFallback>
         </Avatar>
         <div className='flex-1'>
-          <p className='text-sm'>{couple.first_player.nickname}</p>
+          <p className='text-sm'>{couple.first_player?.nickname}</p>
         </div>
       </div>
       <div className='flex items-center gap-2'>
         <Avatar className='h-8 w-8'>
           <AvatarImage
-            src={couple.second_player.picture || ''}
-            alt={couple.second_player.nickname}
+            src={couple.second_player?.picture || ''}
+            alt={couple.second_player?.nickname}
           />
           <AvatarFallback>
-            {getInitials(couple.second_player.nickname)}
+            {getInitials(couple.second_player?.nickname || '')}
           </AvatarFallback>
         </Avatar>
         <div className='flex-1'>
-          <p className='text-sm'>{couple.second_player.nickname}</p>
+          <p className='text-sm'>{couple.second_player?.nickname}</p>
         </div>
       </div>
     </div>
