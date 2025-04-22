@@ -110,17 +110,17 @@ export default function TournamentsClientPage() {
   if (isLoading) {
     return (
       <PageContainer>
-        <div className='flex flex-1 flex-col space-y-2'>
+        <div className='flex w-full flex-col space-y-2'>
           {/* Skeleton row for heading + button */}
-          <div className='mb-4 flex items-center justify-between'>
+          <div className='mb-4 flex w-full items-center justify-between'>
             <Skeleton className='h-6 w-1/3' />
             <Skeleton className='h-8 w-24' />
           </div>
 
           {/* 3-card grid skeleton */}
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i}>
+              <Card key={i} className='w-full'>
                 <CardHeader>
                   <CardTitle>
                     <Skeleton className='h-6 w-1/2' />
@@ -150,8 +150,8 @@ export default function TournamentsClientPage() {
   if (!tournaments || tournaments.length === 0) {
     return (
       <PageContainer>
-        <div className='flex flex-1 flex-col space-y-2'>
-          <div className='flex items-center justify-between space-y-2'>
+        <div className='flex w-full flex-col space-y-2'>
+          <div className='flex w-full items-center justify-between space-y-2'>
             <Heading title='Tournaments' description='Manage tournaments' />
             <Link
               href='/dashboard/tournament/create'
@@ -169,9 +169,9 @@ export default function TournamentsClientPage() {
 
   return (
     <PageContainer>
-      <div className='flex flex-1 flex-col space-y-2'>
+      <div className='flex w-full flex-col space-y-2'>
         {/* Title + Button row */}
-        <div className='flex items-center justify-between space-y-2'>
+        <div className='flex w-full items-center justify-between space-y-2'>
           <Heading title='Tournaments' description='Manage tournaments' />
           <Link
             href='/dashboard/tournament/create'
@@ -183,7 +183,7 @@ export default function TournamentsClientPage() {
         <Separator />
 
         {/* Cards in a 3-column grid (responsive) */}
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {tournaments.map((tourney) => {
             const status = getTournamentStatus(tourney);
             const start = new Date(tourney.start_date);
@@ -193,7 +193,7 @@ export default function TournamentsClientPage() {
               : null;
 
             return (
-              <Card key={tourney.id}>
+              <Card key={tourney.id} className='w-full'>
                 <CardHeader className='space-y-1'>
                   <CardTitle className='flex items-center justify-between text-lg font-semibold'>
                     {tourney.name}

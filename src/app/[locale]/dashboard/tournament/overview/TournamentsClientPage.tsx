@@ -216,7 +216,7 @@ export default function TournamentsClientPage() {
 
   return (
     <PageContainer>
-      <div className='flex flex-col space-y-4'>
+      <div className='flex w-full flex-col space-y-4'>
         <div className='flex items-center justify-between'>
           <Heading
             title={t('tournament')}
