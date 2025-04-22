@@ -3,6 +3,9 @@ import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import type { JwtPayload } from 'jwt-decode';
 
+// API base URL from environment or fallback to localhost
+const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+
 // Extend the User type to include the token property and additional user details
 interface CustomUser {
   id: string;
@@ -59,35 +62,29 @@ const authConfig = {
         }
 
         try {
-          const loginResponse = await fetch(
-            'http://api.be.orb.local:8000/login',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: new URLSearchParams({
-                username: creds.username,
-                password: creds.password
-              })
-            }
-          );
+          const loginResponse = await fetch(`${baseUrl}/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+              username: creds.username,
+              password: creds.password
+            })
+          });
 
           const loginData = await loginResponse.json();
           console.log('Login response data:', loginData);
 
           if (loginResponse.ok && loginData.access_token) {
             // Fetch user details
-            const userResponse = await fetch(
-              'http://api.be.orb.local:8000/companies/me/',
-              {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${loginData.access_token}`
-                }
+            const userResponse = await fetch(`${baseUrl}/companies/me/`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${loginData.access_token}`
               }
-            );
+            });
 
             if (userResponse.ok) {
               const userData = await userResponse.json();
