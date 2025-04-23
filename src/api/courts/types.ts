@@ -10,7 +10,7 @@ export interface Court {
   updated_at: string;
   deleted_at: string | null;
   tournament_id: number | null;
-  image: string | null;
+  images: string[];
 }
 
 /**
@@ -21,7 +21,7 @@ export interface CreateCourtParams {
   size: number;
   active?: boolean;
   tournament_id?: number | null;
-  image?: string | null;
+  images?: string[];
 }
 
 /**
