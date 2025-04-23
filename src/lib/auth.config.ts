@@ -2,21 +2,8 @@ import { NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import type { JwtPayload } from 'jwt-decode';
-
-// API base URL from environment or fallback to localhost
-const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-
-// Extend the User type to include the token property and additional user details
-interface CustomUser {
-  id: string;
-  name: string;
-  login: string;
-  token: string;
-  address: string;
-  email: string;
-  phone_number: string;
-  created_at: string;
-}
+import { login, getProfileServer } from '@/api/auth';
+import { AuthenticatedUser } from '@/api/auth';
 
 // Extend the Session type to include the accessToken property and additional user details
 declare module 'next-auth' {
@@ -62,48 +49,25 @@ const authConfig = {
         }
 
         try {
-          const loginResponse = await fetch(`${baseUrl}/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-              username: creds.username,
-              password: creds.password
-            })
-          });
+          // Use the centralized API for login
+          const loginData = await login(creds.username, creds.password);
 
-          const loginData = await loginResponse.json();
-          console.log('Login response data:', loginData);
+          if (loginData.access_token) {
+            // Fetch user details using our server-side API
+            const userData = await getProfileServer(loginData.access_token);
 
-          if (loginResponse.ok && loginData.access_token) {
-            // Fetch user details
-            const userResponse = await fetch(`${baseUrl}/companies/me/`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${loginData.access_token}`
-              }
-            });
-
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              return {
-                id: String(userData.id),
-                name: userData.name,
-                login: userData.login,
-                token: loginData.access_token,
-                address: userData.address,
-                email: userData.email,
-                phone_number: userData.phone_number,
-                created_at: userData.created_at
-              } as CustomUser;
-            } else {
-              console.error('Failed to fetch user data');
-              return null;
-            }
+            return {
+              id: String(userData.id),
+              name: userData.name,
+              login: userData.login,
+              token: loginData.access_token,
+              address: userData.address,
+              email: userData.email,
+              phone_number: userData.phone_number,
+              created_at: userData.created_at
+            } as AuthenticatedUser;
           } else {
-            console.error('Login failed:', loginData);
+            console.error('Login failed: No access token');
             return null;
           }
         } catch (error) {

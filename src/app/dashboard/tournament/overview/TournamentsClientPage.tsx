@@ -11,18 +11,7 @@ import Link from 'next/link';
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-
-interface Tournament {
-  id: number;
-  name: string;
-  description: string;
-  images: string[];
-  company_id: number;
-  start_date: string;
-  end_date: string;
-  players_number: number;
-  full_description?: any; // if needed, or refine
-}
+import { Tournament, fetchTournaments } from '@/api/tournaments';
 
 function formatDate(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
@@ -90,21 +79,19 @@ export default function TournamentsClientPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const loadTournaments = async () => {
       try {
         setIsLoading(true);
-        const resp = await callApi('/tournament/');
-        if (!resp.ok) {
-          throw new Error('Failed to fetch tournaments');
-        }
-        const data = await resp.json();
+        const data = await fetchTournaments(callApi);
         setTournaments(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
         setIsLoading(false);
       }
-    })();
+    };
+
+    loadTournaments();
   }, [callApi]);
 
   if (isLoading) {

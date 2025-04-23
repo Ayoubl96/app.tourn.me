@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { apiClient } from '@/lib/apiClient';
+import { clientApiClient } from '@/api/common/clientApi';
 import { useCallback } from 'react';
 
 export function useApi() {
@@ -10,11 +10,11 @@ export function useApi() {
 
   /**
    * Generic call function that merges the user's bearer token
-   * into headers. Also calls `apiClient` to handle base URL + logout-on-401.
+   * into headers. Also calls the client API client to handle base URL + logout-on-401.
    */
   const callApi = useCallback(
     async (endpoint: string, init?: RequestInit) => {
-      return apiClient(endpoint, {
+      return clientApiClient(endpoint, {
         ...init,
         headers: {
           Authorization: `Bearer ${token}`,

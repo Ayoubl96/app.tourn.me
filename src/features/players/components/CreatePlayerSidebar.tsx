@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
+import { createPlayer } from '@/api/players';
 
 interface CreatePlayerSidebarProps {
   onClose: () => void;
@@ -27,21 +28,10 @@ export default function CreatePlayerSidebar({
     setIsLoading(true);
 
     try {
-      const response = await callApi('/players/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          nickname,
-          gender
-        })
+      await createPlayer(callApi, {
+        nickname,
+        gender: parseInt(gender, 10)
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.message || 'Failed to create player');
-      }
 
       // Success
       onSuccess();

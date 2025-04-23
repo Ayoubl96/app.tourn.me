@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tournament } from '../../types';
 import { useTournamentEdit } from '../../hooks/useTournamentEdit';
@@ -11,8 +11,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-  CardFooter
+  CardTitle
 } from '@/components/ui/card';
 import { FileUploader } from '@/components/file-uploader';
 import { Editor } from '@/components/blocks/editor-00/editor';
@@ -31,6 +30,7 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
 }) => {
   const t = useTranslations('Dashboard');
   const commonT = useTranslations('Common');
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const {
     // Form state
@@ -52,10 +52,8 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
 
     // Loading states
     isSubmitting,
-    isUploading,
 
     // Actions
-    handleImageUpload,
     removeImage,
     handleSubmit,
     reset
@@ -64,7 +62,22 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
   // Reset form when tournament changes
   useEffect(() => {
     reset();
+    // Clear any existing preview URLs
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setPreviewUrls([]);
   }, [tournament, reset]);
+
+  // Handle image change and create previews
+  const handleImagesChange = (files: File[]) => {
+    // Clear previous preview URLs before creating new ones
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
+
+    // Create preview URLs for the images
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+
+    setPreviewUrls(newPreviewUrls);
+    setImages(files);
+  };
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
@@ -80,24 +93,18 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
           <div className='space-y-4'>
             <FileUploader
               value={images}
-              onValueChange={setImages}
+              onValueChange={(files) => handleImagesChange(files as File[])}
               maxFiles={1}
               maxSize={5 * 1024 * 1024}
-              disabled={isUploading}
+              disabled={isSubmitting}
             />
 
-            <div className='flex justify-end'>
-              <Button
-                type='button'
-                onClick={handleImageUpload}
-                disabled={isUploading || images.length === 0}
-              >
-                {isUploading ? t('uploading') : t('uploadImage')}
-              </Button>
-            </div>
-
+            {/* Current uploaded images */}
             {uploadedImageUrls.length > 0 && (
               <div className='mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
+                <p className='text-sm text-muted-foreground md:col-span-3'>
+                  {t('currentImages', { fallback: 'Current images' })}:
+                </p>
                 {uploadedImageUrls.map((url, index) => (
                   <div
                     key={index}
@@ -114,7 +121,12 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
                       size='icon'
                       variant='destructive'
                       className='absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100'
-                      onClick={() => removeImage(index)}
+                      onClick={(e) => {
+                        // Prevent the event from propagating to parent elements
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeImage(index);
+                      }}
                       type='button'
                     >
                       <Trash2 className='h-4 w-4' />
@@ -124,7 +136,30 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
               </div>
             )}
 
-            {uploadedImageUrls.length === 0 && (
+            {/* New image previews */}
+            {previewUrls.length > 0 && (
+              <div className='mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
+                <p className='text-sm text-muted-foreground md:col-span-3'>
+                  {t('newImages', { fallback: 'New images to upload' })}:
+                </p>
+                {previewUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    className='relative aspect-video w-full overflow-hidden rounded-md border bg-muted'
+                  >
+                    <Image
+                      src={url}
+                      alt={`${t('newImage')} ${index}`}
+                      fill
+                      sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw'
+                      className='rounded-md object-cover'
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {uploadedImageUrls.length === 0 && previewUrls.length === 0 && (
               <Alert>
                 <AlertCircle className='h-4 w-4' />
                 <AlertDescription>{t('uploadImageFirst')}</AlertDescription>
@@ -235,7 +270,10 @@ export const TournamentEditForm: React.FC<TournamentEditFormProps> = ({
         </Button>
         <Button
           type='submit'
-          disabled={isSubmitting || uploadedImageUrls.length === 0}
+          disabled={
+            isSubmitting ||
+            (uploadedImageUrls.length === 0 && images.length === 0)
+          }
         >
           {isSubmitting ? t('updating') : t('update')}
         </Button>

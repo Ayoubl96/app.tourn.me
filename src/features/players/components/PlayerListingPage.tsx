@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { getSession } from 'next-auth/react';
-import { Player } from '../api/fetchPlayers';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { DataTable } from '@/components/ui/table/data-table';
 import { playerColumns } from './player-tables/columns';
 import { useApi } from '@/hooks/useApi';
+import { Player, fetchPlayers } from '@/api/players';
 
 const PlayerListingPage: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -18,20 +18,14 @@ const PlayerListingPage: React.FC = () => {
   const callApi = useApi();
 
   useEffect(() => {
-    const fetchPlayers = async () => {
+    const loadPlayers = async () => {
       try {
         const session = await getSession();
         if (!session || !session.accessToken) {
           throw new Error('User is not authenticated');
         }
 
-        const response = await callApi('/players/');
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch players');
-        }
-
-        const data = await response.json();
+        const data = await fetchPlayers(callApi);
         setPlayers(data);
       } catch (err) {
         setError(
@@ -42,7 +36,7 @@ const PlayerListingPage: React.FC = () => {
       }
     };
 
-    fetchPlayers();
+    loadPlayers();
   }, [callApi]);
 
   if (loading) {

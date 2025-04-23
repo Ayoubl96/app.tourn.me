@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
-import { Player, TournamentPlayer, Couple } from '../types';
 import {
+  Player,
+  TournamentPlayer,
+  Couple,
   fetchTournamentPlayers,
   fetchTournamentCouples,
-  fetchAllPlayers,
-  addPlayerToTournament,
-  removePlayerFromTournament
-} from '../api/tournamentApi';
+  fetchPlayers,
+  addPlayerToTournament as apiAddPlayerToTournament,
+  removePlayerFromTournament as apiRemovePlayerFromTournament
+} from '@/api';
 import { toast } from 'sonner';
 
 export const useTournamentPlayers = (
@@ -60,7 +62,7 @@ export const useTournamentPlayers = (
   const loadAllPlayers = useCallback(async () => {
     try {
       setLoadingAllPlayers(true);
-      const data = await fetchAllPlayers(callApi);
+      const data = await fetchPlayers(callApi);
       setAllPlayers(data);
     } catch (error) {
       console.error('Error fetching players:', error);
@@ -81,7 +83,7 @@ export const useTournamentPlayers = (
         }
 
         setAddingPlayer(true);
-        await addPlayerToTournament(callApi, tournamentId, playerId);
+        await apiAddPlayerToTournament(callApi, tournamentId, playerId);
         toast.success('Player added');
         await loadTournamentPlayers(); // Refresh the list
       } catch (error) {
@@ -109,7 +111,7 @@ export const useTournamentPlayers = (
         setIsDeletingPlayer(true);
         setPlayerToDelete(playerId);
 
-        await removePlayerFromTournament(callApi, tournamentId, playerId);
+        await apiRemovePlayerFromTournament(callApi, tournamentId, playerId);
         toast.success('Player removed');
 
         // Refresh both players and couples lists

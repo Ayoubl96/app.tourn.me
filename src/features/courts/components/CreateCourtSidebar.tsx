@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApi } from '@/hooks/useApi';
 import { Input } from '@/components/ui/input';
+import { uploadCourtImage, createCourt } from '@/api/courts';
 // If you have a toast utility, import it here:
 // import { toast } from "react-hot-toast"; // Example
 // or wherever your toast is from
@@ -38,29 +39,16 @@ export default function CreateCourtSidebar({
       setIsUploading(true);
       setError(null);
 
-      // Prepare FormData
-      const formData = new FormData();
-      // "files" is the field name (revert to original)
+      // Upload each file one by one
+      const uploadedImages = [];
       for (let i = 0; i < files.length; i++) {
-        formData.append('files', files[i], files[i].name);
+        const result = await uploadCourtImage(callApi, files[i]);
+        if (result.image_url) {
+          uploadedImages.push(result.image_url);
+        }
       }
 
-      // Make the request
-      const resp = await callApi('/courts/upload_image/', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (resp.status !== 201) {
-        const eData = await resp.json();
-        throw new Error(eData?.message || 'Failed to upload images');
-      }
-
-      // If the server returns { "image_urls": [...] }, map it to "images"
-      const { image_urls } = await resp.json();
-      const images = image_urls ?? [];
-      setUploadedUrls(images);
-
+      setUploadedUrls(uploadedImages);
       setUploadSuccessful(true);
       // if you have a toast:
       // toast.success("Images uploaded!");
@@ -78,21 +66,11 @@ export default function CreateCourtSidebar({
     try {
       setIsCreating(true);
 
-      const resp = await callApi('/courts/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          images: uploadedUrls
-        })
+      await createCourt(callApi, {
+        name,
+        size: 1, // Default size, adjust as needed
+        image: uploadedUrls.length > 0 ? uploadedUrls[0] : null
       });
-
-      if (!resp.ok) {
-        const eData = await resp.json();
-        throw new Error(eData?.message || 'Failed to create court');
-      }
 
       // toast.success("Court created!");
       onSuccess();

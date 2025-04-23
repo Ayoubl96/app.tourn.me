@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
 import { locales } from '@/config/locales';
 import { useApi } from '@/hooks/useApi';
+import { fetchTournament } from '@/api/tournaments';
 
 type BreadcrumbItem = {
   title: string;
@@ -66,21 +67,19 @@ export function useBreadcrumbs() {
     }
 
     // Otherwise fetch the tournament data
-    const fetchTournamentName = async () => {
+    const fetchTournamentData = async () => {
       try {
-        const response = await callApi(`/tournament/${tournamentId}`);
-        if (response.ok) {
-          const data = await response.json();
-          // Store in cache for future use
-          tournamentNamesCache.set(tournamentId, data.name);
-          setTournamentName(data.name);
-        }
+        const tournament = await fetchTournament(callApi, tournamentId);
+
+        // Store in cache for future use
+        tournamentNamesCache.set(tournamentId, tournament.name);
+        setTournamentName(tournament.name);
       } catch (error) {
         console.error('Error fetching tournament name:', error);
       }
     };
 
-    fetchTournamentName();
+    fetchTournamentData();
   }, [tournamentId, callApi]);
 
   const breadcrumbs = useMemo(() => {
