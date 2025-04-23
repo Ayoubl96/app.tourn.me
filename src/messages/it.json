@@ -181,7 +181,10 @@
     "needTwoPlayersForCouple": "Hai bisogno di almeno due giocatori nel torneo per creare coppie",
     "couplesLimitReached": "È stato raggiunto il numero massimo di coppie ({number})",
     "delete": "Elimina",
-    "creating": "Creazione in corso..."
+    "creating": "Creazione in corso...",
+    "genderMissingForPlayer": "Genere mancante per {player}. Per favore, seleziona un genere.",
+    "back": "Indietro",
+    "confirmImport": "Conferma Importazione"
   },
   "Metadata": {
     "productView": "Dashboard : Vista Prodotto",

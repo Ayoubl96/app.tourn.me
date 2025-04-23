@@ -87,6 +87,7 @@ export default function TournamentClientPage({
     handleCreatePlayer,
     handleSearchPlaytomicPlayers,
     handleImportPlayer,
+    handleImportPlayerWithGender,
     handleSelectMode
   } = usePlayerManagement(addPlayerToTournament);
 
@@ -216,6 +217,7 @@ export default function TournamentClientPage({
             setSelectedPlayer={setSelectedPlayer}
             handleSearchPlaytomicPlayers={handleSearchPlaytomicPlayers}
             handleImportPlayer={handleImportPlayer}
+            handleImportPlayerWithGender={handleImportPlayerWithGender}
             handleCreatePlayer={handleCreatePlayer}
             error={playerManagementError}
           />
