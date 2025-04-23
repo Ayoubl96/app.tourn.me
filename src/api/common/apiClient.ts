@@ -1,5 +1,3 @@
-'use client';
-
 import { fetchWithLogout } from '@/lib/fetchWithLogout';
 import { ApiError } from './types';
 
@@ -28,7 +26,7 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
 
 /**
  * Makes an API call with consistent error handling and base URL
- * This is a lower-level function that doesn't include auth tokens
+ * This works in both client and server contexts
  */
 export async function apiClient(
   endpoint: string,
@@ -40,7 +38,8 @@ export async function apiClient(
     : `/${endpoint}`;
   const fullUrl = `${baseUrl}${normalizedEndpoint}`;
 
-  return fetchWithLogout(fullUrl, {
+  // Use standard fetch for now - we'll add a client-specific wrapper
+  return fetch(fullUrl, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers ?? {})

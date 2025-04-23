@@ -7,12 +7,12 @@ import { LoginCredentials, LoginResponse, CompanyProfile } from './types';
  */
 
 /**
- * Login with username and password
+ * Login with username and password (works on both client and server)
  */
-export const login = async (
+export async function login(
   username: string,
   password: string
-): Promise<LoginResponse> => {
+): Promise<LoginResponse> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/login`,
     {
@@ -35,22 +35,47 @@ export const login = async (
   }
 
   return response.json();
-};
+}
 
 /**
- * Get the current user/company profile
+ * Get the current user/company profile - client-side version
  */
-export const getProfile = async (
-  callApi: ApiCaller
-): Promise<CompanyProfile> => {
+export async function getProfile(callApi: ApiCaller): Promise<CompanyProfile> {
   const response = await callApi('/companies/me/');
   return handleApiResponse<CompanyProfile>(response);
-};
+}
+
+/**
+ * Get the current user/company profile - server-side version
+ * This function can be used in server components and auth.config.ts
+ */
+export async function getProfileServer(
+  accessToken: string
+): Promise<CompanyProfile> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+  const response = await fetch(`${baseUrl}/companies/me/`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: 'Failed to get profile' }));
+    throw new Error(
+      errorData.message || errorData.detail || 'Failed to get profile'
+    );
+  }
+
+  return response.json();
+}
 
 /**
  * Validate token
  */
-export const validateToken = async (token: string): Promise<boolean> => {
+export async function validateToken(token: string): Promise<boolean> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/token/validate`,
@@ -67,4 +92,4 @@ export const validateToken = async (token: string): Promise<boolean> => {
   } catch (error) {
     return false;
   }
-};
+}

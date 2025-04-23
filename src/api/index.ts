@@ -13,5 +13,8 @@ export * from './courts';
 export * from './auth';
 export * from './common/types';
 
-// Re-export apiClient utility
+// Re-export API utilities (which now work in both client and server)
 export { apiClient, handleApiResponse } from './common/apiClient';
+
+// Export client-specific API utilities
+export { clientApiClient } from './common/clientApi';

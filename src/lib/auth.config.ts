@@ -2,7 +2,7 @@ import { NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import type { JwtPayload } from 'jwt-decode';
-import { login, getProfile } from '@/api/auth';
+import { login, getProfileServer } from '@/api/auth';
 import { AuthenticatedUser } from '@/api/auth';
 
 // Extend the Session type to include the accessToken property and additional user details
@@ -53,26 +53,8 @@ const authConfig = {
           const loginData = await login(creds.username, creds.password);
 
           if (loginData.access_token) {
-            // Create a simple API function for the profile fetch
-            const profileFetcher = async (
-              endpoint: string,
-              init?: RequestInit
-            ) => {
-              const baseUrl =
-                process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-              const fullUrl = `${baseUrl}${endpoint}`;
-              return fetch(fullUrl, {
-                ...init,
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${loginData.access_token}`,
-                  ...(init?.headers ?? {})
-                }
-              });
-            };
-
-            // Fetch user details using our API
-            const userData = await getProfile(profileFetcher);
+            // Fetch user details using our server-side API
+            const userData = await getProfileServer(loginData.access_token);
 
             return {
               id: String(userData.id),
