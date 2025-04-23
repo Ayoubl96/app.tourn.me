@@ -17,6 +17,7 @@ import { Editor as TournamentEditor } from '@/app/dashboard/tournament/create/pa
 import { toast } from 'sonner';
 import { FORMAT_TEXT_COMMAND } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { createTournament } from '@/api/tournaments';
 
 const editorConfig = {
   namespace: 'MyEditor',
@@ -62,7 +63,8 @@ export default function CreateTournamentPage() {
         console.error('Failed to parse editor content', parseErr);
       }
 
-      const payload = {
+      // Use our centralized API to create the tournament
+      await createTournament(callApi, {
         name,
         description,
         images: [],
@@ -70,20 +72,7 @@ export default function CreateTournamentPage() {
         end_date: endDateISO,
         players_number: Number(playersNumber),
         full_description: fullDescObj
-      };
-
-      // Call API
-      const resp = await callApi('/tournament/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
       });
-      if (!resp.ok) {
-        const data = await resp.json();
-        throw new Error(data?.message || 'Failed to create tournament');
-      }
 
       // success toast
       toast.success('Tournament created successfully!');

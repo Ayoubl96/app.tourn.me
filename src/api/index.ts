@@ -10,6 +10,7 @@
 export * from './tournaments';
 export * from './players';
 export * from './courts';
+export * from './auth';
 export * from './common/types';
 
 // Re-export apiClient utility

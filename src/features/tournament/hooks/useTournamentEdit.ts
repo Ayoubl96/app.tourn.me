@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
-import { Tournament } from '../types';
-import { updateTournament } from '../api/tournamentApi';
+import { Tournament, updateTournament } from '@/api/tournaments';
+import { uploadCourtImage } from '@/api/courts';
 import { toast } from 'sonner';
 import { SerializedEditorState } from 'lexical';
 
@@ -51,26 +51,14 @@ export const useTournamentEdit = (
     try {
       setIsUploading(true);
 
-      // Prepare FormData for image upload
-      const formData = new FormData();
-      // Use the same field name as court upload API
+      // Upload each image individually using our API
+      const imageUrls: string[] = [];
       for (let i = 0; i < images.length; i++) {
-        formData.append('files', images[i], images[i].name);
+        const result = await uploadCourtImage(callApi, images[i]);
+        if (result.url) {
+          imageUrls.push(result.url);
+        }
       }
-
-      // Make API request to upload images
-      const response = await callApi('/courts/upload_image/', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload images');
-      }
-
-      // If the server returns { "image_urls": [...] }, store it
-      const data = await response.json();
-      const imageUrls = data.image_urls || [];
 
       // Append new images to existing ones
       setUploadedImageUrls((prev) => [...prev, ...imageUrls]);
