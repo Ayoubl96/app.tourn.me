@@ -20,11 +20,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CreateCourtSidebar from '@/features/courts/components/CreateCourtSidebar';
 import { useTranslations } from 'next-intl';
-
-interface Court {
-  name: string;
-  images: string[];
-}
+import { Court, fetchCourts } from '@/api/courts';
 
 function CourtCard({ court }: { court: Court }) {
   return (
@@ -33,23 +29,23 @@ function CourtCard({ court }: { court: Court }) {
         <CardTitle className='text-lg'>{court.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Carousel className='relative w-full'>
-          <CarouselPrevious className='absolute left-2 top-1/2 z-10 -translate-y-1/2' />
-          <CarouselContent>
-            {court.images.map((image, i) => (
-              <CarouselItem key={i}>
+        {court.image && (
+          <Carousel className='relative w-full'>
+            <CarouselPrevious className='absolute left-2 top-1/2 z-10 -translate-y-1/2' />
+            <CarouselContent>
+              <CarouselItem>
                 <Image
-                  src={image}
-                  alt={`Court image ${i}`}
+                  src={court.image}
+                  alt={`Court image`}
                   width={640}
                   height={360}
                   className='h-auto w-full object-cover'
                 />
               </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselNext className='absolute right-2 top-1/2 z-10 -translate-y-1/2' />
-        </Carousel>
+            </CarouselContent>
+            <CarouselNext className='absolute right-2 top-1/2 z-10 -translate-y-1/2' />
+          </Carousel>
+        )}
       </CardContent>
     </Card>
   );
@@ -64,37 +60,30 @@ export default function CourtsClientPage() {
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    const loadCourts = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const resp = await callApi('/courts/', { method: 'GET' });
-        if (!resp.ok) {
-          throw new Error('Failed to fetch courts');
-        }
-
-        const data = await resp.json();
+        const data = await fetchCourts(callApi);
         setCourts(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
       } finally {
         setIsLoading(false);
       }
-    })();
+    };
+
+    loadCourts();
   }, [callApi]);
 
-  function refreshCourts() {
-    (async () => {
-      try {
-        const resp = await callApi('/courts/');
-        if (!resp.ok) throw new Error('Failed to fetch courts');
-        const data = await resp.json();
-        setCourts(data);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
+  async function refreshCourts() {
+    try {
+      const data = await fetchCourts(callApi);
+      setCourts(data);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (

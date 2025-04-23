@@ -12,18 +12,7 @@ import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { useTranslations } from 'next-intl';
-
-interface Tournament {
-  id: number;
-  name: string;
-  description: string;
-  images: string[];
-  company_id: number;
-  start_date: string;
-  end_date: string;
-  players_number: number;
-  full_description?: any; // if needed, or refine
-}
+import { Tournament, fetchTournaments } from '@/api/tournaments';
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -95,17 +84,12 @@ export default function TournamentsClientPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTournaments = async () => {
+    const loadTournaments = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await callApi('/tournaments/');
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch tournaments');
-        }
-
-        const data = await response.json();
+        const data = await fetchTournaments(callApi);
         setTournaments(data);
       } catch (err) {
         console.error('Error fetching tournaments:', err);
@@ -117,7 +101,7 @@ export default function TournamentsClientPage() {
       }
     };
 
-    fetchTournaments();
+    loadTournaments();
   }, [callApi]);
 
   const renderTournamentCard = (tournament: Tournament) => {

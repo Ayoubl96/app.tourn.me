@@ -27,6 +27,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileUploader } from '@/components/file-uploader';
 import { SerializedEditorState } from 'lexical';
 import { Editor } from '@/components/blocks/editor-00/editor';
+import { uploadCourtImage } from '@/api/courts';
+import { createTournament } from '@/api/tournaments';
 
 // Initial value for editor
 const initialEditorValue = {
@@ -107,30 +109,15 @@ export default function CreateTournamentPage() {
     try {
       setIsUploading(true);
 
-      // Prepare FormData for image upload
-      const formData = new FormData();
-      // Use the same field name as court upload API
+      // Upload each file one by one using our centralized API
+      const imageUrls: string[] = [];
       for (let i = 0; i < images.length; i++) {
-        formData.append('files', images[i], images[i].name);
+        const result = await uploadCourtImage(callApi, images[i]);
+        if (result.url) {
+          imageUrls.push(result.url);
+        }
       }
 
-      // Make API request to upload images
-      const response = await callApi('/courts/upload_image/', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          errorT('failedToUploadImages', {
-            fallback: 'Failed to upload images'
-          })
-        );
-      }
-
-      // If the server returns { "image_urls": [...] }, store it
-      const data = await response.json();
-      const imageUrls = data.image_urls || [];
       setUploadedImageUrls(imageUrls);
       setIsImageUploaded(true);
 
@@ -168,29 +155,16 @@ export default function CreateTournamentPage() {
     try {
       setIsSubmitting(true);
 
-      // Create tournament with the expected BE format
-      const tournamentData = {
+      // Create tournament with our centralized API
+      await createTournament(callApi, {
         name: name,
         description: description,
-        images: uploadedImageUrls, // Use the uploaded image URLs
+        images: uploadedImageUrls,
         start_date: new Date(startDate).toISOString(),
         end_date: new Date(endDate).toISOString(),
         players_number: parseInt(playersNumber, 10),
-        full_description: editorState // Pass the full editor state as the BE expects
-      };
-
-      // Make API request
-      const response = await callApi('/tournaments/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(tournamentData)
+        full_description: editorState
       });
-
-      if (!response.ok) {
-        throw new Error(errorT('failedToLoad'));
-      }
 
       toast.success(commonT('success'));
       router.push('/dashboard/tournament/overview');

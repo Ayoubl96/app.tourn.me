@@ -5,22 +5,17 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useApi } from '@/hooks/useApi';
+import {
+  PlaytomicPlayer,
+  searchPlaytomicPlayers,
+  importPlayerFromPlaytomic
+} from '@/api/players';
 // If you have a "toast" utility, import it:
 // import { toast } from 'react-hot-toast'; // or whichever toast library you use
 
 interface ImportPlaytomicSidebarProps {
   onClose: () => void;
   onSuccess: () => void;
-}
-
-interface PlaytomicUser {
-  user_id: string;
-  full_name: string;
-  gender: string;
-  picture: string;
-  additional_data?: Array<{
-    level_value: number;
-  }>;
 }
 
 export default function ImportPlaytomicSidebar({
@@ -30,7 +25,7 @@ export default function ImportPlaytomicSidebar({
   const callApi = useApi();
 
   const [searchText, setSearchText] = useState('');
-  const [results, setResults] = useState<PlaytomicUser[] | null>(null);
+  const [results, setResults] = useState<PlaytomicPlayer[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,13 +35,7 @@ export default function ImportPlaytomicSidebar({
     setResults(null);
 
     try {
-      const resp = await callApi(
-        `/players/playtomic-player/?name=${searchText}`
-      );
-      if (!resp.ok) {
-        throw new Error('Failed to search from Playtomic');
-      }
-      const data = await resp.json();
+      const data = await searchPlaytomicPlayers(callApi, searchText);
       setResults(data);
     } catch (err: any) {
       setError(err.message);
@@ -56,23 +45,13 @@ export default function ImportPlaytomicSidebar({
     }
   }
 
-  async function handleImport(user: PlaytomicUser) {
+  async function handleImport(user: PlaytomicPlayer) {
     try {
       const genderInt = user.gender.toUpperCase() === 'MALE' ? 1 : 2;
-      const resp = await callApi('/players/from-playtomic/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: user.user_id,
-          gender: genderInt
-        })
+      await importPlayerFromPlaytomic(callApi, {
+        user_id: user.user_id,
+        gender: genderInt
       });
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data?.message || 'Failed to import this user');
-      }
       onSuccess();
     } catch (err: any) {
       setError(err.message);
