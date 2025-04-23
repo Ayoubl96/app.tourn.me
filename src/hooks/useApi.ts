@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/api/common/apiClient';
 import { useCallback } from 'react';
 
 export function useApi() {

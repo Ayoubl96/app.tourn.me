@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
-import { Tournament } from '../types';
-import { fetchTournament } from '../api/tournamentApi';
+import { Tournament } from '@/api/tournaments';
+import { fetchTournament } from '@/api/tournaments';
 import { toast } from 'sonner';
 
 export const useTournament = (tournamentId: string) => {
