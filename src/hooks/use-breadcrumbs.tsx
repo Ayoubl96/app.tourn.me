@@ -1,8 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { locales } from '@/config/locales';
+import { useApi } from '@/hooks/useApi';
 
 type BreadcrumbItem = {
   title: string;
@@ -32,8 +33,55 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
   // Add more custom mappings as needed
 };
 
+// Cache for tournament names to avoid repeated API calls
+const tournamentNamesCache = new Map<string, string>();
+
 export function useBreadcrumbs() {
   const pathname = usePathname();
+  const callApi = useApi();
+  const [tournamentName, setTournamentName] = useState<string | null>(null);
+
+  // Extract tournament ID from path if this is a tournament detail page
+  const tournamentId = useMemo(() => {
+    const segments = pathname.split('/').filter(Boolean);
+    if (
+      segments.length >= 3 &&
+      segments.includes('dashboard') &&
+      segments.includes('tournament') &&
+      !['overview', 'tournament'].includes(segments[segments.length - 1])
+    ) {
+      return segments[segments.length - 1];
+    }
+    return null;
+  }, [pathname]);
+
+  // Fetch tournament name if on a tournament detail page
+  useEffect(() => {
+    if (!tournamentId) return;
+
+    // If we already have this tournament name in cache, use it
+    if (tournamentNamesCache.has(tournamentId)) {
+      setTournamentName(tournamentNamesCache.get(tournamentId) || null);
+      return;
+    }
+
+    // Otherwise fetch the tournament data
+    const fetchTournamentName = async () => {
+      try {
+        const response = await callApi(`/tournament/${tournamentId}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Store in cache for future use
+          tournamentNamesCache.set(tournamentId, data.name);
+          setTournamentName(data.name);
+        }
+      } catch (error) {
+        console.error('Error fetching tournament name:', error);
+      }
+    };
+
+    fetchTournamentName();
+  }, [tournamentId, callApi]);
 
   const breadcrumbs = useMemo(() => {
     // Check if we have a custom mapping for this exact path
@@ -54,12 +102,24 @@ export function useBreadcrumbs() {
       const pathSegments = segments.slice(0, startIndex + index + 1);
       const path = `/${pathSegments.join('/')}`;
 
+      // Special case for tournament detail page - use tournament name instead of ID
+      if (
+        tournamentId &&
+        index === segments.length - 1 - startIndex &&
+        tournamentName
+      ) {
+        return {
+          title: tournamentName,
+          link: path
+        };
+      }
+
       return {
         title: segment.charAt(0).toUpperCase() + segment.slice(1),
         link: path
       };
     });
-  }, [pathname]);
+  }, [pathname, tournamentId, tournamentName]);
 
   return breadcrumbs;
 }
