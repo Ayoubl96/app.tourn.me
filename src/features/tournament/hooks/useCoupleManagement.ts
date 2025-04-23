@@ -2,7 +2,11 @@ import { useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { Couple, Player } from '../types';
 import { toast } from 'sonner';
-import { createCouple, updateCouple, deleteCouple } from '../api/tournamentApi';
+import {
+  createCouple as apiCreateCouple,
+  updateCouple as apiUpdateCouple,
+  deleteCouple as apiDeleteCouple
+} from '@/api/tournaments';
 
 // Utility function to generate a random couple name
 const generateCoupleName = (player1: Player, player2: Player) => {
@@ -41,7 +45,7 @@ export const useCoupleManagement = (
         setIsCreatingCouple(true);
         setError(null);
 
-        await createCouple(callApi, tournamentId, {
+        await apiCreateCouple(callApi, tournamentId, {
           first_player_id: data.first_player_id,
           second_player_id: data.second_player_id,
           name: data.name || ''
@@ -72,8 +76,7 @@ export const useCoupleManagement = (
         setIsEditingCouple(true);
         setError(null);
 
-        await updateCouple(callApi, tournamentId, data.couple_id, {
-          tournament_id: parseInt(tournamentId),
+        await apiUpdateCouple(callApi, tournamentId, data.couple_id, {
           first_player_id: data.first_player_id,
           second_player_id: data.second_player_id,
           name: data.name || ''
@@ -106,7 +109,7 @@ export const useCoupleManagement = (
         setCoupleToDelete(coupleId);
         setError(null);
 
-        await deleteCouple(callApi, tournamentId, coupleId);
+        await apiDeleteCouple(callApi, tournamentId, coupleId);
 
         toast.success('Couple deleted successfully');
         await refreshCouples();

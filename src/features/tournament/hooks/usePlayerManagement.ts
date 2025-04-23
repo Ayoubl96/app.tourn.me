@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
-import { PlayerAdditionMode, PlaytomicPlayer } from '../types';
+import { PlayerAdditionMode } from '../types';
 import {
-  createPlayer,
-  importPlayerFromPlaytomic,
-  searchPlaytomicPlayers
-} from '../api/tournamentApi';
+  createPlayer as apiCreatePlayer,
+  importPlayerFromPlaytomic as apiImportPlayerFromPlaytomic,
+  searchPlaytomicPlayers as apiSearchPlaytomicPlayers,
+  PlaytomicPlayer
+} from '@/api/players';
 import { toast } from 'sonner';
 
 export const usePlayerManagement = (
@@ -34,7 +35,7 @@ export const usePlayerManagement = (
         setIsCreating(true);
         setError(null);
 
-        const newPlayer = await createPlayer(callApi, {
+        const newPlayer = await apiCreatePlayer(callApi, {
           nickname: formData.nickname,
           gender: parseInt(formData.gender)
         });
@@ -70,7 +71,7 @@ export const usePlayerManagement = (
         setIsSearching(true);
         setError(null);
 
-        const data = await searchPlaytomicPlayers(callApi, searchTerm);
+        const data = await apiSearchPlaytomicPlayers(callApi, searchTerm);
         setPlaytomicPlayers(data);
       } catch (error) {
         console.error('Error searching Playtomic players:', error);
@@ -103,11 +104,10 @@ export const usePlayerManagement = (
         // Convert gender string to integer (1 for male, 2 for female)
         const genderInt = player.gender.toUpperCase() === 'MALE' ? 1 : 2;
 
-        const importedPlayer = await importPlayerFromPlaytomic(
-          callApi,
-          player.user_id,
-          genderInt
-        );
+        const importedPlayer = await apiImportPlayerFromPlaytomic(callApi, {
+          user_id: player.user_id,
+          gender: genderInt
+        });
         toast.success('Player imported');
 
         await onPlayerAdded(importedPlayer.id);
