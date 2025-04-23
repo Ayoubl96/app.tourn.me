@@ -116,7 +116,7 @@
     "enterName": "Ingrese nombre del jugador",
     "enterSurname": "Ingrese apellido del jugador",
     "enterEmail": "Ingrese correo electrónico del jugador",
-    "selectGender": "Seleccione género",
+    "selectGender": "Seleccionar Género",
     "male": "Hombre",
     "female": "Mujer",
     "selectLevel": "Seleccione nivel",
@@ -182,7 +182,10 @@
     "useDragAndDrop": "Usar arrastrar y soltar",
     "useDropdown": "Usar menú desplegable",
     "needTwoPlayersForCouple": "Necesita al menos dos jugadores en el torneo para crear parejas",
-    "couplesLimitReached": "Se ha alcanzado el número máximo de parejas ({number})"
+    "couplesLimitReached": "Se ha alcanzado el número máximo de parejas ({number})",
+    "genderMissingForPlayer": "Falta el género para {player}. Por favor, seleccione un género.",
+    "back": "Volver",
+    "confirmImport": "Confirmar Importación"
   },
   "Metadata": {
     "productView": "Panel : Vista de Producto",

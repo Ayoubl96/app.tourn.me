@@ -30,7 +30,8 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
+  SheetDescription
 } from '@/components/ui/sheet';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -85,7 +86,13 @@ interface PlayersAndTeamsProps {
   selectedPlayer: PlaytomicPlayer | null;
   setSelectedPlayer: (player: PlaytomicPlayer | null) => void;
   handleSearchPlaytomicPlayers: (term: string) => Promise<void>;
-  handleImportPlayer: (player: PlaytomicPlayer) => Promise<void>;
+  handleImportPlayer: (
+    player: PlaytomicPlayer
+  ) => Promise<{ success: boolean; needsGender?: boolean; playerId?: number }>;
+  handleImportPlayerWithGender: (
+    player: PlaytomicPlayer,
+    gender: number
+  ) => Promise<boolean>;
   handleCreatePlayer: (data: {
     nickname: string;
     gender: string;
@@ -127,6 +134,7 @@ export const PlayersAndTeams: React.FC<PlayersAndTeamsProps> = ({
   setSelectedPlayer,
   handleSearchPlaytomicPlayers,
   handleImportPlayer,
+  handleImportPlayerWithGender,
   handleCreatePlayer,
   error
 }) => {
@@ -330,6 +338,7 @@ export const PlayersAndTeams: React.FC<PlayersAndTeamsProps> = ({
             onCancel={() => handleSelectMode('selection')}
             onSearch={handleSearchPlaytomicPlayers}
             onImport={handleImportPlayer}
+            onImportWithGender={handleImportPlayerWithGender}
             playtomicPlayers={playtomicPlayers}
             isSearching={isSearching}
             isImporting={isImporting}
@@ -466,6 +475,10 @@ export const PlayersAndTeams: React.FC<PlayersAndTeamsProps> = ({
             >
               <SheetHeader>
                 <SheetTitle>{t('addPlayerToTournament')}</SheetTitle>
+                <SheetDescription>
+                  {tournamentPlayers.length} / {tournament.players_number}{' '}
+                  {t('players').toLowerCase()}
+                </SheetDescription>
                 {isPlayerLimitReached() && (
                   <Alert variant='destructive' className='mt-4'>
                     <AlertCircle className='h-4 w-4' />
@@ -585,6 +598,10 @@ export const PlayersAndTeams: React.FC<PlayersAndTeamsProps> = ({
                 <SheetTitle>
                   {coupleToEdit ? t('editCouple') : t('createCouple')}
                 </SheetTitle>
+                <SheetDescription>
+                  {couples.length} / {Math.floor(tournament.players_number / 2)}{' '}
+                  {t('couples').toLowerCase()}
+                </SheetDescription>
                 <div className='mt-2'>
                   <div className='mb-1 flex justify-between text-sm'>
                     <span>

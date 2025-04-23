@@ -10,12 +10,27 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
 
 interface ImportPlaytomicPlayerProps {
   onPlayerImported: (playerId: number) => void;
   onCancel: () => void;
   onSearch: (searchTerm: string) => Promise<void>;
-  onImport: (player: PlaytomicPlayer) => Promise<void>;
+  onImport: (
+    player: PlaytomicPlayer
+  ) => Promise<{ success: boolean; needsGender?: boolean; playerId?: number }>;
+  onImportWithGender: (
+    player: PlaytomicPlayer,
+    gender: number
+  ) => Promise<boolean>;
   playtomicPlayers: PlaytomicPlayer[];
   isSearching: boolean;
   isImporting: boolean;
@@ -31,6 +46,7 @@ export const ImportPlaytomicPlayer: React.FC<ImportPlaytomicPlayerProps> = ({
   onCancel,
   onSearch,
   onImport,
+  onImportWithGender,
   playtomicPlayers,
   isSearching,
   isImporting,
@@ -41,6 +57,8 @@ export const ImportPlaytomicPlayer: React.FC<ImportPlaytomicPlayerProps> = ({
   setSearchTerm
 }) => {
   const t = useTranslations('Dashboard');
+  const [needsGenderInput, setNeedsGenderInput] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<string>('');
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -49,13 +67,111 @@ export const ImportPlaytomicPlayer: React.FC<ImportPlaytomicPlayerProps> = ({
 
   const handleImport = async () => {
     if (!selectedPlayer) return;
+
     try {
-      await onImport(selectedPlayer);
-      onPlayerImported(0); // The actual ID will be handled in the parent component
+      // Reset gender input state
+      setNeedsGenderInput(false);
+
+      // Try to import the player
+      const result = await onImport(selectedPlayer);
+
+      // Handle the case where we need gender input
+      if (result.needsGender) {
+        setNeedsGenderInput(true);
+        return;
+      }
+      // Handle successful import
+      if (result.success && result.playerId) {
+        onPlayerImported(result.playerId);
+      }
     } catch (err) {
       // Error handling is done in the parent component
     }
   };
+
+  const handleImportWithGender = async () => {
+    // Check each condition separately to better identify the issue
+    if (!selectedPlayer) {
+      return;
+    }
+
+    if (!selectedGender) {
+      return;
+    }
+
+    if (!onImportWithGender) {
+      return;
+    }
+
+    try {
+      const gender = parseInt(selectedGender, 10);
+      const success = await onImportWithGender(selectedPlayer, gender);
+
+      if (success) {
+        setNeedsGenderInput(false);
+        onPlayerImported(0); // The actual ID will be handled in the parent
+      }
+    } catch (err) {
+      // Error handling is done in the parent component
+    }
+  };
+
+  // Render gender selection form when needed
+  if (needsGenderInput && selectedPlayer) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('selectGender')}</CardTitle>
+          <CardDescription>
+            {t('genderMissingForPlayer', {
+              player: selectedPlayer.full_name,
+              fallback: `Gender is missing for ${selectedPlayer.full_name}. Please select a gender.`
+            })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='space-y-4'>
+            <RadioGroup
+              value={selectedGender}
+              onValueChange={(value) => {
+                setSelectedGender(value);
+              }}
+            >
+              <div className='flex items-center space-x-2'>
+                <RadioGroupItem value='1' id='male' />
+                <Label htmlFor='male'>{t('male', { fallback: 'Male' })}</Label>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <RadioGroupItem value='2' id='female' />
+                <Label htmlFor='female'>
+                  {t('female', { fallback: 'Female' })}
+                </Label>
+              </div>
+            </RadioGroup>
+
+            <div className='flex justify-end space-x-2 pt-2'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setNeedsGenderInput(false)}
+                size='sm'
+              >
+                {t('back')}
+              </Button>
+              <Button
+                type='button'
+                onClick={handleImportWithGender}
+                disabled={isImporting || !selectedGender}
+                size='sm'
+              >
+                {isImporting ? t('importing') : t('confirmImport')}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className='space-y-4'>
@@ -97,8 +213,8 @@ export const ImportPlaytomicPlayer: React.FC<ImportPlaytomicPlayerProps> = ({
           <Skeleton className='h-10 w-full' />
         </div>
       ) : (
-        <div className='overflow-hidden rounded-md border'>
-          <ScrollArea className='max-h-40'>
+        <div className='rounded-md border'>
+          <ScrollArea className='h-96' type='always'>
             <div className='space-y-1 p-1'>
               {playtomicPlayers.map((player) => (
                 <div
@@ -125,9 +241,7 @@ export const ImportPlaytomicPlayer: React.FC<ImportPlaytomicPlayerProps> = ({
                           player.additional_data.length > 0 && (
                             <p className='text-xs text-muted-foreground'>
                               {t('level')}:{' '}
-                              {formatPlayerLevel(
-                                player.additional_data[0].level_value
-                              )}
+                              {player.additional_data[0].level_value}
                             </p>
                           )}
                       </div>

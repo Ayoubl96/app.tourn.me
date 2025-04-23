@@ -20,7 +20,7 @@ export interface Player {
 export interface PlaytomicPlayer {
   user_id: string;
   full_name: string;
-  gender: string;
+  gender?: string;
   picture: string;
   additional_data?: Array<{
     level_value: number;

@@ -182,7 +182,11 @@
     "useDragAndDrop": "Use drag & drop",
     "useDropdown": "Use dropdown",
     "needTwoPlayersForCouple": "You need at least two players in the tournament to create couples",
-    "couplesLimitReached": "Maximum number of couples ({number}) has been reached"
+    "couplesLimitReached": "Maximum number of couples ({number}) has been reached",
+    "genderMissingForPlayer": "Gender is missing for {player}. Please select a gender.",
+    "selectGender": "Select Gender",
+    "back": "Back",
+    "confirmImport": "Confirm Import"
   },
   "Metadata": {
     "productView": "Dashboard : Product View",

@@ -94,15 +94,32 @@ export const usePlayerManagement = (
 
   // Import player from Playtomic
   const handleImportPlayer = useCallback(
-    async (player: PlaytomicPlayer): Promise<void> => {
-      if (!player) return;
+    async (
+      player: PlaytomicPlayer
+    ): Promise<{
+      success: boolean;
+      needsGender?: boolean;
+      playerId?: number;
+    }> => {
+      if (!player) return { success: false };
 
       try {
         setIsImporting(true);
         setError(null);
 
-        // Convert gender string to integer (1 for male, 2 for female)
-        const genderInt = player.gender.toUpperCase() === 'MALE' ? 1 : 2;
+        // Check if gender is missing
+        if (!player.gender) {
+          // Return signal that we need gender input from user
+          setIsImporting(false);
+          return {
+            success: false,
+            needsGender: true
+          };
+        }
+
+        // Process normal case when gender is available
+        const genderUpper = player.gender.toUpperCase();
+        const genderInt = genderUpper === 'MALE' || genderUpper === 'M' ? 1 : 2;
 
         const importedPlayer = await apiImportPlayerFromPlaytomic(callApi, {
           user_id: player.user_id,
@@ -112,6 +129,11 @@ export const usePlayerManagement = (
 
         await onPlayerAdded(importedPlayer.id);
         setPlayerAdditionMode('selection');
+
+        return {
+          success: true,
+          playerId: importedPlayer.id
+        };
       } catch (error) {
         console.error('Error importing player:', error);
         setError(
@@ -120,7 +142,41 @@ export const usePlayerManagement = (
         toast.error(
           error instanceof Error ? error.message : 'Failed to import player'
         );
-        throw error;
+        return { success: false };
+      } finally {
+        setIsImporting(false);
+      }
+    },
+    [callApi, onPlayerAdded]
+  );
+
+  // Add a new function to handle import with user-provided gender
+  const handleImportPlayerWithGender = useCallback(
+    async (player: PlaytomicPlayer, gender: number): Promise<boolean> => {
+      if (!player) return false;
+
+      try {
+        setIsImporting(true);
+        setError(null);
+
+        const importedPlayer = await apiImportPlayerFromPlaytomic(callApi, {
+          user_id: player.user_id,
+          gender: gender
+        });
+        toast.success('Player imported');
+
+        await onPlayerAdded(importedPlayer.id);
+        setPlayerAdditionMode('selection');
+        return true;
+      } catch (error) {
+        console.error('Error importing player with gender:', error);
+        setError(
+          error instanceof Error ? error.message : 'Failed to import player'
+        );
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to import player'
+        );
+        return false;
       } finally {
         setIsImporting(false);
       }
@@ -154,6 +210,7 @@ export const usePlayerManagement = (
     handleCreatePlayer,
     handleSearchPlaytomicPlayers,
     handleImportPlayer,
+    handleImportPlayerWithGender,
     handleSelectMode
   };
 };
