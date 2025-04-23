@@ -150,10 +150,7 @@ export function FileUploader(props: FileUploaderProps) {
 
         toast.promise(onUpload(updatedFiles), {
           loading: `Uploading ${target}...`,
-          success: () => {
-            setFiles([]);
-            return `${target} uploaded`;
-          },
+          success: () => `${target} uploaded`,
           error: `Failed to upload ${target}`
         });
       }

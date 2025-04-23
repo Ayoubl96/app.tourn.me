@@ -43,8 +43,8 @@ export default function CreateCourtSidebar({
       const uploadedImages = [];
       for (let i = 0; i < files.length; i++) {
         const result = await uploadCourtImage(callApi, files[i]);
-        if (result.url) {
-          uploadedImages.push(result.url);
+        if (result.image_url) {
+          uploadedImages.push(result.image_url);
         }
       }
 

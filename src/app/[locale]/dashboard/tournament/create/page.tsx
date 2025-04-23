@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useRouter } from '@/lib/navigation';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
@@ -92,47 +91,21 @@ export default function CreateTournamentPage() {
   const [endDate, setEndDate] = useState('');
   const [playersNumber, setPlayersNumber] = useState('');
   const [images, setImages] = useState<File[]>([]);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isImageUploaded, setIsImageUploaded] = useState(false);
 
-  // Handle image upload using the court API
-  async function handleImageUpload() {
-    if (images.length === 0) {
-      toast.error(
-        t('pleaseSelectImage', { fallback: 'Please select an image to upload' })
-      );
-      return;
-    }
+  // Preview selected images immediately
+  const handleImagesChange = (files: File[]) => {
+    setImages(files);
 
-    try {
-      setIsUploading(true);
+    // Create preview URLs for the images
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
 
-      // Upload each file one by one using our centralized API
-      const imageUrls: string[] = [];
-      for (let i = 0; i < images.length; i++) {
-        const result = await uploadCourtImage(callApi, images[i]);
-        if (result.url) {
-          imageUrls.push(result.url);
-        }
-      }
+    // Clean up any previous preview URLs to avoid memory leaks
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
 
-      setUploadedImageUrls(imageUrls);
-      setIsImageUploaded(true);
-
-      toast.success(
-        t('imagesUploaded', { fallback: 'Images uploaded successfully' })
-      );
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error(
-        error instanceof Error ? error.message : errorT('somethingWentWrong')
-      );
-    } finally {
-      setIsUploading(false);
-    }
-  }
+    setPreviewUrls(newPreviewUrls);
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -142,11 +115,11 @@ export default function CreateTournamentPage() {
       return;
     }
 
-    if (!isImageUploaded || uploadedImageUrls.length === 0) {
+    if (images.length === 0) {
       toast.error(
-        t('pleaseUploadImageFirst', {
+        t('pleaseSelectImage', {
           fallback:
-            'Please upload at least one image before creating the tournament'
+            'Please select at least one image before creating the tournament'
         })
       );
       return;
@@ -155,11 +128,30 @@ export default function CreateTournamentPage() {
     try {
       setIsSubmitting(true);
 
+      // First, upload the images
+      const uploadPromises = images.map((image) =>
+        uploadCourtImage(callApi, image)
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+
+      // Extract the image URLs
+      const imageUrls = uploadResults
+        .filter((result) => result.image_url)
+        .map((result) => result.image_url);
+
+      if (imageUrls.length === 0) {
+        toast.error(
+          t('failedToUploadImages', { fallback: 'Failed to upload images' })
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create tournament with our centralized API
       await createTournament(callApi, {
         name: name,
         description: description,
-        images: uploadedImageUrls,
+        images: imageUrls,
         start_date: new Date(startDate).toISOString(),
         end_date: new Date(endDate).toISOString(),
         players_number: parseInt(playersNumber, 10),
@@ -167,7 +159,7 @@ export default function CreateTournamentPage() {
       });
 
       toast.success(commonT('success'));
-      router.push('/dashboard/tournament/overview');
+      window.location.href = '/dashboard/tournament/overview';
     } catch (error) {
       console.error('Error creating tournament:', error);
       toast.error(
@@ -200,18 +192,6 @@ export default function CreateTournamentPage() {
           <Separator className='my-4' />
         </div>
 
-        {!isImageUploaded && (
-          <Alert>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>
-              {t('uploadImageFirst', {
-                fallback:
-                  'You need to upload an image before creating a tournament.'
-              })}
-            </AlertDescription>
-          </Alert>
-        )}
-
         <form onSubmit={handleSubmit} className='w-full space-y-8'>
           {/* Image Upload Section */}
           <Card>
@@ -229,29 +209,15 @@ export default function CreateTournamentPage() {
               <div className='space-y-4'>
                 <FileUploader
                   value={images}
-                  onValueChange={setImages}
+                  onValueChange={(files) => handleImagesChange(files as File[])}
                   maxFiles={1}
                   maxSize={5 * 1024 * 1024}
-                  disabled={isUploading || isImageUploaded}
+                  disabled={isSubmitting}
                 />
 
-                <div className='flex justify-end'>
-                  <Button
-                    type='button'
-                    onClick={handleImageUpload}
-                    disabled={
-                      isUploading || images.length === 0 || isImageUploaded
-                    }
-                  >
-                    {isUploading
-                      ? t('uploading', { fallback: 'Uploading...' })
-                      : t('uploadImage', { fallback: 'Upload Image' })}
-                  </Button>
-                </div>
-
-                {uploadedImageUrls.length > 0 && (
+                {previewUrls.length > 0 && (
                   <div className='mt-4 grid grid-cols-1 gap-2'>
-                    {uploadedImageUrls.map((url, index) => (
+                    {previewUrls.map((url, index) => (
                       <div
                         key={index}
                         className='relative aspect-video w-full rounded-md border bg-muted'
@@ -372,12 +338,17 @@ export default function CreateTournamentPage() {
           <div className='flex justify-end space-x-2'>
             <Button
               variant='outline'
-              onClick={() => router.push('/dashboard/tournament/overview')}
+              onClick={() =>
+                (window.location.href = '/dashboard/tournament/overview')
+              }
               disabled={isSubmitting}
             >
               {commonT('cancel')}
             </Button>
-            <Button type='submit' disabled={isSubmitting || !isImageUploaded}>
+            <Button
+              type='submit'
+              disabled={isSubmitting || images.length === 0}
+            >
               {isSubmitting
                 ? t('creating')
                 : `${t('create')} ${t('tournament')}`}

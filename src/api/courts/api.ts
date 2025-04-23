@@ -69,15 +69,18 @@ export const deleteCourt = async (
 // Upload a court image
 export const uploadCourtImage = async (
   callApi: ApiCaller,
-  image: File
-): Promise<{ url: string }> => {
+  files: File
+): Promise<{ image_url: string }> => {
   const formData = new FormData();
-  formData.append('image', image);
+  formData.append('files', files);
 
   const response = await callApi('/courts/upload_image/', {
     method: 'POST',
     body: formData
   });
 
-  return handleApiResponse<{ url: string }>(response);
+  const result = await handleApiResponse<{ image_urls: string[] }>(response);
+
+  // Extract the first URL from the array and return it in the expected format
+  return { image_url: result.image_urls[0] };
 };

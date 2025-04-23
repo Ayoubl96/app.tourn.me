@@ -55,14 +55,17 @@
     "enterNumberOfPlayers": "Ingrese el número de jugadores",
     "enterFullDescription": "Ingrese descripción detallada del torneo",
     "tournamentImage": "Imagen del torneo",
-    "pleaseSelectImage": "Por favor seleccione una imagen para subir",
+    "pleaseSelectImage": "Por favor, selecciona al menos una imagen antes de crear el torneo",
     "failedToUploadImages": "Error al subir imágenes",
     "imagesUploaded": "Imágenes subidas con éxito",
-    "pleaseUploadImageFirst": "Por favor sube al menos una imagen antes de crear el torneo",
+    "pleaseUploadImageFirst": "Por favor, sube al menos una imagen antes de crear el torneo",
     "uploadImageFirst": "Necesitas subir una imagen antes de crear un torneo.",
     "uploadImage": "Subir Imagen",
     "uploading": "Subiendo...",
-    "detailedTournamentDescription": "Proporcione una descripción detallada de su torneo",
+    "currentImages": "Imágenes actuales",
+    "newImages": "Nuevas imágenes para subir",
+    "newImage": "Nueva imagen",
+    "detailedTournamentDescription": "Proporciona una descripción detallada de tu torneo",
     "tournamentDetails": "Detalles del Torneo",
     "dates": "Fechas",
     "playersAndTeams": "Jugadores y Equipos",
@@ -230,15 +233,15 @@
     "returnToLogin": "Volver al Inicio de Sesión"
   },
   "Errors": {
-    "requiredUsername": "Ingresa un nombre de usuario válido",
-    "requiredPassword": "La contraseña es requerida",
-    "failedToLoad": "Error al cargar datos",
+    "requiredUsername": "Introduce un nombre de usuario válido",
+    "requiredPassword": "La contraseña es obligatoria",
+    "failedToLoad": "Error al cargar los datos",
     "somethingWentWrong": "Algo salió mal",
-    "tryAgainLater": "Por favor intenta más tarde",
+    "tryAgainLater": "Por favor, inténtalo de nuevo más tarde",
     "unableToDisplay": "No se puede mostrar el contenido",
-    "invalidData": "Datos proporcionados inválidos",
+    "invalidData": "Datos proporcionados no válidos",
     "tournament": "Error con el torneo",
-    "create": "Error al crear elemento",
-    "failedToUploadImages": "Error al subir imágenes"
+    "create": "Error al crear el elemento",
+    "failedToUploadImages": "Error al subir las imágenes"
   }
 }

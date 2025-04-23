@@ -53,7 +53,7 @@ export const updateTournament = async (
   params: UpdateTournamentParams
 ): Promise<Tournament> => {
   const response = await callApi(`/tournaments/${tournamentId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -92,7 +92,7 @@ export const fetchTournamentPlayers = async (
 // Add a player to a tournament
 export const addPlayerToTournament = async (
   callApi: ApiCaller,
-  tournamentId: string | number,
+  tournamentId: number,
   playerId: number
 ): Promise<TournamentPlayer> => {
   const response = await callApi(`/tournaments/${tournamentId}/player/`, {
@@ -100,7 +100,7 @@ export const addPlayerToTournament = async (
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ player_id: playerId })
+    body: JSON.stringify({ player_id: playerId, tournament_id: tournamentId })
   });
   return handleApiResponse<TournamentPlayer>(response);
 };

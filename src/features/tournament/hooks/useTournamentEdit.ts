@@ -11,7 +11,6 @@ export const useTournamentEdit = (
 ) => {
   const callApi = useApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   // Initial form state
   const [name, setName] = useState(tournament?.name || '');
@@ -41,43 +40,13 @@ export const useTournamentEdit = (
     tournament?.images || []
   );
 
-  // Handle image upload
-  const handleImageUpload = useCallback(async () => {
-    if (images.length === 0) {
-      toast.error('Please select an image to upload');
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-
-      // Upload each image individually using our API
-      const imageUrls: string[] = [];
-      for (let i = 0; i < images.length; i++) {
-        const result = await uploadCourtImage(callApi, images[i]);
-        if (result.url) {
-          imageUrls.push(result.url);
-        }
-      }
-
-      // Append new images to existing ones
-      setUploadedImageUrls((prev) => [...prev, ...imageUrls]);
-      setImages([]); // Clear selected files after upload
-
-      toast.success('Images uploaded successfully');
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Something went wrong'
-      );
-    } finally {
-      setIsUploading(false);
-    }
-  }, [callApi, images]);
-
   // Remove image from uploaded images
   const removeImage = useCallback((index: number) => {
-    setUploadedImageUrls((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImageUrls((currentUrls) => {
+      const newUrls = [...currentUrls];
+      newUrls.splice(index, 1);
+      return newUrls;
+    });
   }, []);
 
   // Handle form submission
@@ -95,7 +64,8 @@ export const useTournamentEdit = (
         return;
       }
 
-      if (uploadedImageUrls.length === 0) {
+      // Check if we have either existing uploaded images or new images to upload
+      if (uploadedImageUrls.length === 0 && images.length === 0) {
         toast.error('Please upload at least one image');
         return;
       }
@@ -103,11 +73,45 @@ export const useTournamentEdit = (
       try {
         setIsSubmitting(true);
 
+        // Process any new images if they exist
+        let allImageUrls = [...uploadedImageUrls]; // Start with existing images
+
+        if (images.length > 0) {
+          try {
+            // Upload all new images
+            const uploadPromises = images.map((image) =>
+              uploadCourtImage(callApi, image)
+            );
+            const uploadResults = await Promise.all(uploadPromises);
+
+            // Extract and add new image URLs
+            const newImageUrls = uploadResults
+              .filter((result) => result.image_url)
+              .map((result) => result.image_url);
+
+            if (newImageUrls.length === 0 && uploadedImageUrls.length === 0) {
+              toast.error('Failed to upload images');
+              setIsSubmitting(false);
+              return;
+            }
+
+            // Add new image URLs to the existing ones
+            allImageUrls = [...allImageUrls, ...newImageUrls];
+          } catch (error) {
+            console.error('Error uploading images:', error);
+            if (uploadedImageUrls.length === 0) {
+              toast.error('Failed to upload images');
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        }
+
         // Prepare update data
         const updateData = {
           name,
           description,
-          images: uploadedImageUrls,
+          images: allImageUrls,
           start_date: new Date(startDate).toISOString(),
           end_date: new Date(endDate).toISOString(),
           players_number: parseInt(playersNumber, 10),
@@ -116,6 +120,10 @@ export const useTournamentEdit = (
 
         // Call API to update tournament
         await updateTournament(callApi, tournament.id.toString(), updateData);
+
+        // Update state with the uploaded images
+        setUploadedImageUrls(allImageUrls);
+        setImages([]); // Clear the image selection after upload
 
         toast.success('Tournament updated successfully');
         if (onSuccess) onSuccess();
@@ -137,6 +145,7 @@ export const useTournamentEdit = (
       endDate,
       playersNumber,
       uploadedImageUrls,
+      images,
       editorState,
       onSuccess
     ]
@@ -191,10 +200,8 @@ export const useTournamentEdit = (
 
     // Loading states
     isSubmitting,
-    isUploading,
 
     // Actions
-    handleImageUpload,
     removeImage,
     handleSubmit,
     reset
