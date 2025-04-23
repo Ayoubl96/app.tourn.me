@@ -14,7 +14,7 @@ export type Player = {
 };
 
 export async function fetchPlayers(token: string): Promise<Player[]> {
-  const response = await fetch('http://localhost:8000/player/', {
+  const response = await fetch('http://localhost:8000/players/', {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'

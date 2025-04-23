@@ -41,7 +41,7 @@ export default function ImportPlaytomicSidebar({
 
     try {
       const resp = await callApi(
-        `/player/playtomic-player/?name=${searchText}`
+        `/players/playtomic-player/?name=${searchText}`
       );
       if (!resp.ok) {
         throw new Error('Failed to search from Playtomic');
@@ -59,7 +59,7 @@ export default function ImportPlaytomicSidebar({
   async function handleImport(user: PlaytomicUser) {
     try {
       const genderInt = user.gender.toUpperCase() === 'MALE' ? 1 : 2;
-      const resp = await callApi('/player/from-playtomic/', {
+      const resp = await callApi('/players/from-playtomic/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

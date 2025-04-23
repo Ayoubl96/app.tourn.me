@@ -59,7 +59,7 @@ export const useTournamentEdit = (
       }
 
       // Make API request to upload images
-      const response = await callApi('/court/upload_image/', {
+      const response = await callApi('/courts/upload_image/', {
         method: 'POST',
         body: formData
       });

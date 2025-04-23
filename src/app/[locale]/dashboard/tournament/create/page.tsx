@@ -115,7 +115,7 @@ export default function CreateTournamentPage() {
       }
 
       // Make API request to upload images
-      const response = await callApi('/court/upload_image/', {
+      const response = await callApi('/courts/upload_image/', {
         method: 'POST',
         body: formData
       });
@@ -180,7 +180,7 @@ export default function CreateTournamentPage() {
       };
 
       // Make API request
-      const response = await callApi('/tournament/', {
+      const response = await callApi('/tournaments/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

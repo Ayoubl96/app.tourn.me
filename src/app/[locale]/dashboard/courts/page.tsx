@@ -69,7 +69,7 @@ export default function CourtsClientPage() {
         setIsLoading(true);
         setError(null);
 
-        const resp = await callApi('/court/', { method: 'GET' });
+        const resp = await callApi('/courts/', { method: 'GET' });
         if (!resp.ok) {
           throw new Error('Failed to fetch courts');
         }
@@ -87,7 +87,7 @@ export default function CourtsClientPage() {
   function refreshCourts() {
     (async () => {
       try {
-        const resp = await callApi('/court/');
+        const resp = await callApi('/courts/');
         if (!resp.ok) throw new Error('Failed to fetch courts');
         const data = await resp.json();
         setCourts(data);

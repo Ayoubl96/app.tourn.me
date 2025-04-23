@@ -5,7 +5,7 @@ export const fetchTournament = async (
   callApi: any,
   tournamentId: string
 ): Promise<Tournament> => {
-  const response = await callApi(`/tournament/${tournamentId}`);
+  const response = await callApi(`/tournaments/${tournamentId}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch tournament');
@@ -19,7 +19,7 @@ export const updateTournament = async (
   tournamentId: string,
   data: Partial<Tournament>
 ): Promise<Tournament> => {
-  const response = await callApi(`/tournament/${tournamentId}`, {
+  const response = await callApi(`/tournaments/${tournamentId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export const fetchTournamentPlayers = async (
   callApi: any,
   tournamentId: string
 ): Promise<TournamentPlayer[]> => {
-  const response = await callApi(`/tournament/${tournamentId}/player/`);
+  const response = await callApi(`/tournaments/${tournamentId}/player/`);
 
   if (!response.ok) {
     throw new Error('Failed to load players');
@@ -52,7 +52,7 @@ export const fetchTournamentCouples = async (
   callApi: any,
   tournamentId: string
 ): Promise<Couple[]> => {
-  const response = await callApi(`/tournament/${tournamentId}/couple/`);
+  const response = await callApi(`/tournaments/${tournamentId}/couple/`);
 
   if (!response.ok) {
     throw new Error('Failed to load couples');
@@ -62,7 +62,7 @@ export const fetchTournamentCouples = async (
 };
 
 export const fetchAllPlayers = async (callApi: any): Promise<Player[]> => {
-  const response = await callApi('/player/');
+  const response = await callApi('/players/');
 
   if (!response.ok) {
     throw new Error('Failed to load players');
@@ -76,7 +76,7 @@ export const addPlayerToTournament = async (
   tournamentId: string,
   playerId: number
 ): Promise<void> => {
-  const response = await callApi('/tournament/player/', {
+  const response = await callApi(`/tournaments/${tournamentId}/player/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ export const removePlayerFromTournament = async (
   playerId: number
 ): Promise<void> => {
   const response = await callApi(
-    `/tournament/${tournamentId}/player/${playerId}`,
+    `/tournaments/${tournamentId}/player/${playerId}`,
     {
       method: 'DELETE'
     }
@@ -114,7 +114,7 @@ export const createPlayer = async (
   callApi: any,
   data: { nickname: string; gender: number; level?: number }
 ): Promise<Player> => {
-  const response = await callApi('/player/', {
+  const response = await callApi('/players/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -138,7 +138,7 @@ export const importPlayerFromPlaytomic = async (
   userId: string,
   gender: number
 ): Promise<Player> => {
-  const response = await callApi('/player/from-playtomic/', {
+  const response = await callApi('/players/from-playtomic/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -163,7 +163,7 @@ export const searchPlaytomicPlayers = async (
   searchTerm: string
 ) => {
   const response = await callApi(
-    `/player/playtomic-player/?name=${searchTerm}`
+    `/players/playtomic-player/?name=${searchTerm}`
   );
 
   if (!response.ok) {
@@ -182,7 +182,7 @@ export const createCouple = async (
     name: string;
   }
 ): Promise<Couple> => {
-  const response = await callApi(`/tournament/${tournamentId}/couple`, {
+  const response = await callApi(`/tournaments/${tournamentId}/couple`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -211,7 +211,7 @@ export const updateCouple = async (
   }
 ): Promise<Couple> => {
   const response = await callApi(
-    `/tournament/${tournamentId}/couple/${coupleId}`,
+    `/tournaments/${tournamentId}/couple/${coupleId}`,
     {
       method: 'PUT',
       headers: {
@@ -236,7 +236,7 @@ export const deleteCouple = async (
   coupleId: number
 ): Promise<void> => {
   const response = await callApi(
-    `/tournament/${tournamentId}/couple/${coupleId}`,
+    `/tournaments/${tournamentId}/couple/${coupleId}`,
     {
       method: 'DELETE'
     }

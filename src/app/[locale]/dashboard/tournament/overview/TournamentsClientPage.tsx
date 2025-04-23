@@ -99,7 +99,7 @@ export default function TournamentsClientPage() {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await callApi('/tournament/');
+        const response = await callApi('/tournaments/');
 
         if (!response.ok) {
           throw new Error('Failed to fetch tournaments');

@@ -25,7 +25,7 @@ export class TournamentService {
    * Tournament Methods
    */
   async fetchTournament(tournamentId: string): Promise<Tournament> {
-    const response = await this.callApi(`/tournament/${tournamentId}`);
+    const response = await this.callApi(`/tournaments/${tournamentId}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch tournament');
@@ -38,7 +38,7 @@ export class TournamentService {
     tournamentId: string,
     data: Partial<Tournament>
   ): Promise<Tournament> {
-    const response = await this.callApi(`/tournament/${tournamentId}`, {
+    const response = await this.callApi(`/tournaments/${tournamentId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ export class TournamentService {
   async fetchTournamentPlayers(
     tournamentId: string
   ): Promise<TournamentPlayer[]> {
-    const response = await this.callApi(`/tournament/${tournamentId}/player/`);
+    const response = await this.callApi(`/tournaments/${tournamentId}/player/`);
 
     if (!response.ok) {
       throw new Error('Failed to load players');
@@ -70,7 +70,7 @@ export class TournamentService {
   }
 
   async fetchAllPlayers(): Promise<Player[]> {
-    const response = await this.callApi('/player/');
+    const response = await this.callApi('/players/');
 
     if (!response.ok) {
       throw new Error('Failed to load players');
@@ -83,7 +83,7 @@ export class TournamentService {
     tournamentId: string,
     playerId: number
   ): Promise<void> {
-    const response = await this.callApi('/tournament/player/', {
+    const response = await this.callApi('/tournaments/player/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ export class TournamentService {
     playerId: number
   ): Promise<void> {
     const response = await this.callApi(
-      `/tournament/${tournamentId}/player/${playerId}`,
+      `/tournaments/${tournamentId}/player/${playerId}`,
       {
         method: 'DELETE'
       }
@@ -121,7 +121,7 @@ export class TournamentService {
     gender: number;
     level?: number;
   }): Promise<Player> {
-    const response = await this.callApi('/player/', {
+    const response = await this.callApi('/players/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ export class TournamentService {
    * Couple Methods
    */
   async fetchTournamentCouples(tournamentId: string): Promise<Couple[]> {
-    const response = await this.callApi(`/tournament/${tournamentId}/couple/`);
+    const response = await this.callApi(`/tournaments/${tournamentId}/couple/`);
 
     if (!response.ok) {
       throw new Error('Failed to load couples');
@@ -161,7 +161,7 @@ export class TournamentService {
       name: string;
     }
   ): Promise<Couple> {
-    const response = await this.callApi(`/tournament/${tournamentId}/couple`, {
+    const response = await this.callApi(`/tournaments/${tournamentId}/couple`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -189,7 +189,7 @@ export class TournamentService {
     }
   ): Promise<Couple> {
     const response = await this.callApi(
-      `/tournament/${tournamentId}/couple/${coupleId}`,
+      `/tournaments/${tournamentId}/couple/${coupleId}`,
       {
         method: 'PUT',
         headers: {
@@ -210,7 +210,7 @@ export class TournamentService {
 
   async deleteCouple(tournamentId: string, coupleId: number): Promise<void> {
     const response = await this.callApi(
-      `/tournament/${tournamentId}/couple/${coupleId}`,
+      `/tournaments/${tournamentId}/couple/${coupleId}`,
       {
         method: 'DELETE'
       }
@@ -227,7 +227,7 @@ export class TournamentService {
    */
   async searchPlaytomicPlayers(searchTerm: string): Promise<PlaytomicPlayer[]> {
     const response = await this.callApi(
-      `/player/playtomic-player/?name=${searchTerm}`
+      `/players/playtomic-player/?name=${searchTerm}`
     );
 
     if (!response.ok) {
@@ -241,7 +241,7 @@ export class TournamentService {
     userId: string,
     gender: number
   ): Promise<Player> {
-    const response = await this.callApi('/player/from-playtomic/', {
+    const response = await this.callApi('/players/from-playtomic/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

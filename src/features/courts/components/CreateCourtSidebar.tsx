@@ -46,7 +46,7 @@ export default function CreateCourtSidebar({
       }
 
       // Make the request
-      const resp = await callApi('/court/upload_image/', {
+      const resp = await callApi('/courts/upload_image/', {
         method: 'POST',
         body: formData
       });
@@ -78,7 +78,7 @@ export default function CreateCourtSidebar({
     try {
       setIsCreating(true);
 
-      const resp = await callApi('/court/', {
+      const resp = await callApi('/courts/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -25,7 +25,7 @@ const PlayerListingPage: React.FC = () => {
           throw new Error('User is not authenticated');
         }
 
-        const response = await callApi('/player/');
+        const response = await callApi('/players/');
 
         if (!response.ok) {
           throw new Error('Failed to fetch players');

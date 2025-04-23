@@ -27,7 +27,7 @@ export default function CreatePlayerSidebar({
     setIsLoading(true);
 
     try {
-      const response = await callApi('/player/', {
+      const response = await callApi('/players/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
