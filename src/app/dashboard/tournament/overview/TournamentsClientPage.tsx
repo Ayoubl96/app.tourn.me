@@ -194,7 +194,9 @@ export default function TournamentsClientPage() {
                         src={tourney.images[0]}
                         alt={tourney.name}
                         fill
-                        className='object-cover'
+                        sizes='100%'
+                        style={{ objectFit: 'cover' }}
+                        className=''
                       />
                     </div>
                   )}

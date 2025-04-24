@@ -53,7 +53,7 @@ export async function getProfileServer(
   accessToken: string
 ): Promise<CompanyProfile> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-  const response = await fetch(`${baseUrl}/companies/me/`, {
+  const response = await fetch(`${baseUrl}/companies/me`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`
@@ -73,23 +73,32 @@ export async function getProfileServer(
 }
 
 /**
- * Validate token
+ * Refresh access token using refresh token
  */
-export async function validateToken(token: string): Promise<boolean> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/token/validate`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+export async function refreshToken(
+  refreshToken: string
+): Promise<LoginResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/refresh`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        refresh_token: refreshToken
+      })
+    }
+  );
 
-    return response.ok;
-  } catch (error) {
-    return false;
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: 'Token refresh failed' }));
+    throw new Error(
+      errorData.message || errorData.detail || 'Token refresh failed'
+    );
   }
+
+  return response.json();
 }

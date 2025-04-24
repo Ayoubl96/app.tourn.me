@@ -11,6 +11,7 @@ export interface LoginCredentials {
  */
 export interface LoginResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
 }
 
@@ -36,6 +37,7 @@ export interface AuthenticatedUser {
   name: string;
   login: string;
   token: string;
+  refreshToken: string;
   address: string;
   email: string;
   phone_number: string;

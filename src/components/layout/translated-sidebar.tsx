@@ -35,7 +35,7 @@ import {
   GalleryVerticalEnd,
   LogOut
 } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import {
   Collapsible,
@@ -47,6 +47,7 @@ import { Icons } from '../icons';
 import LanguageSwitcher from '../language-switcher';
 import { useTranslations } from 'next-intl';
 import { navItems } from '@/constants/data';
+import { useSecureLogout } from '@/hooks/useSecureLogout';
 
 export const company = {
   name: 'Acme Inc',
@@ -59,6 +60,7 @@ export default function TranslatedSidebar() {
   const navT = useTranslations('Navigation');
   const { data: session } = useSession();
   const pathname = usePathname();
+  const logout = useSecureLogout();
 
   // Map navigation items with translations, using the Navigation namespace
   const translatedNavItems = navItems.map((item) => {
@@ -218,7 +220,7 @@ export default function TranslatedSidebar() {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()}>
+                <DropdownMenuItem onClick={() => logout()}>
                   <LogOut />
                   Log out
                 </DropdownMenuItem>

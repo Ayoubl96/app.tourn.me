@@ -1,4 +1,3 @@
-import { fetchWithLogout } from '@/lib/fetchWithLogout';
 import { ApiError } from './types';
 
 // The base URL is read from environment variable

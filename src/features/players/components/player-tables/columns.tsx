@@ -16,8 +16,9 @@ export const playerColumns: ColumnDef<Player>[] = [
           <Image
             src={picture}
             alt={nickname}
-            layout='fill'
-            objectFit='cover'
+            fill
+            sizes='60px'
+            style={{ objectFit: 'cover' }}
             className='rounded-full'
           />
         </div>

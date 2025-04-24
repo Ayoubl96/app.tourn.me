@@ -1,10 +1,10 @@
 'use client';
 
-import { fetchWithLogout } from '@/lib/fetchWithLogout';
+import { fetchWithTokenRefresh } from '@/lib/refreshTokenClient';
 import { apiClient } from './apiClient';
 
 /**
- * Client-side version of apiClient that uses fetchWithLogout for 401 handling
+ * Client-side version of apiClient that handles token refresh and 401 errors
  * This can only be used in client components
  */
 export async function clientApiClient(
@@ -18,8 +18,8 @@ export async function clientApiClient(
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
   const fullUrl = `${baseUrl}${normalizedEndpoint}`;
 
-  // Use fetchWithLogout for client-side 401 handling
-  return fetchWithLogout(fullUrl, {
+  // Use fetchWithTokenRefresh for client-side token refresh handling
+  return fetchWithTokenRefresh(fullUrl, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers ?? {})

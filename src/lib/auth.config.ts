@@ -2,13 +2,16 @@ import { NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import type { JwtPayload } from 'jwt-decode';
-import { login, getProfileServer } from '@/api/auth';
+import { JWT } from 'next-auth/jwt';
+import { login, getProfileServer, refreshToken } from '@/api/auth';
 import { AuthenticatedUser } from '@/api/auth';
+import { locales, defaultLocale } from '@/config/locales';
 
 // Extend the Session type to include the accessToken property and additional user details
 declare module 'next-auth' {
   interface Session {
     accessToken: string;
+    refreshToken: string;
     user: {
       id: string;
       name: string;
@@ -20,6 +23,29 @@ declare module 'next-auth' {
     };
   }
 }
+
+// Extend the JWT type to include our custom properties
+declare module 'next-auth/jwt' {
+  interface JWT {
+    accessToken?: string;
+    refreshToken?: string;
+    expiresAt?: number;
+  }
+}
+
+// Helper function to get sign-in page URL with proper locale handling
+const getSignInPage = (req: Request) => {
+  // Extract locale from URL if present
+  const url = new URL(req.url);
+  const pathname = url.pathname;
+
+  const currentLocale = locales.find(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+
+  // If locale is found, redirect to /{locale}, otherwise to /
+  return currentLocale ? `/${currentLocale}` : '/';
+};
 
 const authConfig = {
   providers: [
@@ -61,11 +87,12 @@ const authConfig = {
               name: userData.name,
               login: userData.login,
               token: loginData.access_token,
+              refreshToken: loginData.refresh_token,
               address: userData.address,
               email: userData.email,
               phone_number: userData.phone_number,
               created_at: userData.created_at
-            } as AuthenticatedUser;
+            } as AuthenticatedUser & { refreshToken: string };
           } else {
             console.error('Login failed: No access token');
             return null;
@@ -77,9 +104,10 @@ const authConfig = {
       }
     })
   ],
+  // Using fixed paths with locale handling in the middleware
   pages: {
     signIn: '/', // Sign-in page
-    signOut: '/auth/signout', // Optional: Sign-out page
+    signOut: '/', // Sign-out page
     error: '/auth/error', // Error page
     verifyRequest: '/auth/verify-request', // Verification page
     newUser: '/dashboard' // Redirect new users to the dashboard
@@ -89,6 +117,7 @@ const authConfig = {
       // 1) On initial sign in:
       if (user && (user as any).token) {
         const accessToken = (user as any).token;
+        const refreshTokenValue = (user as any).refreshToken;
         try {
           // Decode the JWT to find `exp`
           const decoded = simpleJwtDecode(accessToken) as JwtPayload;
@@ -98,15 +127,55 @@ const authConfig = {
           token.expiresAt = 0;
         }
         token.accessToken = accessToken;
+        token.refreshToken = refreshTokenValue;
       }
 
-      // 2) On subsequent requests, if the token is expired, clear it.
+      // 2) On subsequent requests, check if the token is about to expire and refresh it
       if (
         typeof token.expiresAt === 'number' &&
-        Date.now() >= token.expiresAt
+        Date.now() >= token.expiresAt - 60000 && // 1 minute before expiration
+        token.refreshToken
       ) {
-        console.log('Token has expired. Clearing token.');
+        console.log('Token is about to expire. Attempting to refresh...');
+        try {
+          const refreshedTokens = await refreshToken(token.refreshToken);
+
+          // Update token with new values
+          token.accessToken = refreshedTokens.access_token;
+          token.refreshToken = refreshedTokens.refresh_token;
+
+          // Update expiration time
+          try {
+            const decoded = simpleJwtDecode(
+              refreshedTokens.access_token
+            ) as JwtPayload;
+            token.expiresAt = decoded.exp ? decoded.exp * 1000 : 0;
+          } catch (err) {
+            console.error('Could not decode refreshed token', err);
+            token.expiresAt = Date.now() + 30 * 60 * 1000; // Fallback: assume 30 minutes
+          }
+
+          console.log('Token successfully refreshed');
+        } catch (error) {
+          console.error('Failed to refresh token', error);
+          // On refresh failure, clear tokens which will force re-login
+          token.accessToken = undefined;
+          token.refreshToken = undefined;
+          token.expiresAt = 0;
+        }
+      }
+
+      // 3) If token is expired and couldn't be refreshed, clear it
+      if (
+        typeof token.expiresAt === 'number' &&
+        Date.now() >= token.expiresAt &&
+        !token.refreshToken
+      ) {
+        console.log(
+          'Token has expired and cannot be refreshed. Clearing token.'
+        );
         token.accessToken = undefined;
+        token.refreshToken = undefined;
       }
 
       return token;
@@ -122,8 +191,9 @@ const authConfig = {
         };
       }
 
-      // Otherwise, return the (valid) session
+      // Otherwise, return the (valid) session with access and refresh tokens
       session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
       return session;
     }
   }
