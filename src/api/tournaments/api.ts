@@ -7,7 +7,10 @@ import {
   CreateTournamentParams,
   UpdateTournamentParams,
   CreateCoupleParams,
-  UpdateCoupleParams
+  UpdateCoupleParams,
+  TournamentCourt,
+  AddCourtToTournamentParams,
+  UpdateTournamentCourtParams
 } from './types';
 
 /**
@@ -187,5 +190,72 @@ export const deleteCouple = async (
 
   if (!response.ok) {
     throw new Error('Failed to delete couple');
+  }
+};
+
+/**
+ * Tournament Courts API functions
+ */
+
+// Fetch courts in a tournament
+export const fetchTournamentCourts = async (
+  callApi: ApiCaller,
+  tournamentId: string | number
+): Promise<TournamentCourt[]> => {
+  const response = await callApi(`/tournaments/${tournamentId}/court`);
+  return handleApiResponse<TournamentCourt[]>(response);
+};
+
+// Add a court to a tournament
+export const addCourtToTournament = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  params: AddCourtToTournamentParams
+): Promise<TournamentCourt> => {
+  const response = await callApi(`/tournaments/${tournamentId}/court`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentCourt>(response);
+};
+
+// Update a court in a tournament
+export const updateTournamentCourt = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  courtId: number,
+  params: UpdateTournamentCourtParams
+): Promise<TournamentCourt> => {
+  const response = await callApi(
+    `/tournaments/${tournamentId}/court/${courtId}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    }
+  );
+  return handleApiResponse<TournamentCourt>(response);
+};
+
+// Remove a court from a tournament
+export const removeCourtFromTournament = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  courtId: number
+): Promise<void> => {
+  const response = await callApi(
+    `/tournaments/${tournamentId}/court/${courtId}`,
+    {
+      method: 'DELETE'
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to remove court from tournament');
   }
 };

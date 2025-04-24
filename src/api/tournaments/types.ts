@@ -81,3 +81,40 @@ export interface CreateCoupleParams {
  * Couple update parameters
  */
 export interface UpdateCoupleParams extends Partial<CreateCoupleParams> {}
+
+/**
+ * Tournament Court type
+ */
+export interface TournamentCourt {
+  id: number;
+  court_id: number;
+  tournament_id: number;
+  availability_start: string;
+  availability_end: string;
+  created_at: string;
+  updated_at: string;
+  court: {
+    id: number;
+    name: string;
+    size: number;
+    active: boolean;
+    images: string[];
+  };
+}
+
+/**
+ * Add Court to Tournament params
+ */
+export interface AddCourtToTournamentParams {
+  court_id: number;
+  availability_start: string;
+  availability_end: string;
+}
+
+/**
+ * Update Tournament Court params
+ */
+export interface UpdateTournamentCourtParams {
+  availability_start: string;
+  availability_end: string;
+}

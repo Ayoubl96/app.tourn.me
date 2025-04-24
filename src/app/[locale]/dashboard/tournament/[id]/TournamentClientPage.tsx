@@ -28,6 +28,7 @@ import { TournamentManage } from '@/features/tournament/components/sections/Tour
 import { PlayersAndTeams } from '@/features/tournament/components/sections/PlayersAndTeams';
 import { TournamentLeaderboard } from '@/features/tournament/components/sections/TournamentLeaderboard';
 import { TournamentGames } from '@/features/tournament/components/sections/TournamentGames';
+import { TournamentCourts } from '@/features/tournament/components/sections/TournamentCourts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
@@ -166,6 +167,7 @@ export default function TournamentClientPage({
         <TabsList className='mb-4 w-full justify-start overflow-auto sm:w-auto'>
           <TabsTrigger value='overview'>{t('overview')}</TabsTrigger>
           <TabsTrigger value='manage'>{t('manage')}</TabsTrigger>
+          <TabsTrigger value='courts'>{t('courts')}</TabsTrigger>
           <TabsTrigger value='players'>{t('playersAndTeams')}</TabsTrigger>
           <TabsTrigger value='leaderboard'>{t('leaderboard')}</TabsTrigger>
           <TabsTrigger value='games'>{t('games')}</TabsTrigger>
@@ -179,6 +181,11 @@ export default function TournamentClientPage({
         {/* Manage Tab Content */}
         <TabsContent value='manage' className='space-y-6'>
           <TournamentManage tournament={tournament} />
+        </TabsContent>
+
+        {/* Courts Tab Content */}
+        <TabsContent value='courts' className='space-y-6'>
+          <TournamentCourts tournament={tournament} />
         </TabsContent>
 
         {/* Players & Teams Tab Content */}
