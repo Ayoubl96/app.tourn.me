@@ -10,7 +10,23 @@ import {
   UpdateCoupleParams,
   TournamentCourt,
   AddCourtToTournamentParams,
-  UpdateTournamentCourtParams
+  UpdateTournamentCourtParams,
+  TournamentStage,
+  CreateTournamentStageParams,
+  UpdateTournamentStageParams,
+  TournamentGroup,
+  CreateTournamentGroupParams,
+  UpdateTournamentGroupParams,
+  GroupCouple,
+  AddCoupleToGroupParams,
+  AutoAssignCouplesParams,
+  GroupStandingsResponse,
+  TournamentBracket,
+  CreateTournamentBracketParams,
+  UpdateTournamentBracketParams,
+  ScheduleMatchParams,
+  CourtAvailability,
+  AutoScheduleMatchesParams
 } from './types';
 
 /**
@@ -257,5 +273,386 @@ export const removeCourtFromTournament = async (
 
   if (!response.ok) {
     throw new Error('Failed to remove court from tournament');
+  }
+};
+
+/**
+ * Tournament Staging API functions
+ */
+
+// Fetch tournament stages
+export const fetchTournamentStages = async (
+  callApi: ApiCaller,
+  tournamentId: string | number
+): Promise<TournamentStage[]> => {
+  const response = await callApi(`/staging/tournament/${tournamentId}/stage`);
+  return handleApiResponse<TournamentStage[]>(response);
+};
+
+// Fetch a stage by ID
+export const fetchStageById = async (
+  callApi: ApiCaller,
+  stageId: string | number
+): Promise<TournamentStage> => {
+  const response = await callApi(`/staging/stage/${stageId}`);
+  return handleApiResponse<TournamentStage>(response);
+};
+
+// Create a tournament stage
+export const createTournamentStage = async (
+  callApi: ApiCaller,
+  params: CreateTournamentStageParams
+): Promise<TournamentStage> => {
+  const response = await callApi(
+    `/staging/tournament/${params.tournament_id}/stage`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    }
+  );
+  return handleApiResponse<TournamentStage>(response);
+};
+
+// Update a tournament stage
+export const updateTournamentStage = async (
+  callApi: ApiCaller,
+  stageId: string | number,
+  params: UpdateTournamentStageParams
+): Promise<TournamentStage> => {
+  const response = await callApi(`/staging/stage/${stageId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentStage>(response);
+};
+
+// Delete a tournament stage
+export const deleteTournamentStage = async (
+  callApi: ApiCaller,
+  stageId: string | number
+): Promise<void> => {
+  const response = await callApi(`/staging/stage/${stageId}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete stage');
+  }
+};
+
+// Fetch stage groups
+export const fetchStageGroups = async (
+  callApi: ApiCaller,
+  stageId: string | number
+): Promise<TournamentGroup[]> => {
+  const response = await callApi(`/staging/stage/${stageId}/group`);
+  return handleApiResponse<TournamentGroup[]>(response);
+};
+
+// Fetch a group by ID
+export const fetchGroupById = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<TournamentGroup> => {
+  const response = await callApi(`/staging/group/${groupId}`);
+  return handleApiResponse<TournamentGroup>(response);
+};
+
+// Create a tournament group
+export const createTournamentGroup = async (
+  callApi: ApiCaller,
+  params: CreateTournamentGroupParams
+): Promise<TournamentGroup> => {
+  const response = await callApi(`/staging/stage/${params.stage_id}/group`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentGroup>(response);
+};
+
+// Update a tournament group
+export const updateTournamentGroup = async (
+  callApi: ApiCaller,
+  groupId: string | number,
+  params: UpdateTournamentGroupParams
+): Promise<TournamentGroup> => {
+  const response = await callApi(`/staging/group/${groupId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentGroup>(response);
+};
+
+// Delete a tournament group
+export const deleteTournamentGroup = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<void> => {
+  const response = await callApi(`/staging/group/${groupId}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete group');
+  }
+};
+
+// Add couple to group
+export const addCoupleToGroup = async (
+  callApi: ApiCaller,
+  params: AddCoupleToGroupParams
+): Promise<GroupCouple> => {
+  const response = await callApi(`/staging/group/${params.group_id}/couple`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<GroupCouple>(response);
+};
+
+// Get group couples
+export const fetchGroupCouples = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<GroupCouple[]> => {
+  const response = await callApi(`/staging/group/${groupId}/couple`);
+  return handleApiResponse<GroupCouple[]>(response);
+};
+
+// Remove couple from group
+export const removeCoupleFromGroup = async (
+  callApi: ApiCaller,
+  groupId: string | number,
+  coupleId: string | number
+): Promise<void> => {
+  const response = await callApi(
+    `/staging/group/${groupId}/couple/${coupleId}`,
+    {
+      method: 'DELETE'
+    }
+  );
+  if (!response.ok) {
+    throw new Error('Failed to remove couple from group');
+  }
+};
+
+// Auto-assign couples to groups
+export const autoAssignCouples = async (
+  callApi: ApiCaller,
+  stageId: string | number,
+  params: AutoAssignCouplesParams
+): Promise<void> => {
+  const response = await callApi(
+    `/staging/stage/${stageId}/assign-couples?method=${params.method}`,
+    {
+      method: 'POST'
+    }
+  );
+  if (!response.ok) {
+    throw new Error('Failed to auto-assign couples');
+  }
+};
+
+// Get group standings
+export const fetchGroupStandings = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<GroupStandingsResponse> => {
+  const response = await callApi(`/staging/group/${groupId}/standings`);
+  return handleApiResponse<GroupStandingsResponse>(response);
+};
+
+// Fetch stage brackets
+export const fetchStageBrackets = async (
+  callApi: ApiCaller,
+  stageId: string | number
+): Promise<TournamentBracket[]> => {
+  const response = await callApi(`/staging/stage/${stageId}/bracket`);
+  return handleApiResponse<TournamentBracket[]>(response);
+};
+
+// Fetch a bracket by ID
+export const fetchBracketById = async (
+  callApi: ApiCaller,
+  bracketId: string | number
+): Promise<TournamentBracket> => {
+  const response = await callApi(`/staging/bracket/${bracketId}`);
+  return handleApiResponse<TournamentBracket>(response);
+};
+
+// Create a tournament bracket
+export const createTournamentBracket = async (
+  callApi: ApiCaller,
+  params: CreateTournamentBracketParams
+): Promise<TournamentBracket> => {
+  const response = await callApi(`/staging/stage/${params.stage_id}/bracket`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentBracket>(response);
+};
+
+// Update a tournament bracket
+export const updateTournamentBracket = async (
+  callApi: ApiCaller,
+  bracketId: string | number,
+  params: UpdateTournamentBracketParams
+): Promise<TournamentBracket> => {
+  const response = await callApi(`/staging/bracket/${bracketId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  });
+  return handleApiResponse<TournamentBracket>(response);
+};
+
+// Delete a tournament bracket
+export const deleteTournamentBracket = async (
+  callApi: ApiCaller,
+  bracketId: string | number
+): Promise<void> => {
+  const response = await callApi(`/staging/bracket/${bracketId}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete bracket');
+  }
+};
+
+// Generate bracket matches
+export const generateBracketMatches = async (
+  callApi: ApiCaller,
+  bracketId: string | number,
+  couples?: number[]
+): Promise<void> => {
+  const response = await callApi(
+    `/staging/bracket/${bracketId}/generate-matches`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: couples ? JSON.stringify({ couples }) : undefined
+    }
+  );
+  if (!response.ok) {
+    throw new Error('Failed to generate bracket matches');
+  }
+};
+
+// Generate group matches
+export const generateGroupMatches = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<void> => {
+  const response = await callApi(`/staging/group/${groupId}/generate-matches`, {
+    method: 'POST'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to generate group matches');
+  }
+};
+
+// Schedule a match
+export const scheduleMatch = async (
+  callApi: ApiCaller,
+  matchId: string | number,
+  params: ScheduleMatchParams
+): Promise<void> => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('court_id', params.court_id.toString());
+  queryParams.append('start_time', params.start_time);
+
+  if (params.end_time) {
+    queryParams.append('end_time', params.end_time);
+  }
+
+  if (params.is_time_limited !== undefined) {
+    queryParams.append('is_time_limited', params.is_time_limited.toString());
+  }
+
+  if (params.time_limit_minutes) {
+    queryParams.append(
+      'time_limit_minutes',
+      params.time_limit_minutes.toString()
+    );
+  }
+
+  const response = await callApi(
+    `/staging/match/${matchId}/schedule?${queryParams.toString()}`,
+    {
+      method: 'POST'
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to schedule match');
+  }
+};
+
+// Unschedule a match
+export const unscheduleMatch = async (
+  callApi: ApiCaller,
+  matchId: string | number
+): Promise<void> => {
+  const response = await callApi(`/staging/match/${matchId}/schedule`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to unschedule match');
+  }
+};
+
+// Get court availability
+export const fetchCourtAvailability = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  date: string
+): Promise<CourtAvailability[]> => {
+  const response = await callApi(
+    `/staging/tournament/${tournamentId}/court-availability?date=${date}`
+  );
+  return handleApiResponse<CourtAvailability[]>(response);
+};
+
+// Auto-schedule matches
+export const autoScheduleMatches = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  params: AutoScheduleMatchesParams
+): Promise<void> => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('start_date', params.start_date);
+
+  if (params.end_date) {
+    queryParams.append('end_date', params.end_date);
+  }
+
+  const response = await callApi(
+    `/staging/tournament/${tournamentId}/auto-schedule?${queryParams.toString()}`,
+    {
+      method: 'POST'
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to auto-schedule matches');
   }
 };

@@ -31,7 +31,11 @@ export function getTournamentStatus(
 }
 
 // Extract initials from a name
-export function getInitials(nickname: string): string {
+export function getInitials(nickname: string | undefined | null): string {
+  if (!nickname) {
+    return 'NA';
+  }
+
   return nickname
     .split(' ')
     .map((part) => part[0])

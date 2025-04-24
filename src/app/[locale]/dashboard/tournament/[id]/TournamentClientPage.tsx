@@ -29,6 +29,7 @@ import { PlayersAndTeams } from '@/features/tournament/components/sections/Playe
 import { TournamentLeaderboard } from '@/features/tournament/components/sections/TournamentLeaderboard';
 import { TournamentGames } from '@/features/tournament/components/sections/TournamentGames';
 import { TournamentCourts } from '@/features/tournament/components/sections/TournamentCourts';
+import { TournamentStaging } from '@/features/tournament/components/sections/TournamentStaging';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
@@ -169,6 +170,7 @@ export default function TournamentClientPage({
           <TabsTrigger value='manage'>{t('manage')}</TabsTrigger>
           <TabsTrigger value='courts'>{t('courts')}</TabsTrigger>
           <TabsTrigger value='players'>{t('playersAndTeams')}</TabsTrigger>
+          <TabsTrigger value='staging'>{t('staging')}</TabsTrigger>
           <TabsTrigger value='leaderboard'>{t('leaderboard')}</TabsTrigger>
           <TabsTrigger value='games'>{t('games')}</TabsTrigger>
         </TabsList>
@@ -228,6 +230,11 @@ export default function TournamentClientPage({
             handleCreatePlayer={handleCreatePlayer}
             error={playerManagementError}
           />
+        </TabsContent>
+
+        {/* Staging Tab Content */}
+        <TabsContent value='staging' className='space-y-6'>
+          <TournamentStaging tournament={tournament} />
         </TabsContent>
 
         {/* Leaderboard Tab Content */}

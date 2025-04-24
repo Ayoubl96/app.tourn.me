@@ -118,3 +118,289 @@ export interface UpdateTournamentCourtParams {
   availability_start: string;
   availability_end: string;
 }
+
+/**
+ * Tournament Stage Types
+ */
+export type StageType = 'group' | 'elimination';
+export type BracketType = 'main' | 'silver' | 'bronze';
+export type ScoringType = 'points' | 'games' | 'both';
+export type WinCriteria = 'best_of' | 'all_games' | 'time_based';
+export type SchedulingPriority = 'court_efficiency' | 'player_rest';
+export type TiebreakerMethod =
+  | 'points'
+  | 'head_to_head'
+  | 'games_diff'
+  | 'games_won'
+  | 'matches_won';
+export type MatchResultStatus =
+  | 'pending'
+  | 'completed'
+  | 'time_expired'
+  | 'forfeited';
+
+/**
+ * Tournament Stage entity
+ */
+export interface TournamentStage {
+  id: number;
+  tournament_id: number;
+  name: string;
+  stage_type: StageType;
+  order: number;
+  config: StageConfig;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+/**
+ * Tournament Stage Configuration
+ */
+export interface StageConfig {
+  scoring_system: ScoringSystem;
+  match_rules: MatchRules;
+  advancement_rules: AdvancementRules;
+  scheduling: SchedulingOptions;
+}
+
+/**
+ * Scoring System Configuration
+ */
+export interface ScoringSystem {
+  type: ScoringType;
+  win: number;
+  draw: number;
+  loss: number;
+  game_win: number;
+  game_loss: number;
+}
+
+/**
+ * Match Rules Configuration
+ */
+export interface MatchRules {
+  matches_per_opponent: number;
+  games_per_match: number;
+  win_criteria: WinCriteria;
+  time_limited: boolean;
+  time_limit_minutes: number;
+  break_between_matches: number;
+}
+
+/**
+ * Advancement Rules Configuration
+ */
+export interface AdvancementRules {
+  top_n: number;
+  to_bracket: BracketType;
+  tiebreaker: TiebreakerMethod[];
+}
+
+/**
+ * Scheduling Options Configuration
+ */
+export interface SchedulingOptions {
+  auto_schedule: boolean;
+  overlap_allowed: boolean;
+  scheduling_priority: SchedulingPriority;
+}
+
+/**
+ * Tournament Group entity
+ */
+export interface TournamentGroup {
+  id: number;
+  stage_id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+/**
+ * Tournament Bracket entity
+ */
+export interface TournamentBracket {
+  id: number;
+  stage_id: number;
+  bracket_type: BracketType;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+/**
+ * Group Couple Assignment entity
+ */
+export interface GroupCouple {
+  id: number;
+  group_id: number;
+  couple_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Group Standings entity
+ */
+export interface GroupStanding {
+  couple_id: number;
+  couple_name: string;
+  matches_played: number;
+  matches_won: number;
+  matches_lost: number;
+  matches_drawn: number;
+  games_won: number;
+  games_lost: number;
+  total_points: number;
+  games_diff: number;
+  position: number;
+}
+
+/**
+ * Group Standings Response
+ */
+export interface GroupStandingsResponse {
+  group_id: number;
+  group_name: string;
+  standings: GroupStanding[];
+}
+
+/**
+ * Tournament Match with staging information
+ */
+export interface StagingMatch {
+  id: number;
+  tournament_id: number;
+  couple1_id: number;
+  couple2_id: number;
+  winner_couple_id: number | null;
+  games: MatchGame[];
+  stage_id: number;
+  group_id: number | null;
+  bracket_id: number | null;
+  court_id: number | null;
+  scheduled_start: string | null;
+  scheduled_end: string | null;
+  is_time_limited: boolean;
+  time_limit_minutes: number | null;
+  match_result_status: MatchResultStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Match Game entity
+ */
+export interface MatchGame {
+  game_number: number;
+  couple1_score: number;
+  couple2_score: number;
+  winner_id: number | null;
+  duration_minutes: number | null;
+}
+
+/**
+ * Court Availability entity
+ */
+export interface CourtAvailability {
+  court_id: number;
+  court_name: string;
+  day_availability: {
+    start: string;
+    end: string;
+  };
+  scheduled_matches: {
+    match_id: number;
+    start: string;
+    end: string;
+    couple1_id: number;
+    couple2_id: number;
+  }[];
+  free_slots: {
+    start: string;
+    end: string;
+  }[];
+}
+
+/**
+ * Create Tournament Stage params
+ */
+export interface CreateTournamentStageParams {
+  tournament_id: number;
+  name: string;
+  stage_type: StageType;
+  order: number;
+  config: StageConfig;
+}
+
+/**
+ * Update Tournament Stage params
+ */
+export interface UpdateTournamentStageParams
+  extends Partial<Omit<CreateTournamentStageParams, 'tournament_id'>> {}
+
+/**
+ * Create Tournament Group params
+ */
+export interface CreateTournamentGroupParams {
+  stage_id: number;
+  name: string;
+}
+
+/**
+ * Update Tournament Group params
+ */
+export interface UpdateTournamentGroupParams {
+  name: string;
+}
+
+/**
+ * Create Tournament Bracket params
+ */
+export interface CreateTournamentBracketParams {
+  stage_id: number;
+  bracket_type: BracketType;
+}
+
+/**
+ * Update Tournament Bracket params
+ */
+export interface UpdateTournamentBracketParams {
+  bracket_type: BracketType;
+}
+
+/**
+ * Add Couple to Group params
+ */
+export interface AddCoupleToGroupParams {
+  group_id: number;
+  couple_id: number;
+}
+
+/**
+ * Schedule Match params
+ */
+export interface ScheduleMatchParams {
+  court_id: number;
+  start_time: string;
+  end_time?: string;
+  is_time_limited?: boolean;
+  time_limit_minutes?: number;
+}
+
+/**
+ * Auto-assign Couples params
+ */
+export interface AutoAssignCouplesParams {
+  method: 'random' | 'balanced';
+}
+
+/**
+ * Auto-schedule Matches params
+ */
+export interface AutoScheduleMatchesParams {
+  start_date: string;
+  end_date?: string;
+}

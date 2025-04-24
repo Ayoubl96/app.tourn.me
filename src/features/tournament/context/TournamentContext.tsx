@@ -15,6 +15,7 @@ import {
 } from '../types';
 import { TournamentService } from '../api/tournamentService';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface TournamentContextValue {
   // Core data
@@ -461,10 +462,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({
 // Custom hook to use the tournament context
 export const useTournamentContext = () => {
   const context = useContext(TournamentContext);
+  const t = useTranslations('Errors');
+
   if (context === undefined) {
-    throw new Error(
-      'useTournamentContext must be used within a TournamentProvider'
-    );
+    throw new Error(t('tournamentContextError'));
   }
   return context;
 };
