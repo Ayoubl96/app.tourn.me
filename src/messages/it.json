@@ -318,8 +318,8 @@
     "autoAssignCouples": "Assegna Coppie Automaticamente",
     "autoAssignCouplesDescription": "Distribuisci automaticamente le coppie tra i gironi",
     "assignmentMethod": "Metodo di Assegnazione",
-    "balancedDistribution": "Distribuzione bilanciata (numero uguale in ogni girone)",
-    "randomDistribution": "Distribuzione casuale",
+    "randomAssignment": "Assegnazione casuale",
+    "balancedAssignment": "Assegnazione bilanciata (numero uguale in ogni girone)",
     "autoAssignWarning": "Questo assegnerà tutte le coppie non assegnate ai gironi. Le assegnazioni esistenti rimarranno invariate.",
     "assigning": "Assegnazione in corso...",
     "createGroupsFirst": "Crea prima i gironi per assegnare le coppie",
@@ -329,7 +329,9 @@
     "coupleAssigned": "Coppia assegnata con successo",
     "coupleRemoved": "Coppia rimossa dal girone con successo",
     "dragging": "Trascinamento in corso",
-    "coupleAssignment": "Assegnazione Coppie"
+    "dragDropInstruction": "Trascina e rilascia le coppie per assegnarle ai gironi",
+    "manageMatches": "Gestisci Partite",
+    "stageGroupsAndAssignment": "Gironi e Assegnazioni della Fase"
   },
   "Metadata": {
     "productView": "Dashboard : Vista Prodotto",

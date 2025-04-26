@@ -318,8 +318,8 @@
     "autoAssignCouples": "Auto Assign Couples",
     "autoAssignCouplesDescription": "Automatically distribute couples between groups",
     "assignmentMethod": "Assignment Method",
-    "balancedDistribution": "Balanced distribution (equal number in each group)",
-    "randomDistribution": "Random distribution",
+    "randomAssignment": "Random assignment",
+    "balancedAssignment": "Balanced assignment (equal number in each group)",
     "autoAssignWarning": "This will assign all unassigned couples to groups. Any existing assignments will remain unchanged.",
     "assigning": "Assigning...",
     "createGroupsFirst": "Create groups first to assign couples",
@@ -328,7 +328,10 @@
     "failedToRemoveCouple": "Failed to remove couple from group",
     "coupleAssigned": "Couple assigned successfully",
     "coupleRemoved": "Couple removed from group successfully",
-    "dragging": "Dragging"
+    "dragging": "Dragging",
+    "dragDropInstruction": "Drag and drop couples to assign them to groups",
+    "manageMatches": "Manage Matches",
+    "stageGroupsAndAssignment": "Stage Groups & Assignment"
   },
   "Metadata": {
     "productView": "Dashboard : Product View",

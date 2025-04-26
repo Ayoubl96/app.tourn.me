@@ -30,8 +30,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTournamentStaging } from '@/features/tournament/hooks/useTournamentStaging';
-import { GroupManagement } from './groups/GroupManagement';
-import { GroupCoupleManagement } from './groups/GroupCoupleManagement';
+import { IntegratedGroupManagement } from './groups/IntegratedGroupManagement';
 
 interface StageDetailViewProps {
   stage: TournamentStage;
@@ -49,17 +48,10 @@ export function StageDetailView({
 
   const isGroupStage = stage.stage_type === 'group';
 
-  const {
-    groups,
-    brackets,
-    isLoading,
-    loadGroups,
-    loadBrackets,
-    handleCreateGroup,
-    handleDeleteGroup
-  } = useTournamentStaging({
-    tournamentId: tournament.id
-  });
+  const { groups, brackets, isLoading, loadGroups, loadBrackets } =
+    useTournamentStaging({
+      tournamentId: tournament.id
+    });
 
   // Filter groups that belong to this stage
   const stageGroups = groups.filter((group) => group.stage_id === stage.id);
@@ -102,12 +94,7 @@ export function StageDetailView({
         <TabsList className='w-full justify-start overflow-auto sm:w-auto'>
           <TabsTrigger value='overview'>{t('overview')}</TabsTrigger>
           {isGroupStage && (
-            <>
-              <TabsTrigger value='groups'>{t('groups')}</TabsTrigger>
-              <TabsTrigger value='couples'>
-                {t('couplesAssignment')}
-              </TabsTrigger>
-            </>
+            <TabsTrigger value='groups'>{t('groups')}</TabsTrigger>
           )}
           {!isGroupStage && (
             <TabsTrigger value='brackets'>{t('brackets')}</TabsTrigger>
@@ -221,22 +208,9 @@ export function StageDetailView({
 
         {/* Groups Tab Content (for group stages only) */}
         {isGroupStage && (
-          <TabsContent value='groups' className='space-y-4'>
-            <GroupManagement
+          <TabsContent value='groups' className='space-y-6'>
+            <IntegratedGroupManagement
               stageId={stage.id}
-              groups={stageGroups}
-              onCreateGroup={handleCreateGroup}
-              onDeleteGroup={handleDeleteGroup}
-            />
-          </TabsContent>
-        )}
-
-        {/* Couples Assignment Tab Content (for group stages only) */}
-        {isGroupStage && (
-          <TabsContent value='couples' className='space-y-4'>
-            <GroupCoupleManagement
-              stageId={stage.id}
-              groups={stageGroups}
               tournamentId={tournament.id}
             />
           </TabsContent>

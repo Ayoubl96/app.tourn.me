@@ -318,8 +318,8 @@
     "autoAssignCouples": "Asignar Parejas Automáticamente",
     "autoAssignCouplesDescription": "Distribuir automáticamente las parejas entre grupos",
     "assignmentMethod": "Método de Asignación",
-    "balancedDistribution": "Distribución equilibrada (número igual en cada grupo)",
-    "randomDistribution": "Distribución aleatoria",
+    "randomAssignment": "Asignación aleatoria",
+    "balancedAssignment": "Asignación equilibrada (número igual en cada grupo)",
     "autoAssignWarning": "Esto asignará todas las parejas no asignadas a grupos. Las asignaciones existentes no cambiarán.",
     "assigning": "Asignando...",
     "createGroupsFirst": "Crea grupos primero para asignar parejas",
@@ -328,7 +328,10 @@
     "failedToRemoveCouple": "Error al eliminar pareja del grupo",
     "coupleAssigned": "Pareja asignada exitosamente",
     "coupleRemoved": "Pareja eliminada del grupo exitosamente",
-    "dragging": "Arrastrando"
+    "dragging": "Arrastrando",
+    "dragDropInstruction": "Arrastra y suelta parejas para asignarlas a grupos",
+    "manageMatches": "Gestionar Partidos",
+    "stageGroupsAndAssignment": "Grupos y Asignación de Etapa"
   },
   "Metadata": {
     "productView": "Panel : Vista de Producto",
