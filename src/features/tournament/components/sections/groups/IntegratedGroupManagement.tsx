@@ -43,6 +43,8 @@ import { useCoupleDragAndDrop } from '@/features/tournament/hooks/useCoupleDragA
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getInitials } from '@/features/tournament/utils/formatters';
 import { toast } from 'sonner';
+import { fetchStageGroups, fetchGroupCouples } from '@/api/tournaments/api';
+import { useApi } from '@/hooks/useApi';
 
 interface IntegratedGroupManagementProps {
   stageId: number;
@@ -55,6 +57,7 @@ export function IntegratedGroupManagement({
 }: IntegratedGroupManagementProps) {
   const t = useTranslations('Dashboard');
   const { couples } = useTournamentContext();
+  const callApi = useApi();
 
   // State for group management
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -70,48 +73,81 @@ export function IntegratedGroupManagement({
   const [isRemovingCouple, setIsRemovingCouple] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Get tournament staging hook
+  // Stage-specific state to avoid conflicts with global hook state
+  const [stageGroups, setStageGroups] = useState<TournamentGroup[]>([]);
+  const [groupCouples, setGroupCouples] = useState<
+    Record<number, GroupCouple[]>
+  >({});
+  const [isLoadingStageData, setIsLoadingStageData] = useState(false);
+
+  // Get tournament staging hook functions but don't use the global state
   const {
-    groups,
-    groupCouples,
-    isLoading,
     isCreatingGroup,
-    loadGroups,
-    loadGroupCouples,
     handleCreateGroup,
     handleDeleteGroup,
     handleAddCoupleToGroup,
     handleRemoveCoupleFromGroup,
     handleAutoAssignCouples
   } = useTournamentStaging({
-    tournamentId
+    tournamentId,
+    autoLoad: false // Disable auto-loading to prevent conflicts
   });
 
-  // Filter groups that belong to this stage
-  const stageGroups = groups.filter((group) => group.stage_id === stageId);
+  // Load stage-specific groups
+  const loadStageGroups = useCallback(async () => {
+    setIsLoadingStageData(true);
+    try {
+      const groupsData = await fetchStageGroups(callApi, stageId);
+      setStageGroups(groupsData);
+      return groupsData;
+    } catch (error) {
+      console.error('Error loading stage groups:', error);
+      return [];
+    } finally {
+      setIsLoadingStageData(false);
+    }
+  }, [callApi, stageId]);
 
-  // Load groups
+  // Load couples for a specific group
+  const loadGroupCouplesData = useCallback(
+    async (groupId: number) => {
+      try {
+        const couplesData = await fetchGroupCouples(callApi, groupId);
+        setGroupCouples((prev) => ({
+          ...prev,
+          [groupId]: couplesData
+        }));
+        return couplesData;
+      } catch (error) {
+        console.error('Error loading group couples:', error);
+        return [];
+      }
+    },
+    [callApi]
+  );
+
+  // Load groups on mount and when stageId changes
   useEffect(() => {
-    loadGroups(stageId);
-  }, [stageId, loadGroups]);
+    loadStageGroups();
+  }, [stageId, loadStageGroups]);
 
   // Helper function to refresh data
   const refreshData = useCallback(async () => {
     if (stageGroups.length > 0) {
-      const promises = stageGroups.map((group) => loadGroupCouples(group.id));
+      const promises = stageGroups.map((group) =>
+        loadGroupCouplesData(group.id)
+      );
       await Promise.all(promises);
       setRefreshTrigger((prev) => prev + 1);
     }
-  }, [stageGroups, loadGroupCouples]);
+  }, [stageGroups, loadGroupCouplesData]);
 
-  // Load couples for each group - only run on initial mount and when groups change
+  // Load couples for each group - only run when groups change
   useEffect(() => {
-    // Only load couples data when we have groups and after initial load
-    const groupIds = stageGroups.map((group) => group.id).join(',');
-    if (groupIds) {
+    if (stageGroups.length > 0) {
       refreshData();
     }
-  }, [stageGroups.length]); // Only depend on the length to detect when groups are added/removed
+  }, [stageGroups.length, refreshData]);
 
   // Get couples in a specific group
   const getCouplesInGroup = (groupId: number) => {
@@ -145,6 +181,8 @@ export function IntegratedGroupManagement({
       if (result) {
         setNewGroupName('');
         setIsCreateDialogOpen(false);
+        // Refresh stage groups after creation
+        await loadStageGroups();
         toast.success(
           t('groupCreated', { defaultValue: 'Group created successfully' })
         );
@@ -164,6 +202,15 @@ export function IntegratedGroupManagement({
       if (success) {
         setGroupToDelete(null);
         setIsDeleteDialogOpen(false);
+        // Remove the group from local state and clear its couples
+        setStageGroups((prev) =>
+          prev.filter((group) => group.id !== groupToDelete)
+        );
+        setGroupCouples((prev) => {
+          const newState = { ...prev };
+          delete newState[groupToDelete];
+          return newState;
+        });
         toast.success(
           t('groupDeleted', { defaultValue: 'Group deleted successfully' })
         );
@@ -185,7 +232,8 @@ export function IntegratedGroupManagement({
   const handleAssignCouple = async (groupId: number, coupleId: number) => {
     try {
       await handleAddCoupleToGroup(groupId, coupleId);
-      await refreshData(); // Refresh data after assignment
+      // Refresh the specific group's couples
+      await loadGroupCouplesData(groupId);
     } catch (error) {
       console.error('Failed to assign couple:', error);
     }
@@ -196,7 +244,8 @@ export function IntegratedGroupManagement({
     setIsRemovingCouple(true);
     try {
       await handleRemoveCoupleFromGroup(groupId, coupleId);
-      await refreshData(); // Refresh data after removal
+      // Refresh the specific group's couples
+      await loadGroupCouplesData(groupId);
     } catch (error) {
       console.error('Failed to remove couple:', error);
     } finally {
@@ -209,7 +258,9 @@ export function IntegratedGroupManagement({
     try {
       await handleAutoAssignCouples(stageId, assignMethod);
       setIsAutoAssignDialogOpen(false);
-      await refreshData(); // Refresh data after auto-assignment
+      // Refresh all group data after auto-assignment
+      await loadStageGroups();
+      await refreshData();
     } catch (error) {
       console.error('Failed to auto-assign couples:', error);
     }
@@ -539,8 +590,8 @@ export function IntegratedGroupManagement({
               >
                 {t('cancel')}
               </Button>
-              <Button onClick={handleAutoAssign} disabled={isLoading}>
-                {isLoading ? t('assigning') : t('assignCouples')}
+              <Button onClick={handleAutoAssign} disabled={isLoadingStageData}>
+                {isLoadingStageData ? t('assigning') : t('assignCouples')}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -26,7 +26,8 @@ import {
   UpdateTournamentBracketParams,
   ScheduleMatchParams,
   CourtAvailability,
-  AutoScheduleMatchesParams
+  AutoScheduleMatchesParams,
+  StagingMatch
 } from './types';
 
 /**
@@ -655,4 +656,69 @@ export const autoScheduleMatches = async (
   if (!response.ok) {
     throw new Error('Failed to auto-schedule matches');
   }
+};
+
+/**
+ * Match Management API functions
+ */
+
+// Fetch all matches for a tournament
+export const fetchTournamentMatches = async (
+  callApi: ApiCaller,
+  tournamentId: string | number
+): Promise<StagingMatch[]> => {
+  const response = await callApi(`/staging/tournament/${tournamentId}/matches`);
+  return handleApiResponse<StagingMatch[]>(response);
+};
+
+// Fetch all matches for a stage
+export const fetchStageMatches = async (
+  callApi: ApiCaller,
+  stageId: string | number
+): Promise<StagingMatch[]> => {
+  const response = await callApi(`/staging/stage/${stageId}/matches`);
+  return handleApiResponse<StagingMatch[]>(response);
+};
+
+// Fetch all matches for a group
+export const fetchGroupMatches = async (
+  callApi: ApiCaller,
+  groupId: string | number
+): Promise<StagingMatch[]> => {
+  const response = await callApi(`/staging/group/${groupId}/matches`);
+  return handleApiResponse<StagingMatch[]>(response);
+};
+
+// Fetch all matches for a bracket
+export const fetchBracketMatches = async (
+  callApi: ApiCaller,
+  bracketId: string | number
+): Promise<StagingMatch[]> => {
+  const response = await callApi(`/staging/bracket/${bracketId}/matches`);
+  return handleApiResponse<StagingMatch[]>(response);
+};
+
+// Fetch details for a specific match
+export const fetchMatchById = async (
+  callApi: ApiCaller,
+  matchId: string | number
+): Promise<StagingMatch> => {
+  const response = await callApi(`/staging/match/${matchId}`);
+  return handleApiResponse<StagingMatch>(response);
+};
+
+// Update match details (including results)
+export const updateMatch = async (
+  callApi: ApiCaller,
+  matchId: string | number,
+  matchData: Partial<StagingMatch>
+): Promise<StagingMatch> => {
+  const response = await callApi(`/staging/match/${matchId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(matchData)
+  });
+  return handleApiResponse<StagingMatch>(response);
 };

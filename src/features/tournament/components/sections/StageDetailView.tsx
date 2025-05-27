@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Tournament,
   TournamentStage,
-  TournamentGroup
+  TournamentGroup,
+  TournamentBracket
 } from '@/api/tournaments/types';
 import {
   Card,
@@ -25,12 +26,17 @@ import {
   Calendar,
   Share2,
   Settings,
-  Group
+  Group,
+  Flag,
+  Swords
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTournamentStaging } from '@/features/tournament/hooks/useTournamentStaging';
+import { fetchStageGroups, fetchStageBrackets } from '@/api/tournaments/api';
+import { useApi } from '@/hooks/useApi';
 import { IntegratedGroupManagement } from './groups/IntegratedGroupManagement';
+import { MatchManagement } from './matches/MatchManagement';
 
 interface StageDetailViewProps {
   stage: TournamentStage;
@@ -46,26 +52,44 @@ export function StageDetailView({
   const t = useTranslations('Dashboard');
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Stage-specific state to avoid conflicts with global hook state
+  const [stageGroups, setStageGroups] = useState<TournamentGroup[]>([]);
+  const [stageBrackets, setStageBrackets] = useState<TournamentBracket[]>([]);
+  const [isLoadingStageData, setIsLoadingStageData] = useState(false);
+
   const isGroupStage = stage.stage_type === 'group';
 
-  const { groups, brackets, isLoading, loadGroups, loadBrackets } =
-    useTournamentStaging({
-      tournamentId: tournament.id
-    });
+  // Get the hook functions but don't use the global state
+  const { loadGroups, loadBrackets } = useTournamentStaging({
+    tournamentId: tournament.id,
+    autoLoad: false // Disable auto-loading to prevent conflicts
+  });
 
-  // Filter groups that belong to this stage
-  const stageGroups = groups.filter((group) => group.stage_id === stage.id);
-  const stageBrackets = brackets.filter(
-    (bracket) => bracket.stage_id === stage.id
-  );
+  const callApi = useApi();
 
-  // Load stage-specific data
+  // Load stage-specific data with local state management
   useEffect(() => {
-    loadGroups(stage.id);
-    if (!isGroupStage) {
-      loadBrackets(stage.id);
-    }
-  }, [stage.id, isGroupStage, loadGroups, loadBrackets]);
+    const loadStageData = async () => {
+      setIsLoadingStageData(true);
+      try {
+        // Load groups for this specific stage directly from API
+        const groupsData = await fetchStageGroups(callApi, stage.id);
+        setStageGroups(groupsData);
+
+        // Load brackets for elimination stages
+        if (!isGroupStage) {
+          const bracketsData = await fetchStageBrackets(callApi, stage.id);
+          setStageBrackets(bracketsData);
+        }
+      } catch (error) {
+        console.error('Error loading stage data:', error);
+      } finally {
+        setIsLoadingStageData(false);
+      }
+    };
+
+    loadStageData();
+  }, [stage.id, isGroupStage, callApi]);
 
   return (
     <div className='space-y-6'>
@@ -99,6 +123,10 @@ export function StageDetailView({
           {!isGroupStage && (
             <TabsTrigger value='brackets'>{t('brackets')}</TabsTrigger>
           )}
+          <TabsTrigger value='matches'>
+            <Swords className='mr-1 h-4 w-4' />
+            {t('matches')}
+          </TabsTrigger>
           <TabsTrigger value='scheduling'>{t('scheduling')}</TabsTrigger>
           <TabsTrigger value='settings'>{t('settings')}</TabsTrigger>
         </TabsList>
@@ -227,6 +255,17 @@ export function StageDetailView({
             </Alert>
           </TabsContent>
         )}
+
+        {/* Matches Tab Content */}
+        <TabsContent value='matches' className='space-y-6'>
+          <MatchManagement
+            stageId={stage.id}
+            stageType={stage.stage_type}
+            tournamentId={tournament.id}
+            stageGroups={stageGroups}
+            stageBrackets={stageBrackets}
+          />
+        </TabsContent>
 
         {/* Scheduling Tab Content */}
         <TabsContent value='scheduling' className='space-y-4'>
