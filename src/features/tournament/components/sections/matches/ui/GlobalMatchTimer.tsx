@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, RotateCcw, Clock, Timer } from 'lucide-react';
 import { Couple } from '@/features/tournament/types';
+import {
+  getMatchTimingStatus,
+  getPriorityMatches
+} from '@/features/tournament/utils/matchHelpers';
 
 interface GlobalMatchTimerProps {
   matches: StagingMatch[];
@@ -51,13 +55,45 @@ export function GlobalMatchTimer({
   const t = useTranslations('Dashboard');
 
   // Get active time-limited matches that can be played now
-  const activeTimeLimitedMatches = matches.filter(
-    (match) =>
-      match.match_result_status === 'pending' &&
-      match.is_time_limited &&
-      match.time_limit_minutes &&
-      match.time_limit_minutes > 0
-  );
+  // Use the same logic as CourtCardView to identify which matches are currently active on courts
+  const activeTimeLimitedMatches = (() => {
+    // Get available courts that have matches
+    const availableCourts = Array.from(
+      new Set(
+        matches
+          .filter((m) => m.court_id && m.match_result_status === 'pending')
+          .map((m) => m.court_id!)
+      )
+    );
+
+    const activeMatches: StagingMatch[] = [];
+
+    // For each court, find the active/next match that should be playing
+    availableCourts.forEach((courtId) => {
+      const courtMatches = matches.filter(
+        (m) => m.court_id === courtId && m.match_result_status === 'pending'
+      );
+
+      if (courtMatches.length > 0) {
+        // Use the same priority sorting as CourtCardView
+        const sortedMatches = getPriorityMatches(courtMatches);
+
+        // Take the first (highest priority) match for this court
+        const activeMatch = sortedMatches[0];
+
+        // Only include if it's time-limited
+        if (
+          activeMatch.is_time_limited &&
+          activeMatch.time_limit_minutes &&
+          activeMatch.time_limit_minutes > 0
+        ) {
+          activeMatches.push(activeMatch);
+        }
+      }
+    });
+
+    return activeMatches;
+  })();
 
   // Get the time limit (use the first match's time limit, assuming all active matches have the same limit)
   const timeLimit =
@@ -370,7 +406,7 @@ export function GlobalMatchTimer({
         <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center gap-2 text-lg'>
             <Timer className='h-5 w-5' />
-            {t('globalMatchTimer', { defaultValue: 'Match Timer' })}
+            {t('liveMatchTimer', { defaultValue: 'Live Match Timer' })}
             {wasRestored && (
               <Badge
                 variant='outline'
@@ -394,7 +430,7 @@ export function GlobalMatchTimer({
         {/* Active Matches Info */}
         <div className='text-sm text-muted-foreground'>
           <p>
-            {t('activeMatches', { defaultValue: 'Active matches' })}:{' '}
+            {t('liveMatches', { defaultValue: 'Live matches on courts' })}:{' '}
             {activeTimeLimitedMatches.length}
           </p>
           <div className='mt-2 space-y-1'>
@@ -476,14 +512,14 @@ export function GlobalMatchTimer({
         {timer.status === 'expired' && (
           <div className='rounded-lg bg-red-50 p-3 text-center dark:bg-red-950/20'>
             <p className='font-medium text-red-600 dark:text-red-400'>
-              {t('allMatchesTimeExpired', {
-                defaultValue: 'All active matches time has expired!'
+              {t('allLiveMatchesTimeExpired', {
+                defaultValue: 'All live matches time has expired!'
               })}
             </p>
             <p className='mt-1 text-sm text-muted-foreground'>
-              {t('clickNewTimerGlobal', {
+              {t('clickNewTimerLive', {
                 defaultValue:
-                  'Click "New Timer" to start a new countdown for current matches'
+                  'Click "New Timer" to start a new countdown for current live matches'
               })}
             </p>
           </div>

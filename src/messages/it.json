@@ -503,7 +503,11 @@
     "clickNewTimerGlobal": "Clicca \"Nuovo Cronometro\" per iniziare un nuovo conto alla rovescia per le partite attuali",
     "matchesTimeExpired": "{count, plural, =1 {1 partita è} other {# partite sono}} scaduta e contrassegnata come tempo scaduto",
     "timerRestored": "Ripristinato",
-    "timerContinuedFromSession": "Cronometro continuato dalla sessione precedente"
+    "timerContinuedFromSession": "Cronometro continuato dalla sessione precedente",
+    "liveMatches": "Partite live sui campi",
+    "liveMatchTimer": "Cronometro Partite Live",
+    "allLiveMatchesTimeExpired": "Il tempo di tutte le partite live è scaduto!",
+    "clickNewTimerLive": "Clicca \"Nuovo Cronometro\" per iniziare un nuovo conto alla rovescia per le partite live attuali"
   },
   "Metadata": {
     "productView": "Dashboard : Vista Prodotto",

@@ -502,7 +502,11 @@
     "clickNewTimerGlobal": "Click \"New Timer\" to start a new countdown for current matches",
     "matchesTimeExpired": "{count, plural, =1 {1 match has} other {# matches have}} expired and been marked as time expired",
     "timerRestored": "Restored",
-    "timerContinuedFromSession": "Timer continued from previous session"
+    "timerContinuedFromSession": "Timer continued from previous session",
+    "liveMatches": "Live matches on courts",
+    "liveMatchTimer": "Live Match Timer",
+    "allLiveMatchesTimeExpired": "All live matches time has expired!",
+    "clickNewTimerLive": "Click \"New Timer\" to start a new countdown for current live matches"
   },
   "Metadata": {
     "productView": "Dashboard : Product View",
