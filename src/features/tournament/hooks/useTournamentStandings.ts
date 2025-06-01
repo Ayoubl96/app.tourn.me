@@ -47,7 +47,7 @@ export const useTournamentStandings = (
       setIsRecalculating(true);
       setError(null);
 
-      await recalculateTournamentStats(callApi, tournamentId);
+      await recalculateTournamentStats(callApi, tournamentId, groupId);
       toast.success('Tournament statistics recalculated successfully');
 
       // Reload standings after recalculation
@@ -61,7 +61,7 @@ export const useTournamentStandings = (
     } finally {
       setIsRecalculating(false);
     }
-  }, [callApi, tournamentId, loadStandings]);
+  }, [callApi, tournamentId, groupId, loadStandings]);
 
   return {
     standings,

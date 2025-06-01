@@ -715,7 +715,7 @@ export const updateMatch = async (
   matchData: Partial<StagingMatch>
 ): Promise<StagingMatch> => {
   const response = await callApi(`/staging/match/${matchId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -747,14 +747,18 @@ export const fetchTournamentStandings = async (
 // Recalculate tournament statistics
 export const recalculateTournamentStats = async (
   callApi: ApiCaller,
-  tournamentId: string | number
+  tournamentId: string | number,
+  groupId?: string | number
 ): Promise<void> => {
-  const response = await callApi(
-    `/staging/tournament/${tournamentId}/stats/recalculate`,
-    {
-      method: 'POST'
-    }
-  );
+  let url = `/staging/tournament/${tournamentId}/stats/recalculate`;
+
+  if (groupId) {
+    url += `?group_id=${groupId}`;
+  }
+
+  const response = await callApi(url, {
+    method: 'POST'
+  });
 
   if (!response.ok) {
     throw new Error('Failed to recalculate tournament statistics');
