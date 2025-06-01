@@ -33,6 +33,7 @@ interface CourtsViewProps {
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
+  getStageName?: (match: StagingMatch) => string;
   onOpenResultEntry?: (match: StagingMatch) => void;
   onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
 }
@@ -47,6 +48,7 @@ export function CourtsView({
   getCourtName,
   getGroupName,
   getBracketName,
+  getStageName,
   onOpenResultEntry,
   onSaveResult
 }: CourtsViewProps) {
@@ -96,6 +98,9 @@ export function CourtsView({
             <Table>
               <TableHeader>
                 <TableRow>
+                  {getStageName && (
+                    <TableHead className='w-[120px]'>Stage</TableHead>
+                  )}
                   <TableHead className='min-w-[320px]'>
                     {t('couples', { defaultValue: 'Couples' })}
                   </TableHead>
@@ -129,12 +134,14 @@ export function CourtsView({
                     showSchedule={false}
                     showGroup={stageType === 'group'}
                     showBracket={stageType === 'elimination'}
+                    showStage={!!getStageName}
                     stageType={stageType}
                     couples={couples}
                     getCoupleName={getCoupleName}
                     getCourtName={getCourtName}
                     getGroupName={getGroupName}
                     getBracketName={getBracketName}
+                    getStageName={getStageName}
                     onOpenResultEntry={onOpenResultEntry}
                     isUpdatingMatch={isUpdatingMatch}
                     onSaveResult={onSaveResult}
@@ -176,6 +183,9 @@ export function CourtsView({
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      {getStageName && (
+                        <TableHead className='w-[120px]'>Stage</TableHead>
+                      )}
                       <TableHead className='min-w-[320px]'>
                         {t('couples', { defaultValue: 'Couples' })}
                       </TableHead>
@@ -220,12 +230,14 @@ export function CourtsView({
                         }
                         showGroup={stageType === 'group'}
                         showBracket={stageType === 'elimination'}
+                        showStage={!!getStageName}
                         stageType={stageType}
                         couples={couples}
                         getCoupleName={getCoupleName}
                         getCourtName={getCourtName}
                         getGroupName={getGroupName}
                         getBracketName={getBracketName}
+                        getStageName={getStageName}
                         onOpenResultEntry={onOpenResultEntry}
                         isUpdatingMatch={isUpdatingMatch}
                         onSaveResult={onSaveResult}

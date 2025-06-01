@@ -25,12 +25,14 @@ interface MatchRowProps {
   showSchedule: boolean;
   showGroup?: boolean;
   showBracket?: boolean;
+  showStage?: boolean;
   stageType: 'group' | 'elimination';
   couples: Couple[];
   getCoupleName: (id: number) => string;
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
+  getStageName?: (match: StagingMatch) => string;
   onOpenResultEntry?: (match: StagingMatch) => void;
   onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
   isUpdatingMatch: boolean;
@@ -42,12 +44,14 @@ export function MatchRow({
   showSchedule,
   showGroup = false,
   showBracket = false,
+  showStage = false,
   stageType,
   couples,
   getCoupleName,
   getCourtName,
   getGroupName,
   getBracketName,
+  getStageName,
   onOpenResultEntry,
   onSaveResult,
   isUpdatingMatch
@@ -179,6 +183,13 @@ export function MatchRow({
             : ''
         }
       >
+        {/* Conditional stage column */}
+        {showStage && getStageName && (
+          <TableCell>
+            <span className='text-xs font-medium'>{getStageName(match)}</span>
+          </TableCell>
+        )}
+
         <TableCell className='py-4'>{renderCouplesCell()}</TableCell>
         <TableCell>
           <StatusBadge match={match} />
@@ -276,6 +287,7 @@ export function MatchRow({
         <TableRow>
           <TableCell
             colSpan={
+              (showStage && getStageName ? 1 : 0) + // Stage column
               3 + // Base columns: Couples, Status, Court
               (showGroup && stageType === 'group' ? 1 : 0) + // Group column
               (showBracket && stageType === 'elimination' ? 1 : 0) + // Bracket column

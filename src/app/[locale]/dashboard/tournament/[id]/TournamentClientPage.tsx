@@ -26,13 +26,14 @@ import { TournamentHeader } from '@/features/tournament/components/sections/Tour
 import { TournamentOverview } from '@/features/tournament/components/sections/TournamentOverview';
 import { TournamentManage } from '@/features/tournament/components/sections/TournamentManage';
 import { PlayersAndTeams } from '@/features/tournament/components/sections/PlayersAndTeams';
-import { TournamentLeaderboard } from '@/features/tournament/components/sections/TournamentLeaderboard';
-import { TournamentGames } from '@/features/tournament/components/sections/TournamentGames';
 import { TournamentCourts } from '@/features/tournament/components/sections/TournamentCourts';
 import { TournamentStaging } from '@/features/tournament/components/sections/TournamentStaging';
+import { TournamentAllStandings } from '@/features/tournament/components/sections/TournamentAllStandings';
+import { TournamentAllMatches } from '@/features/tournament/components/sections/TournamentAllMatches';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
+import { TournamentProvider } from '@/features/tournament/context/TournamentContext';
 
 export default function TournamentClientPage({
   tournamentId
@@ -158,95 +159,97 @@ export default function TournamentClientPage({
 
       <Separator />
 
-      {/* Tab navigation */}
-      <Tabs
-        defaultValue='overview'
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className='w-full'
-      >
-        <TabsList className='mb-4 w-full justify-start overflow-auto sm:w-auto'>
-          <TabsTrigger value='overview'>{t('overview')}</TabsTrigger>
-          <TabsTrigger value='manage'>{t('manage')}</TabsTrigger>
-          <TabsTrigger value='courts'>{t('courts')}</TabsTrigger>
-          <TabsTrigger value='players'>{t('playersAndTeams')}</TabsTrigger>
-          <TabsTrigger value='staging'>{t('staging')}</TabsTrigger>
-          <TabsTrigger value='leaderboard'>{t('leaderboard')}</TabsTrigger>
-          <TabsTrigger value='games'>{t('games')}</TabsTrigger>
-        </TabsList>
+      <TournamentProvider tournamentId={tournamentId}>
+        {/* Tab navigation */}
+        <Tabs
+          defaultValue='overview'
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className='w-full'
+        >
+          <TabsList className='mb-4 w-full justify-start overflow-auto sm:w-auto'>
+            <TabsTrigger value='overview'>{t('overview')}</TabsTrigger>
+            <TabsTrigger value='manage'>{t('manage')}</TabsTrigger>
+            <TabsTrigger value='courts'>{t('courts')}</TabsTrigger>
+            <TabsTrigger value='players'>{t('playersAndTeams')}</TabsTrigger>
+            <TabsTrigger value='staging'>{t('staging')}</TabsTrigger>
+            <TabsTrigger value='standings'>{t('standings')}</TabsTrigger>
+            <TabsTrigger value='matches'>{t('matches')}</TabsTrigger>
+          </TabsList>
 
-        {/* Overview Tab Content */}
-        <TabsContent value='overview' className='space-y-6'>
-          <TournamentOverview tournament={tournament} />
-        </TabsContent>
+          {/* Overview Tab Content */}
+          <TabsContent value='overview' className='space-y-6'>
+            <TournamentOverview tournament={tournament} />
+          </TabsContent>
 
-        {/* Manage Tab Content */}
-        <TabsContent value='manage' className='space-y-6'>
-          <TournamentManage tournament={tournament} />
-        </TabsContent>
+          {/* Manage Tab Content */}
+          <TabsContent value='manage' className='space-y-6'>
+            <TournamentManage tournament={tournament} />
+          </TabsContent>
 
-        {/* Courts Tab Content */}
-        <TabsContent value='courts' className='space-y-6'>
-          <TournamentCourts tournament={tournament} />
-        </TabsContent>
+          {/* Courts Tab Content */}
+          <TabsContent value='courts' className='space-y-6'>
+            <TournamentCourts tournament={tournament} />
+          </TabsContent>
 
-        {/* Players & Teams Tab Content */}
-        <TabsContent value='players' className='space-y-6'>
-          <PlayersAndTeams
-            tournament={tournament}
-            tournamentPlayers={tournamentPlayers}
-            couples={couples}
-            allPlayers={allPlayers}
-            loadingPlayers={loadingPlayers}
-            loadingCouples={loadingCouples}
-            loadingAllPlayers={loadingAllPlayers}
-            addingPlayer={addingPlayer}
-            isDeletingPlayer={isDeletingPlayer}
-            playerToDelete={playerToDelete}
-            setPlayerToDelete={setPlayerToDelete}
-            getPlayerCountProgress={getPlayerCountProgress}
-            isPlayerLimitReached={isPlayerLimitReached}
-            loadAllPlayers={loadAllPlayers}
-            addPlayerToTournament={addPlayerToTournament}
-            removePlayerFromTournament={removePlayerFromTournament}
-            loadTournamentCouples={loadTournamentCouples}
-            // Player management props
-            playerAdditionMode={playerAdditionMode}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            setPlayerAdditionMode={setPlayerAdditionMode}
-            handleSelectMode={handleSelectMode}
-            // Import Playtomic props
-            playtomicPlayers={playtomicPlayers}
-            isSearching={isSearching}
-            isImporting={isImporting}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            selectedPlayer={selectedPlayer}
-            setSelectedPlayer={setSelectedPlayer}
-            handleSearchPlaytomicPlayers={handleSearchPlaytomicPlayers}
-            handleImportPlayer={handleImportPlayer}
-            handleImportPlayerWithGender={handleImportPlayerWithGender}
-            handleCreatePlayer={handleCreatePlayer}
-            error={playerManagementError}
-          />
-        </TabsContent>
+          {/* Players & Teams Tab Content */}
+          <TabsContent value='players' className='space-y-6'>
+            <PlayersAndTeams
+              tournament={tournament}
+              tournamentPlayers={tournamentPlayers}
+              couples={couples}
+              allPlayers={allPlayers}
+              loadingPlayers={loadingPlayers}
+              loadingCouples={loadingCouples}
+              loadingAllPlayers={loadingAllPlayers}
+              addingPlayer={addingPlayer}
+              isDeletingPlayer={isDeletingPlayer}
+              playerToDelete={playerToDelete}
+              setPlayerToDelete={setPlayerToDelete}
+              getPlayerCountProgress={getPlayerCountProgress}
+              isPlayerLimitReached={isPlayerLimitReached}
+              loadAllPlayers={loadAllPlayers}
+              addPlayerToTournament={addPlayerToTournament}
+              removePlayerFromTournament={removePlayerFromTournament}
+              loadTournamentCouples={loadTournamentCouples}
+              // Player management props
+              playerAdditionMode={playerAdditionMode}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              setPlayerAdditionMode={setPlayerAdditionMode}
+              handleSelectMode={handleSelectMode}
+              // Import Playtomic props
+              playtomicPlayers={playtomicPlayers}
+              isSearching={isSearching}
+              isImporting={isImporting}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedPlayer={selectedPlayer}
+              setSelectedPlayer={setSelectedPlayer}
+              handleSearchPlaytomicPlayers={handleSearchPlaytomicPlayers}
+              handleImportPlayer={handleImportPlayer}
+              handleImportPlayerWithGender={handleImportPlayerWithGender}
+              handleCreatePlayer={handleCreatePlayer}
+              error={playerManagementError}
+            />
+          </TabsContent>
 
-        {/* Staging Tab Content */}
-        <TabsContent value='staging' className='space-y-6'>
-          <TournamentStaging tournament={tournament} />
-        </TabsContent>
+          {/* Staging Tab Content */}
+          <TabsContent value='staging' className='space-y-6'>
+            <TournamentStaging tournament={tournament} />
+          </TabsContent>
 
-        {/* Leaderboard Tab Content */}
-        <TabsContent value='leaderboard' className='space-y-6'>
-          <TournamentLeaderboard tournament={tournament} />
-        </TabsContent>
+          {/* Standings Tab Content */}
+          <TabsContent value='standings' className='space-y-6'>
+            <TournamentAllStandings tournament={tournament} />
+          </TabsContent>
 
-        {/* Games Tab Content */}
-        <TabsContent value='games' className='space-y-6'>
-          <TournamentGames tournament={tournament} />
-        </TabsContent>
-      </Tabs>
+          {/* Matches Tab Content */}
+          <TabsContent value='matches' className='space-y-6'>
+            <TournamentAllMatches tournament={tournament} />
+          </TabsContent>
+        </Tabs>
+      </TournamentProvider>
 
       {/* Player deletion confirmation dialog - moved to PlayersAndTeams component */}
     </div>

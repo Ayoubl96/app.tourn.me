@@ -131,8 +131,6 @@ export function StageDetailView({
             <Swords className='mr-1 h-4 w-4' />
             {t('matches')}
           </TabsTrigger>
-          <TabsTrigger value='scheduling'>{t('scheduling')}</TabsTrigger>
-          <TabsTrigger value='settings'>{t('settings')}</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab Content */}
@@ -276,28 +274,6 @@ export function StageDetailView({
             stageGroups={stageGroups}
             stageBrackets={stageBrackets}
           />
-        </TabsContent>
-
-        {/* Scheduling Tab Content */}
-        <TabsContent value='scheduling' className='space-y-4'>
-          <Alert>
-            <AlertTitle>{t('comingSoon')}</AlertTitle>
-            <AlertDescription>
-              {t('matchSchedulingComingSoon')}
-            </AlertDescription>
-          </Alert>
-        </TabsContent>
-
-        {/* Settings Tab Content */}
-        <TabsContent value='settings' className='space-y-4'>
-          <Alert>
-            <AlertTitle>{t('comingSoon')}</AlertTitle>
-            <AlertDescription>
-              {t('stageSettingsComingSoon', {
-                defaultValue: 'Stage settings features will be available soon'
-              })}
-            </AlertDescription>
-          </Alert>
         </TabsContent>
       </Tabs>
     </div>
