@@ -241,7 +241,9 @@ export function MatchResultEntry({
             <div className='flex-1 text-center'>
               <p className='font-semibold'>{couple1Name}</p>
             </div>
-            <div className='px-4 text-center'>vs</div>
+            <div className='px-4 text-center'>
+              {t('vs', { defaultValue: 'vs' })}
+            </div>
             <div className='flex-1 text-center'>
               <p className='font-semibold'>{couple2Name}</p>
             </div>
@@ -319,7 +321,9 @@ export function MatchResultEntry({
                   </div>
 
                   <div className='col-span-1 flex items-center justify-center'>
-                    <span className='text-lg font-medium'>vs</span>
+                    <span className='text-lg font-medium'>
+                      {t('vs', { defaultValue: 'vs' })}
+                    </span>
                   </div>
 
                   <div className='col-span-3'>

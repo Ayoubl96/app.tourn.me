@@ -9,7 +9,6 @@ import {
 import { groupMatchesByCourt } from '@/features/tournament/utils/matchDisplayHelpers';
 import { CalendarClock } from 'lucide-react';
 import { MatchCard } from '../ui/MatchCard';
-import { Button } from '@/components/ui/button';
 import { Couple } from '@/features/tournament/types';
 
 interface CourtCardViewProps {
@@ -20,7 +19,7 @@ interface CourtCardViewProps {
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
-  onOpenResultEntry?: (match: StagingMatch) => void;
+  onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
 }
 
 export function CourtCardView({
@@ -31,7 +30,7 @@ export function CourtCardView({
   getCourtName,
   getGroupName,
   getBracketName,
-  onOpenResultEntry
+  onSaveResult
 }: CourtCardViewProps) {
   const t = useTranslations('Dashboard');
 
@@ -87,22 +86,23 @@ export function CourtCardView({
     }); // Show all completed matches instead of limiting to 6
 
   return (
-    <div className='space-y-10'>
-      {/* Active Courts */}
+    <div className='space-y-8'>
+      {/* Current matches on courts */}
       {Object.keys(courtGroups).length > 0 && (
         <div>
           <h3 className='mb-5 text-2xl font-medium'>
-            {t('activeCourts', { defaultValue: 'Active Courts' })}
+            {t('currentMatches', { defaultValue: 'Current Matches' })}
           </h3>
-          <div className='grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3'>
             {Object.entries(courtGroups).map(([venue, courtMatches]) => (
               <div key={venue} className='space-y-4'>
-                <h4 className='text-xl font-semibold text-foreground/90'>
+                <h4 className='text-lg font-medium text-foreground/90'>
                   {venue}
                 </h4>
-                <div className='grid grid-cols-1 gap-4'>
+                <div className='space-y-4'>
                   {courtMatches.map((match, index) => {
-                    const courtNumber = getCourtName(match).split(' - ')[1];
+                    const courtNumber = getCourtName(match);
+
                     return (
                       <div key={match.id} className='space-y-2'>
                         <h5 className='text-base font-medium text-foreground/80'>
@@ -116,19 +116,8 @@ export function CourtCardView({
                           getGroupName={getGroupName}
                           getBracketName={getBracketName}
                           index={index}
+                          onSaveResult={onSaveResult}
                         />
-                        {onOpenResultEntry && (
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() => onOpenResultEntry(match)}
-                            className='mt-2 w-full'
-                          >
-                            {t('recordResult', {
-                              defaultValue: 'Record Result'
-                            })}
-                          </Button>
-                        )}
                       </div>
                     );
                   })}
@@ -158,6 +147,7 @@ export function CourtCardView({
                   getGroupName={getGroupName}
                   getBracketName={getBracketName}
                   index={index}
+                  onSaveResult={onSaveResult}
                 />
               ))
             ) : (
@@ -191,6 +181,7 @@ export function CourtCardView({
                   getGroupName={getGroupName}
                   getBracketName={getBracketName}
                   index={index}
+                  onSaveResult={onSaveResult}
                 />
               ))
             ) : (

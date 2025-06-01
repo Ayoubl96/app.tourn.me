@@ -72,6 +72,7 @@
     "leaderboard": "Classifica",
     "games": "Partite",
     "manage": "Gestisci",
+    "standings": "Classifiche",
     "tournamentNotFound": "Torneo non trovato",
     "tournamentNotFoundDesc": "Il torneo che stai cercando non esiste o è stato rimosso",
     "backToTournaments": "Torna ai Tornei",
@@ -480,6 +481,7 @@
     "readyShort": "PRONTO",
     "cardView": "Vista schede",
     "activeCourts": "Campi Attivi",
+    "currentMatches": "Partite Attuali",
     "upcomingGames": "Partite in Arrivo",
     "recentGames": "Partite Recenti",
     "noUpcomingGames": "Nessuna partita programmata",
@@ -507,7 +509,13 @@
     "liveMatches": "Partite live sui campi",
     "liveMatchTimer": "Cronometro Partite Live",
     "allLiveMatchesTimeExpired": "Il tempo di tutte le partite live è scaduto!",
-    "clickNewTimerLive": "Clicca \"Nuovo Cronometro\" per iniziare un nuovo conto alla rovescia per le partite live attuali"
+    "clickNewTimerLive": "Clicca \"Nuovo Cronometro\" per iniziare un nuovo conto alla rovescia per le partite live attuali",
+    "setScores": "Punteggi Set",
+    "addSet": "Aggiungi Set",
+    "set": "Set",
+    "sets": "Set",
+    "hideResultEntry": "Nascondi Inserimento Risultato",
+    "roundRobin": "Girone all'Italiana"
   },
   "Metadata": {
     "productView": "Dashboard : Vista Prodotto",

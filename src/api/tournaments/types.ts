@@ -404,3 +404,46 @@ export interface AutoScheduleMatchesParams {
   start_date: string;
   end_date?: string;
 }
+
+/**
+ * Tournament Standings Stats entity
+ */
+export interface TournamentStandingStat {
+  tournament_id: number;
+  couple_id: number;
+  group_id: number;
+  matches_played: number;
+  matches_won: number;
+  matches_lost: number;
+  matches_drawn: number;
+  games_won: number;
+  games_lost: number;
+  total_points: number;
+  id: number;
+  last_updated: string;
+  couple: {
+    id: number;
+    tournament_id: number;
+    first_player_id: number;
+    second_player_id: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    name: string;
+  };
+  games_diff: number;
+  win_percentage: number;
+  position: number;
+}
+
+/**
+ * Tournament Standings Response
+ */
+export interface TournamentStandingsResponse {
+  tournament_id: number;
+  tournament_name: string;
+  group_id: number;
+  group_name: string;
+  stats: TournamentStandingStat[];
+  last_updated: string;
+}

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { StagingMatch } from '@/api/tournaments/types';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock } from 'lucide-react';
+import { Trophy, Clock, Edit3 } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import { MatchStatusIndicator } from './MatchStatusIndicator';
 import { CoupleDisplay, VersusDisplay } from './CoupleDisplay';
+import { InlineMatchResultEntry } from './InlineMatchResultEntry';
 import {
   formatMatchDate,
   formatMatchTime
@@ -30,7 +31,8 @@ interface MatchRowProps {
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
-  onOpenResultEntry: (match: StagingMatch) => void;
+  onOpenResultEntry?: (match: StagingMatch) => void;
+  onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
   isUpdatingMatch: boolean;
 }
 
@@ -47,11 +49,36 @@ export function MatchRow({
   getGroupName,
   getBracketName,
   onOpenResultEntry,
+  onSaveResult,
   isUpdatingMatch
 }: MatchRowProps) {
   const t = useTranslations('Dashboard');
+  const [showResultEntry, setShowResultEntry] = useState(false);
+
   const isCurrent = isCurrentMatch(match, allMatches, 0);
   const canPlay = canBePlayedNext(match, allMatches);
+
+  // Check if match has result
+  const hasResult = match.winner_couple_id !== null;
+
+  const handleToggleResultEntry = () => {
+    setShowResultEntry(!showResultEntry);
+  };
+
+  const handleSaveResult = async (matchId: number, scores: any) => {
+    if (onSaveResult) {
+      const success = await onSaveResult(matchId, scores);
+      if (success) {
+        setShowResultEntry(false);
+      }
+      return success;
+    }
+    return false;
+  };
+
+  const handleCancelResultEntry = () => {
+    setShowResultEntry(false);
+  };
 
   // Standardize button styling
   const getActionButtonProps = (isCurrent: boolean, canPlay: boolean) => {
@@ -143,85 +170,130 @@ export function MatchRow({
   };
 
   return (
-    <TableRow
-      key={match.id}
-      className={
-        isCurrent || canPlay
-          ? 'border-l-4 border-red-500 bg-red-50 dark:border-red-600 dark:bg-red-950/40'
-          : ''
-      }
-    >
-      <TableCell className='py-4'>{renderCouplesCell()}</TableCell>
-      <TableCell>
-        <StatusBadge match={match} />
-      </TableCell>
-      <TableCell>
-        {match.court_id ? (
-          getCourtName(match)
-        ) : (
-          <span className='text-sm text-muted-foreground'>—</span>
+    <>
+      <TableRow
+        key={match.id}
+        className={
+          isCurrent || canPlay
+            ? 'border-l-4 border-red-500 bg-red-50 dark:border-red-600 dark:bg-red-950/40'
+            : ''
+        }
+      >
+        <TableCell className='py-4'>{renderCouplesCell()}</TableCell>
+        <TableCell>
+          <StatusBadge match={match} />
+        </TableCell>
+        <TableCell>
+          {match.court_id ? (
+            getCourtName(match)
+          ) : (
+            <span className='text-sm text-muted-foreground'>—</span>
+          )}
+        </TableCell>
+
+        {/* Conditional group column */}
+        {showGroup && stageType === 'group' && (
+          <TableCell>
+            {getGroupName(match) || (
+              <span className='text-sm text-muted-foreground'>—</span>
+            )}
+          </TableCell>
         )}
-      </TableCell>
 
-      {/* Conditional group column */}
-      {showGroup && stageType === 'group' && (
-        <TableCell>
-          {getGroupName(match) || (
-            <span className='text-sm text-muted-foreground'>—</span>
-          )}
-        </TableCell>
-      )}
+        {/* Conditional bracket column */}
+        {showBracket && stageType === 'elimination' && (
+          <TableCell>
+            {match.bracket_id ? (
+              getBracketName(match)
+            ) : (
+              <span className='text-sm text-muted-foreground'>—</span>
+            )}
+          </TableCell>
+        )}
 
-      {/* Conditional bracket column */}
-      {showBracket && stageType === 'elimination' && (
-        <TableCell>
-          {match.bracket_id ? (
-            getBracketName(match)
-          ) : (
-            <span className='text-sm text-muted-foreground'>—</span>
-          )}
-        </TableCell>
-      )}
-
-      {/* Conditional schedule column */}
-      {showSchedule && (
-        <TableCell>
-          {match.scheduled_start ? (
-            <div className='text-sm'>
-              <div className='font-medium'>
-                {formatMatchDate(match.scheduled_start)}
+        {/* Conditional schedule column */}
+        {showSchedule && (
+          <TableCell>
+            {match.scheduled_start ? (
+              <div className='text-sm'>
+                <div className='font-medium'>
+                  {formatMatchDate(match.scheduled_start)}
+                </div>
+                <div className='text-xs text-muted-foreground'>
+                  {formatMatchTime(match.scheduled_start)}
+                  {match.scheduled_end && (
+                    <> - {formatMatchTime(match.scheduled_end)}</>
+                  )}
+                </div>
               </div>
-              <div className='text-xs text-muted-foreground'>
-                {formatMatchTime(match.scheduled_start)}
-                {match.scheduled_end && (
-                  <> - {formatMatchTime(match.scheduled_end)}</>
-                )}
-              </div>
-            </div>
-          ) : (
-            <span className='text-sm text-muted-foreground'>
-              {t('notScheduled', { defaultValue: 'Not scheduled' })}
-            </span>
-          )}
+            ) : (
+              <span className='text-sm text-muted-foreground'>
+                {t('notScheduled', { defaultValue: 'Not scheduled' })}
+              </span>
+            )}
+          </TableCell>
+        )}
+
+        {/* Result column */}
+        <TableCell>{renderResultCell()}</TableCell>
+
+        {/* Actions column */}
+        <TableCell>
+          <div className='flex gap-2'>
+            {/* Inline result entry button (preferred) */}
+            {onSaveResult && (
+              <Button
+                {...getActionButtonProps(isCurrent, canPlay)}
+                onClick={handleToggleResultEntry}
+                disabled={isUpdatingMatch}
+              >
+                <Edit3 className='mr-2 h-4 w-4' />
+                {showResultEntry
+                  ? t('hideResultEntry', { defaultValue: 'Hide' })
+                  : hasResult
+                    ? t('editResult', { defaultValue: 'Edit' })
+                    : t('enterResult', { defaultValue: 'Result' })}
+              </Button>
+            )}
+
+            {/* Fallback to old popup if no onSaveResult */}
+            {!onSaveResult && onOpenResultEntry && (
+              <Button
+                {...getActionButtonProps(isCurrent, canPlay)}
+                onClick={() => onOpenResultEntry(match)}
+                disabled={isUpdatingMatch}
+              >
+                <Clock className='mr-2 h-4 w-4' />
+                {t('result', { defaultValue: 'Result' })}
+              </Button>
+            )}
+          </div>
         </TableCell>
-      )}
+      </TableRow>
 
-      {/* Result column */}
-      <TableCell>{renderResultCell()}</TableCell>
-
-      {/* Actions column */}
-      <TableCell>
-        <div className='flex gap-2'>
-          <Button
-            {...getActionButtonProps(isCurrent, canPlay)}
-            onClick={() => onOpenResultEntry(match)}
-            disabled={isUpdatingMatch}
+      {/* Inline Result Entry Row */}
+      {showResultEntry && onSaveResult && (
+        <TableRow>
+          <TableCell
+            colSpan={
+              3 + // Base columns: Couples, Status, Court
+              (showGroup && stageType === 'group' ? 1 : 0) + // Group column
+              (showBracket && stageType === 'elimination' ? 1 : 0) + // Bracket column
+              (showSchedule ? 1 : 0) + // Schedule column
+              2 // Result + Actions columns
+            }
+            className='p-0'
           >
-            <Clock className='mr-2 h-4 w-4' />
-            {t('result', { defaultValue: 'Result' })}
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
+            <InlineMatchResultEntry
+              match={match}
+              couple1Name={getCoupleName(match.couple1_id)}
+              couple2Name={getCoupleName(match.couple2_id)}
+              onSave={handleSaveResult}
+              onCancel={handleCancelResultEntry}
+            />
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }

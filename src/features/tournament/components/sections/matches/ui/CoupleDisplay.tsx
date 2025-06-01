@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/features/tournament/utils/formatters';
 import { Couple } from '@/features/tournament/types';
+import { useTranslations } from 'next-intl';
 
 interface CoupleDisplayProps {
   coupleId: number;
@@ -129,6 +130,8 @@ export function VersusDisplay({
     return `${player1?.nickname || 'Player 1'} & ${player2?.nickname || 'Player 2'}`;
   };
 
+  const t = useTranslations('Dashboard');
+
   const renderCoupleWithAvatars = (
     couple: Couple | undefined,
     coupleId: number
@@ -176,7 +179,9 @@ export function VersusDisplay({
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {renderCoupleWithAvatars(couple1, couple1Id)}
-      <span className='text-sm font-medium text-muted-foreground'>vs</span>
+      <span className='text-sm font-medium text-muted-foreground'>
+        {t('vs', { defaultValue: 'vs' })}
+      </span>
       {renderCoupleWithAvatars(couple2, couple2Id)}
     </div>
   );

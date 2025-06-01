@@ -27,7 +27,8 @@ import {
   ScheduleMatchParams,
   CourtAvailability,
   AutoScheduleMatchesParams,
-  StagingMatch
+  StagingMatch,
+  TournamentStandingsResponse
 } from './types';
 
 /**
@@ -707,18 +708,55 @@ export const fetchMatchById = async (
   return handleApiResponse<StagingMatch>(response);
 };
 
-// Update match details (including results)
+// Update match details
 export const updateMatch = async (
   callApi: ApiCaller,
   matchId: string | number,
   matchData: Partial<StagingMatch>
 ): Promise<StagingMatch> => {
   const response = await callApi(`/staging/match/${matchId}`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(matchData)
   });
   return handleApiResponse<StagingMatch>(response);
+};
+
+/**
+ * Tournament Standings API functions
+ */
+
+// Fetch tournament standings for group phase
+export const fetchTournamentStandings = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  groupId?: string | number
+): Promise<TournamentStandingsResponse> => {
+  let url = `/staging/tournament/${tournamentId}/standings`;
+
+  if (groupId) {
+    url += `?group_id=${groupId}`;
+  }
+
+  const response = await callApi(url);
+  return handleApiResponse<TournamentStandingsResponse>(response);
+};
+
+// Recalculate tournament statistics
+export const recalculateTournamentStats = async (
+  callApi: ApiCaller,
+  tournamentId: string | number
+): Promise<void> => {
+  const response = await callApi(
+    `/staging/tournament/${tournamentId}/stats/recalculate`,
+    {
+      method: 'POST'
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to recalculate tournament statistics');
+  }
 };

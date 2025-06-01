@@ -37,6 +37,7 @@ import { fetchStageGroups, fetchStageBrackets } from '@/api/tournaments/api';
 import { useApi } from '@/hooks/useApi';
 import { IntegratedGroupManagement } from './groups/IntegratedGroupManagement';
 import { MatchManagement } from './matches/MatchManagement';
+import { StageStandings } from './StageStandings';
 
 interface StageDetailViewProps {
   stage: TournamentStage;
@@ -122,6 +123,9 @@ export function StageDetailView({
           )}
           {!isGroupStage && (
             <TabsTrigger value='brackets'>{t('brackets')}</TabsTrigger>
+          )}
+          {isGroupStage && (
+            <TabsTrigger value='standings'>{t('standings')}</TabsTrigger>
           )}
           <TabsTrigger value='matches'>
             <Swords className='mr-1 h-4 w-4' />
@@ -241,6 +245,13 @@ export function StageDetailView({
               stageId={stage.id}
               tournamentId={tournament.id}
             />
+          </TabsContent>
+        )}
+
+        {/* Standings Tab Content (for group stages only) */}
+        {isGroupStage && (
+          <TabsContent value='standings' className='space-y-6'>
+            <StageStandings stage={stage} tournament={tournament} />
           </TabsContent>
         )}
 

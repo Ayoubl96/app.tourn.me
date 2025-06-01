@@ -33,7 +33,8 @@ interface CourtsViewProps {
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
-  onOpenResultEntry: (match: StagingMatch) => void;
+  onOpenResultEntry?: (match: StagingMatch) => void;
+  onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
 }
 
 export function CourtsView({
@@ -46,7 +47,8 @@ export function CourtsView({
   getCourtName,
   getGroupName,
   getBracketName,
-  onOpenResultEntry
+  onOpenResultEntry,
+  onSaveResult
 }: CourtsViewProps) {
   const t = useTranslations('Dashboard');
 
@@ -135,6 +137,7 @@ export function CourtsView({
                     getBracketName={getBracketName}
                     onOpenResultEntry={onOpenResultEntry}
                     isUpdatingMatch={isUpdatingMatch}
+                    onSaveResult={onSaveResult}
                   />
                 ))}
               </TableBody>
@@ -225,6 +228,7 @@ export function CourtsView({
                         getBracketName={getBracketName}
                         onOpenResultEntry={onOpenResultEntry}
                         isUpdatingMatch={isUpdatingMatch}
+                        onSaveResult={onSaveResult}
                       />
                     ))}
                   </TableBody>

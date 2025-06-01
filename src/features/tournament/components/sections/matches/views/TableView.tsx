@@ -22,7 +22,8 @@ interface TableViewProps {
   getCourtName: (match: StagingMatch) => string;
   getGroupName: (match: StagingMatch) => string;
   getBracketName: (match: StagingMatch) => string;
-  onOpenResultEntry: (match: StagingMatch) => void;
+  onOpenResultEntry?: (match: StagingMatch) => void;
+  onSaveResult?: (matchId: number, scores: any) => Promise<boolean>;
 }
 
 export function TableView({
@@ -34,7 +35,8 @@ export function TableView({
   getCourtName,
   getGroupName,
   getBracketName,
-  onOpenResultEntry
+  onOpenResultEntry,
+  onSaveResult
 }: TableViewProps) {
   const t = useTranslations('Dashboard');
 
@@ -99,6 +101,7 @@ export function TableView({
                   getGroupName={getGroupName}
                   getBracketName={getBracketName}
                   onOpenResultEntry={onOpenResultEntry}
+                  onSaveResult={onSaveResult}
                   isUpdatingMatch={isUpdatingMatch}
                 />
               ))}

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef
+} from 'react';
 import { useTranslations } from 'next-intl';
 import { StagingMatch } from '@/api/tournaments/types';
 import { Button } from '@/components/ui/button';
@@ -56,7 +62,7 @@ export function GlobalMatchTimer({
 
   // Get active time-limited matches that can be played now
   // Use the same logic as CourtCardView to identify which matches are currently active on courts
-  const activeTimeLimitedMatches = (() => {
+  const activeTimeLimitedMatches = useMemo(() => {
     // Get available courts that have matches
     const availableCourts = Array.from(
       new Set(
@@ -93,7 +99,7 @@ export function GlobalMatchTimer({
     });
 
     return activeMatches;
-  })();
+  }, [matches]);
 
   // Get the time limit (use the first match's time limit, assuming all active matches have the same limit)
   const timeLimit =
@@ -207,6 +213,9 @@ export function GlobalMatchTimer({
   const [timer, setTimer] = useState<TimerState>(() => loadPersistedState());
   const [wasRestored, setWasRestored] = useState(false);
 
+  // Use ref to track previous match IDs to avoid infinite loops
+  const prevMatchIdsRef = useRef<number[]>([]);
+
   // Update timer state and persist it
   const updateTimer = useCallback(
     (updater: (prev: TimerState) => TimerState) => {
@@ -240,37 +249,31 @@ export function GlobalMatchTimer({
 
   // Update timer when matches change (but don't reload from storage)
   useEffect(() => {
-    setTimer((prev) => {
-      // If matches changed, update the active matches but keep timer state if it's running
-      const currentMatchIds = activeTimeLimitedMatches.map((m) => m.id).sort();
-      const prevMatchIds = prev.activeMatchIds.sort();
-      const sameMatches =
-        currentMatchIds.length === prevMatchIds.length &&
-        currentMatchIds.every((id, index) => id === prevMatchIds[index]);
+    const currentMatchIds = activeTimeLimitedMatches.map((m) => m.id).sort();
+    const prevMatchIds = prevMatchIdsRef.current;
 
-      if (!sameMatches) {
-        // Different matches - reset timer
-        const newState = {
-          timeRemaining: timeLimit,
-          status: 'not-started' as TimerStatus,
-          startedAt: null,
-          pausedAt: null,
-          activeMatches: activeTimeLimitedMatches,
-          totalTime: timeLimit,
-          activeMatchIds: activeTimeLimitedMatches.map((m) => m.id)
-        };
-        saveTimerState(newState);
-        return newState;
-      } else {
-        // Same matches - just update the activeMatches array
-        const updatedState = {
-          ...prev,
-          activeMatches: activeTimeLimitedMatches
-        };
-        saveTimerState(updatedState);
-        return updatedState;
-      }
-    });
+    // Check if matches have actually changed
+    const sameMatches =
+      currentMatchIds.length === prevMatchIds.length &&
+      currentMatchIds.every((id, index) => id === prevMatchIds[index]);
+
+    if (!sameMatches) {
+      // Update the ref with current match IDs
+      prevMatchIdsRef.current = currentMatchIds;
+
+      // Different matches - reset timer
+      const newState = {
+        timeRemaining: timeLimit,
+        status: 'not-started' as TimerStatus,
+        startedAt: null,
+        pausedAt: null,
+        activeMatches: activeTimeLimitedMatches,
+        totalTime: timeLimit,
+        activeMatchIds: currentMatchIds
+      };
+      setTimer(newState);
+      saveTimerState(newState);
+    }
   }, [activeTimeLimitedMatches, timeLimit, saveTimerState]);
 
   // Check for expired timer on mount
@@ -436,7 +439,8 @@ export function GlobalMatchTimer({
           <div className='mt-2 space-y-1'>
             {activeTimeLimitedMatches.slice(0, 3).map((match) => (
               <div key={match.id} className='text-xs'>
-                {getCoupleName(match.couple1_id)} vs{' '}
+                {getCoupleName(match.couple1_id)}{' '}
+                {t('vs', { defaultValue: 'vs' })}{' '}
                 {getCoupleName(match.couple2_id)}
               </div>
             ))}

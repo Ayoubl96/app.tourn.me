@@ -51,7 +51,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '../../shared/EmptyState';
-import { MatchResultEntry } from './MatchResultEntry';
 import {
   PlayCircle,
   Swords,
@@ -149,8 +148,6 @@ export function MatchManagement({
   );
   const [isGenerateMatchesDialogOpen, setIsGenerateMatchesDialogOpen] =
     useState(false);
-  const [selectedMatch, setSelectedMatch] = useState<StagingMatch | null>(null);
-  const [isResultEntryOpen, setIsResultEntryOpen] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [viewType, setViewType] = useState<ViewType>('cards');
 
@@ -245,22 +242,6 @@ export function MatchManagement({
   // Get bracket name for a match with proper fallback
   const getBracketNameForMatch = (match: StagingMatch): string => {
     return getBracketName(match, stageBrackets);
-  };
-
-  // Open result entry dialog
-  const handleOpenResultEntry = async (match: StagingMatch) => {
-    // Get full match details if not already loaded
-    if (!match.games || match.games.length === 0) {
-      const fullMatchDetails = await loadMatchById(match.id);
-      if (fullMatchDetails) {
-        setSelectedMatch(fullMatchDetails);
-      } else {
-        setSelectedMatch(match);
-      }
-    } else {
-      setSelectedMatch(match);
-    }
-    setIsResultEntryOpen(true);
   };
 
   // Handle match result save
@@ -583,7 +564,7 @@ export function MatchManagement({
             getCourtName={getCourtName}
             getGroupName={getGroupNameForMatch}
             getBracketName={getBracketNameForMatch}
-            onOpenResultEntry={handleOpenResultEntry}
+            onSaveResult={handleSaveMatchResult}
           />
         )}
 
@@ -601,7 +582,7 @@ export function MatchManagement({
             getCourtName={getCourtName}
             getGroupName={getGroupNameForMatch}
             getBracketName={getBracketNameForMatch}
-            onOpenResultEntry={handleOpenResultEntry}
+            onSaveResult={handleSaveMatchResult}
           />
         )}
 
@@ -620,7 +601,7 @@ export function MatchManagement({
             getCourtName={getCourtName}
             getGroupName={getGroupNameForMatch}
             getBracketName={getBracketNameForMatch}
-            onOpenResultEntry={handleOpenResultEntry}
+            onSaveResult={handleSaveMatchResult}
           />
         )}
 
@@ -636,18 +617,6 @@ export function MatchManagement({
         selectedBracketId={selectedBracketId}
         onGenerateMatches={handleGenerateMatches}
       />
-
-      {/* Match Result Entry Dialog */}
-      {selectedMatch && (
-        <MatchResultEntry
-          match={selectedMatch}
-          isOpen={isResultEntryOpen}
-          onClose={() => setIsResultEntryOpen(false)}
-          onSave={handleSaveMatchResult}
-          couple1Name={getCoupleName(selectedMatch.couple1_id)}
-          couple2Name={getCoupleName(selectedMatch.couple2_id)}
-        />
-      )}
     </div>
   );
 }

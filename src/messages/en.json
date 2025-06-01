@@ -72,6 +72,7 @@
     "leaderboard": "Leaderboard",
     "games": "Games",
     "manage": "Manage",
+    "standings": "Standings",
     "tournamentNotFound": "Tournament not found",
     "tournamentNotFoundDesc": "The tournament you're looking for doesn't exist or has been removed",
     "backToTournaments": "Back to Tournaments",
@@ -479,6 +480,7 @@
     "readyShort": "READY",
     "cardView": "Card View",
     "activeCourts": "Active Courts",
+    "currentMatches": "Current Matches",
     "upcomingGames": "Upcoming Games",
     "recentGames": "Recent Games",
     "noUpcomingGames": "No upcoming games scheduled",
@@ -506,7 +508,13 @@
     "liveMatches": "Live matches on courts",
     "liveMatchTimer": "Live Match Timer",
     "allLiveMatchesTimeExpired": "All live matches time has expired!",
-    "clickNewTimerLive": "Click \"New Timer\" to start a new countdown for current live matches"
+    "clickNewTimerLive": "Click \"New Timer\" to start a new countdown for current live matches",
+    "setScores": "Set Scores",
+    "addSet": "Add Set",
+    "set": "Set",
+    "sets": "Sets",
+    "hideResultEntry": "Hide Result Entry",
+    "roundRobin": "Round Robin"
   },
   "Metadata": {
     "productView": "Dashboard : Product View",
