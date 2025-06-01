@@ -150,28 +150,10 @@ export function InlineMatchResultEntry({
   const handleSubmit = async () => {
     setError(null);
 
-    // Validate that we have valid scores
-    const invalidScores = gameScores.some(
-      (game) =>
-        game.couple1_score === game.couple2_score || game.winner_id === null
-    );
-
-    if (invalidScores) {
-      setError(
-        t('invalidScores', {
-          defaultValue:
-            'Set scores cannot be tied. Please ensure scores are valid.'
-        })
-      );
-      return;
-    }
-
-    if (winnerCoupleId === null) {
-      setError(
-        t('noWinnerSelected', { defaultValue: 'Please select a winner' })
-      );
-      return;
-    }
+    // Matches can end in a draw - no winner is required
+    // Individual games can be tied (e.g., 5-5), and that's perfectly valid
+    // The match winner is determined by the number of games/sets won by each team
+    // If equal number of games won, it's a draw (winnerCoupleId remains null)
 
     setIsSaving(true);
 
@@ -339,13 +321,18 @@ export function InlineMatchResultEntry({
         </div>
 
         {/* Winner Display */}
-        {winnerCoupleId && (
+        {winnerCoupleId ? (
           <div className='flex items-center justify-center rounded bg-green-50 p-3 text-sm font-medium text-green-600 dark:bg-green-950/20 dark:text-green-400'>
             <Trophy className='mr-2 h-4 w-4' />
             {t('winner', { defaultValue: 'Winner' })}:{' '}
             {winnerCoupleId === match.couple1_id ? couple1Name : couple2Name}
           </div>
-        )}
+        ) : couple1SetsWon === couple2SetsWon ? (
+          <div className='flex items-center justify-center rounded bg-blue-50 p-3 text-sm font-medium text-blue-600 dark:bg-blue-950/20 dark:text-blue-400'>
+            <Trophy className='mr-2 h-4 w-4' />
+            Draw - Equal sets won
+          </div>
+        ) : null}
 
         {/* Error display */}
         {error && (

@@ -163,31 +163,17 @@ export function MatchResultEntry({
   const handleSubmit = async () => {
     setError(null);
 
-    // Validate results
-    if (resultStatus === 'completed' && winnerCoupleId === null) {
+    // Only require a winner for non-completed matches (time expired, forfeited)
+    if (resultStatus !== 'completed' && winnerCoupleId === null) {
       setError(
         t('noWinnerSelected', { defaultValue: 'Please select a winner' })
       );
       return;
     }
 
-    // For completed matches, ensure we have valid game scores
-    if (resultStatus === 'completed') {
-      const invalidScores = gameScores.some(
-        (game) =>
-          game.couple1_score === game.couple2_score || game.winner_id === null
-      );
-
-      if (invalidScores) {
-        setError(
-          t('invalidScores', {
-            defaultValue:
-              'Game scores cannot be tied. Please ensure scores are valid.'
-          })
-        );
-        return;
-      }
-    }
+    // For completed matches, draws are allowed (winnerCoupleId can be null)
+    // Individual games can be tied (e.g., 5-5), and the match winner is determined
+    // by the number of games won by each team - but if equal, it's a draw
 
     setIsSaving(true);
 
@@ -433,7 +419,7 @@ export function MatchResultEntry({
                         ? couple1Name
                         : winnerCoupleId === match.couple2_id
                           ? couple2Name
-                          : '-'}
+                          : 'Draw'}
                     </p>
                   </div>
                   <div className='text-right'>
