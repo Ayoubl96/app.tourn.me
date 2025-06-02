@@ -28,10 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   BadgeCheck,
-  Bell,
   ChevronRight,
   ChevronsUpDown,
-  CreditCard,
   GalleryVerticalEnd,
   LogOut
 } from 'lucide-react';
@@ -48,11 +46,11 @@ import LanguageSwitcher from '../language-switcher';
 import { useTranslations } from 'next-intl';
 import { navItems } from '@/constants/data';
 import { useSecureLogout } from '@/hooks/useSecureLogout';
+import { TournMeIcon } from '@/components/ui/logo';
 
 export const company = {
-  name: 'Acme Inc',
-  logo: GalleryVerticalEnd,
-  plan: 'Enterprise'
+  name: 'tourn.me',
+  plan: 'Tournament Platform'
 };
 
 export default function TranslatedSidebar() {
@@ -84,11 +82,13 @@ export default function TranslatedSidebar() {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <div className='flex gap-2 py-2 text-sidebar-accent-foreground'>
-          <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-            <company.logo className='size-4' />
+          <div className='flex items-center'>
+            <TournMeIcon size={32} />
           </div>
           <div className='grid flex-1 text-left text-sm leading-tight'>
-            <span className='truncate font-semibold'>{company.name}</span>
+            <span className='truncate font-semibold text-[#f6b43c]'>
+              {company.name}
+            </span>
             <span className='truncate text-xs'>{company.plan}</span>
           </div>
         </div>
@@ -206,17 +206,11 @@ export default function TranslatedSidebar() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <BadgeCheck />
-                    {navT('account')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell />
-                    Notifications
+                  <DropdownMenuItem asChild>
+                    <Link href='/dashboard/profile'>
+                      <BadgeCheck />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

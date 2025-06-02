@@ -7,8 +7,9 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import '../globals.css';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'tourn.me - Tournament Management Platform',
+  description:
+    'Professional tournament management platform for organizing and managing competitive events'
 };
 
 // Generate static params for locales

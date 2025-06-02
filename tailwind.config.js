@@ -66,7 +66,11 @@ module.exports = {
         'color-2': 'hsl(var(--color-2))',
         'color-3': 'hsl(var(--color-3))',
         'color-4': 'hsl(var(--color-4))',
-        'color-5': 'hsl(var(--color-5))'
+        'color-5': 'hsl(var(--color-5))',
+        'brand-primary': '#f6b43c',
+        'brand-secondary': '#101727',
+        'brand-primary-dark': '#e5a332',
+        'brand-secondary-light': '#1a2332'
       },
       borderRadius: {
         lg: 'var(--radius)',

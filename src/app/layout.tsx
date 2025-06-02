@@ -8,8 +8,41 @@ import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: {
+    default: 'tourn.me - Tournament Management Platform',
+    template: '%s | tourn.me'
+  },
+  description:
+    'Professional tournament management platform for organizing and managing competitive events',
+  keywords: [
+    'tournament',
+    'management',
+    'competition',
+    'sports',
+    'esports',
+    'bracket'
+  ],
+  authors: [{ name: 'tourn.me Team' }],
+  creator: 'tourn.me',
+  publisher: 'tourn.me',
+  openGraph: {
+    title: 'tourn.me - Tournament Management Platform',
+    description:
+      'Professional tournament management platform for organizing and managing competitive events',
+    url: 'https://tourn.me',
+    siteName: 'tourn.me',
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'tourn.me - Tournament Management Platform',
+    description:
+      'Professional tournament management platform for organizing and managing competitive events'
+  },
+  robots: {
+    index: true,
+    follow: true
+  }
 };
 
 const lato = Lato({

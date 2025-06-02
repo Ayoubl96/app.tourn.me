@@ -16,8 +16,8 @@ import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import GithubSignInButton from './github-auth-button';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/lib/navigation';
 
 export default function UserAuthForm() {
   const t = useTranslations();
@@ -58,7 +58,7 @@ export default function UserAuthForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className='w-full space-y-2'
+          className='w-full space-y-4'
         >
           <FormField
             control={form.control}
@@ -98,22 +98,20 @@ export default function UserAuthForm() {
             )}
           />
 
-          <Button disabled={loading} className='ml-auto w-full' type='submit'>
+          <div className='flex items-center justify-end'>
+            <Link
+              href='/forgot-password'
+              className='text-sm text-primary hover:underline'
+            >
+              {t('Auth.forgotPassword')}
+            </Link>
+          </div>
+
+          <Button disabled={loading} className='w-full' type='submit'>
             {t('Auth.continueWithEmail')}
           </Button>
         </form>
       </Form>
-      <div className='relative'>
-        <div className='absolute inset-0 flex items-center'>
-          <span className='w-full border-t' />
-        </div>
-        <div className='relative flex justify-center text-xs uppercase'>
-          <span className='bg-background px-2 text-muted-foreground'>
-            {t('Auth.orContinueWith')}
-          </span>
-        </div>
-      </div>
-      <GithubSignInButton />
     </>
   );
 }

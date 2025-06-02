@@ -40,7 +40,8 @@ export type Icon = LucideIcon;
 
 export const Icons = {
   dashboard: LayoutDashboardIcon,
-  logo: Command,
+  logo: Trophy,
+  tournme: Trophy,
   login: LogIn,
   close: X,
   product: LucideShoppingBag,
