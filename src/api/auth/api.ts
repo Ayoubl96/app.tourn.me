@@ -1,6 +1,17 @@
 import { ApiCaller } from '@/api/common/types';
 import { handleApiResponse } from '@/api/common/apiClient';
-import { LoginCredentials, LoginResponse, CompanyProfile } from './types';
+import {
+  LoginCredentials,
+  LoginResponse,
+  CompanyProfile,
+  RegistrationFormData,
+  RegistrationApiData,
+  RegistrationInitiateResponse,
+  RegistrationVerifyRequest,
+  RegistrationVerifyResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse
+} from './types';
 
 /**
  * Authentication API functions
@@ -97,6 +108,96 @@ export async function refreshToken(
       .catch(() => ({ message: 'Token refresh failed' }));
     throw new Error(
       errorData.message || errorData.detail || 'Token refresh failed'
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Registration API functions
+ */
+
+/**
+ * Initiate company registration process
+ * Sends verification code to company email
+ */
+export async function initiateRegistration(
+  formData: RegistrationApiData
+): Promise<RegistrationInitiateResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+  const response = await fetch(`${baseUrl}/register/initiate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: 'Registration initiation failed' }));
+    throw new Error(
+      errorData.detail || errorData.message || 'Registration initiation failed'
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Verify email and complete registration
+ */
+export async function verifyRegistration(
+  verifyData: RegistrationVerifyRequest
+): Promise<RegistrationVerifyResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+  const response = await fetch(`${baseUrl}/register/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(verifyData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: 'Registration verification failed' }));
+    throw new Error(
+      errorData.detail ||
+        errorData.message ||
+        'Registration verification failed'
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Resend verification code
+ */
+export async function resendVerificationCode(
+  resendData: ResendVerificationRequest
+): Promise<ResendVerificationResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+  const response = await fetch(`${baseUrl}/register/resend`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(resendData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: 'Failed to resend verification code' }));
+    throw new Error(
+      errorData.detail ||
+        errorData.message ||
+        'Failed to resend verification code'
     );
   }
 
