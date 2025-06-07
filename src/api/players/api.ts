@@ -98,7 +98,7 @@ export const importPlayerFromPlaytomic = async (
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      user_id: params.user_id,
+      playtomic_id: params.user_id,
       gender: params.gender
     })
   });
