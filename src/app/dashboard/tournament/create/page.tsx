@@ -13,7 +13,6 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { ContentEditable } from '@/components/editor/editor-ui/content-editable';
 import { editorTheme } from '@/components/editor/themes/editor-theme';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { Editor as TournamentEditor } from '@/app/dashboard/tournament/create/page';
 import { toast } from 'sonner';
 import { FORMAT_TEXT_COMMAND } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -149,7 +148,7 @@ export default function CreateTournamentPage() {
           <label className='mb-1 block text-sm font-medium'>
             Full Description
           </label>
-          <TournamentEditor onEditorChange={setFullDescription} />
+          <Editor onEditorChange={setFullDescription} />
         </div>
 
         {error && <div className='text-sm text-destructive'>{error}</div>}
@@ -195,7 +194,7 @@ function EditorToolbar() {
   );
 }
 
-export function Editor({ onEditorChange }: EditorProps) {
+function Editor({ onEditorChange }: EditorProps) {
   const [, setEditorStateJSON] = React.useState('');
 
   function handleChange(editorState: any) {
