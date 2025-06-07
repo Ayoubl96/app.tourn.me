@@ -67,7 +67,7 @@ export default function TournamentClientPage({
     getPlayerCountProgress,
     isPlayerLimitReached
   } = useTournamentPlayers(
-    tournamentId,
+    parseInt(tournamentId),
     activeTab === 'players',
     tournament?.players_number || 0
   );

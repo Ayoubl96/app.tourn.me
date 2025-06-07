@@ -47,7 +47,7 @@ export default function ImportPlaytomicSidebar({
 
   async function handleImport(user: PlaytomicPlayer) {
     try {
-      const genderInt = user.gender.toUpperCase() === 'MALE' ? 1 : 2;
+      const genderInt = user.gender?.toUpperCase() === 'MALE' ? 1 : 2;
       await importPlayerFromPlaytomic(callApi, {
         user_id: user.user_id,
         gender: genderInt

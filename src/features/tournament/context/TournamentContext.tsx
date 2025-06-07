@@ -289,7 +289,6 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({
     try {
       setIsEditingCouple(true);
       await service.updateCouple(tournamentId, data.couple_id, {
-        tournament_id: parseInt(tournamentId),
         first_player_id: data.first_player_id,
         second_player_id: data.second_player_id,
         name: data.name
@@ -352,7 +351,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({
     try {
       setIsImporting(true);
       await service.importPlayerFromPlaytomic(
-        player.id.toString(),
+        player.user_id.toString(),
         player.gender
       );
       toast.success('Player imported successfully');

@@ -68,8 +68,7 @@ export default function CreateCourtSidebar({
 
       await createCourt(callApi, {
         name,
-        size: 1, // Default size, adjust as needed
-        image: uploadedUrls.length > 0 ? uploadedUrls[0] : null
+        images: uploadedUrls.length > 0 ? uploadedUrls : undefined
       });
 
       // toast.success("Court created!");

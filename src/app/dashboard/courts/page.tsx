@@ -28,12 +28,12 @@ function CourtCard({ court }: { court: Court }) {
         <CardTitle className='text-lg'>{court.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        {court.image && (
+        {court.images && court.images.length > 0 && (
           <Carousel className='relative w-full'>
             <CarouselContent>
               <CarouselItem>
                 <Image
-                  src={court.image}
+                  src={court.images[0]}
                   alt={`Court image`}
                   width={640}
                   height={360}

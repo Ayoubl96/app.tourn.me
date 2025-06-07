@@ -154,6 +154,7 @@ export function MatchManagement({
   // Use the match filters hook
   const {
     filters,
+    setFilters,
     toggleStatusFilter,
     toggleCourtFilter,
     toggleGroupFilter,
@@ -453,7 +454,6 @@ export function MatchManagement({
 
   // Set search filter function for input change
   const setSearchFilter = (search: string) => {
-    const { setFilters } = useMatchFilters();
     setFilters((prev) => ({ ...prev, search }));
   };
 

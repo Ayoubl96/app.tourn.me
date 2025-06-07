@@ -13,10 +13,10 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { nodes } from './nodes';
 import { Plugins } from './plugins';
 
-const editorConfig: InitialConfigType = {
+const editorConfig = {
   namespace: 'Editor',
   theme: editorTheme,
-  nodes,
+  nodes: nodes as any,
   onError: (error: Error) => {
     console.error(error);
   }

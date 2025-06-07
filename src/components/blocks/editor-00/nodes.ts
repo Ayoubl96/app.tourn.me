@@ -7,5 +7,4 @@ import {
 } from 'lexical';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 
-export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
-  [HeadingNode, ParagraphNode, TextNode, QuoteNode];
+export const nodes = [HeadingNode, ParagraphNode, TextNode, QuoteNode] as const;

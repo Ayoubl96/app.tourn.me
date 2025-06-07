@@ -13,7 +13,7 @@ import {
 import { toast } from 'sonner';
 
 export const useTournamentPlayers = (
-  tournamentId: string,
+  tournamentId: number,
   isActive: boolean = true,
   playerLimit: number = 0
 ) => {

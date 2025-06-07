@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Couple, Player, TournamentResponse } from '../../types';
-import { Sidebar } from '@/components/layout/sidebar';
+import { Couple, Player } from '../../types';
+import { Sidebar, SidebarHeader } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserPlus, Pencil, Trash2, Users } from 'lucide-react';
@@ -13,8 +13,8 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
-import { SidebarHeader } from '@/components/layout/sidebar-header';
+import { EmptyState } from '../shared/EmptyState';
+
 import { CoupleForm } from '../forms/CoupleForm';
 import { getInitials } from '../../utils/formatters';
 import {
@@ -42,11 +42,11 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
   const {
     tournament,
     tournamentPlayers,
-    tournamentCouples,
-    isLoadingCouples,
-    isLoadingPlayers,
+    couples,
+    loadingCouples,
+    loadingPlayers,
     createCouple,
-    updateCouple,
+    editCouple,
     deleteCouple
   } = useTournamentContext();
 
@@ -75,7 +75,12 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
     couple_id?: number;
   }) => {
     if (data.couple_id) {
-      await updateCouple(data);
+      await editCouple({
+        couple_id: data.couple_id,
+        first_player_id: data.first_player_id,
+        second_player_id: data.second_player_id,
+        name: data.name
+      });
       setEditingCouple(null);
       setIsSidebarOpen(false);
     }
@@ -103,18 +108,17 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
   // Filter available players (those not in a couple)
   const getAvailablePlayers = (): Player[] => {
     // We want to include the players from the editing couple if we're in edit mode
-    const playersInCouples = tournamentCouples
+    const playersInCouples = couples
       .filter((couple) => !editingCouple || couple.id !== editingCouple.id)
       .flatMap((couple) => [couple.first_player.id, couple.second_player.id]);
 
-    return tournamentPlayers.filter(
-      (player) => !playersInCouples.includes(player.id)
-    );
+    return tournamentPlayers
+      .filter((tp) => !playersInCouples.includes(tp.player_id))
+      .map((tp) => tp.player);
   };
 
   // Determine if we've reached the max number of couples
-  const isCouplesLimitReached =
-    maxCouples > 0 && tournamentCouples.length >= maxCouples;
+  const isCouplesLimitReached = maxCouples > 0 && couples.length >= maxCouples;
 
   return (
     <>
@@ -124,7 +128,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
           <h3 className='text-lg font-medium tracking-tight'>
             {t('couples')}
             <Badge variant='outline' className='ml-2'>
-              {tournamentCouples.length}
+              {couples.length}
               {maxCouples > 0 ? `/${maxCouples}` : ''}
             </Badge>
           </h3>
@@ -133,7 +137,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
             onClick={openCreateForm}
             disabled={
               isCouplesLimitReached ||
-              isLoadingCouples ||
+              loadingCouples ||
               tournamentPlayers.length < 2
             }
           >
@@ -145,25 +149,23 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
         <div className='mb-4'>
           <div className='mb-1 flex justify-between text-sm'>
             <span>
-              {t('couples')}: {tournamentCouples.length} /{' '}
+              {t('couples')}: {couples.length} /{' '}
               {maxCouples > 0 ? maxCouples : tournamentPlayers.length / 2}
             </span>
             <span>
               {maxCouples > 0
-                ? Math.round((tournamentCouples.length / maxCouples) * 100)
+                ? Math.round((couples.length / maxCouples) * 100)
                 : 0}
               %
             </span>
           </div>
           <Progress
-            value={
-              maxCouples > 0 ? (tournamentCouples.length / maxCouples) * 100 : 0
-            }
+            value={maxCouples > 0 ? (couples.length / maxCouples) * 100 : 0}
             className='h-2'
           />
         </div>
 
-        {tournamentCouples.length === 0 ? (
+        {couples.length === 0 ? (
           <EmptyState
             title={t('noCouples')}
             description={t('noCouplesDescription')}
@@ -173,7 +175,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
                 onClick={openCreateForm}
                 disabled={
                   isCouplesLimitReached ||
-                  isLoadingCouples ||
+                  loadingCouples ||
                   tournamentPlayers.length < 2
                 }
               >
@@ -184,7 +186,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
           />
         ) : (
           <div className='grid grid-cols-2 gap-4'>
-            {tournamentCouples.map((couple) => (
+            {couples.map((couple: Couple) => (
               <Card key={couple.id} className='h-full'>
                 <CardHeader className='pb-2'>
                   <CardTitle className='text-base'>{couple.name}</CardTitle>
@@ -229,7 +231,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
                     variant='ghost'
                     size='icon'
                     onClick={() => openEditForm(couple)}
-                    disabled={isLoadingCouples}
+                    disabled={loadingCouples}
                   >
                     <Pencil className='h-4 w-4' />
                   </Button>
@@ -237,7 +239,7 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
                     variant='ghost'
                     size='icon'
                     onClick={() => setCoupleToDelete(couple)}
-                    disabled={isLoadingCouples}
+                    disabled={loadingCouples}
                   >
                     <Trash2 className='h-4 w-4' />
                   </Button>
@@ -249,58 +251,53 @@ export const TournamentCouples: React.FC<TournamentCouplesProps> = ({
       </div>
 
       {/* Sidebar for creating/editing couples */}
-      <Sidebar
-        open={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-        onClose={() => {
-          setIsSidebarOpen(false);
-          setEditingCouple(null);
-        }}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-background shadow-lg transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
       >
-        <SidebarHeader
-          title={editingCouple ? t('editCouple') : t('addCouple')}
-          description={
-            editingCouple
+        <div className='border-b px-4 py-4'>
+          <h2 className='text-lg font-semibold'>
+            {editingCouple ? t('editCouple') : t('addCouple')}
+          </h2>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            {editingCouple
               ? t('editCoupleDescription')
-              : t('addCoupleDescription')
-          }
-        />
+              : t('addCoupleDescription')}
+          </p>
+        </div>
         <div className='px-4 py-2'>
           <div className='mb-4'>
             <div className='mb-1 flex justify-between text-sm'>
               <span>
-                {t('couples')}: {tournamentCouples.length} /{' '}
+                {t('couples')}: {couples.length} /{' '}
                 {maxCouples > 0 ? maxCouples : tournamentPlayers.length / 2}
               </span>
               <span>
                 {maxCouples > 0
-                  ? Math.round((tournamentCouples.length / maxCouples) * 100)
+                  ? Math.round((couples.length / maxCouples) * 100)
                   : 0}
                 %
               </span>
             </div>
             <Progress
-              value={
-                maxCouples > 0
-                  ? (tournamentCouples.length / maxCouples) * 100
-                  : 0
-              }
+              value={maxCouples > 0 ? (couples.length / maxCouples) * 100 : 0}
               className='h-2'
             />
           </div>
 
           <CoupleForm
             availablePlayers={getAvailablePlayers()}
-            isLoading={isLoadingCouples}
+            isLoading={loadingCouples}
             onSubmit={editingCouple ? handleUpdateCouple : handleCreateCouple}
             onCancel={() => setIsSidebarOpen(false)}
             editingCouple={editingCouple}
             resetForm={false}
             maxCouples={maxCouples}
-            currentCouplesCount={tournamentCouples.length}
+            currentCouplesCount={couples.length}
           />
         </div>
-      </Sidebar>
+      </div>
 
       {/* Confirmation dialog for deleting couples */}
       <AlertDialog
