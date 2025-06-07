@@ -50,7 +50,7 @@ export default async function middleware(request: NextRequest) {
         // Create redirect URL with proper locale
         const locale = localeFromPath || defaultLocale;
         const signInUrl = new URL(
-          `/${locale === defaultLocale ? '' : locale}`,
+          `/${locale === defaultLocale ? 'signin' : `${locale}/signin`}`,
           request.url
         );
         return NextResponse.redirect(signInUrl);
@@ -71,7 +71,10 @@ export default async function middleware(request: NextRequest) {
 // Exclude not-found paths to prevent redirect loops
 export const config = {
   matcher: [
-    // Include all paths except api routes, static files, and not-found
-    '/((?!api|_next/static|_next/image|favicon.ico|not-found).*)'
+    // Include all paths except api routes, static files, and files with extensions
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|not-found).*)',
+    // Also match specific locale routes
+    '/',
+    '/(en|it|es)/:path*'
   ]
 };
