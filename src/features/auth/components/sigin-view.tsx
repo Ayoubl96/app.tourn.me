@@ -2,16 +2,10 @@
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import UserAuthForm from './user-auth-form';
 import { Logo } from '@/components/ui/logo';
-
-export const metadata: Metadata = {
-  title: 'Authentication',
-  description: 'Authentication forms built using the components.'
-};
 
 export default function SignInViewPage({ stars }: { stars?: number }) {
   const t = useTranslations('Auth');
