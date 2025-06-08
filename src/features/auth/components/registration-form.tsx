@@ -97,7 +97,7 @@ export default function RegistrationForm({
     name: '',
     address: '',
     phone_number: '',
-    country_code: 'ES' // Default to Spain
+    country_code: '' // Default to Spain
   };
 
   const form = useForm<RegistrationFormValue>({

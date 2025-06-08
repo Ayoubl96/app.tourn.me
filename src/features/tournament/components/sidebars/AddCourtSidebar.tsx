@@ -146,36 +146,46 @@ export function AddCourtSidebar({
       if (!open) return;
 
       setLoading(true);
+      console.log('🚀 Starting to load available courts...');
+      console.log('Tournament Court IDs to exclude:', tournamentCourtIds);
+
       try {
-        // Direct call to the courts API endpoint
+        // Direct call to the courts API endpoint - this should return Court[] directly
         const response = await fetchCourts(callApi);
+        console.log('📡 Raw API response:', response);
 
-        let allCourts = [];
-
-        // Handle various response cases
-        if (response && Array.isArray(response)) {
-          allCourts = response;
-        } else if (response && typeof response === 'object') {
-          // Some APIs nest the array response
-          // Try to find an array property
-          const possibleArrays = Object.values(response).filter((val) =>
-            Array.isArray(val)
+        // fetchCourts should return Court[] directly due to handleApiResponse
+        if (!Array.isArray(response)) {
+          console.error(
+            '❌ Expected array but got:',
+            typeof response,
+            response
           );
-          if (possibleArrays.length > 0) {
-            allCourts = possibleArrays[0];
-          }
+          setAvailableCourts([]);
+          return;
         }
 
-        // Filter out courts already in tournament
-        const filteredCourts = allCourts.filter(
-          (court) =>
-            court &&
-            typeof court.id !== 'undefined' &&
-            !tournamentCourtIds.includes(String(court.id))
-        );
+        console.log('✅ Got courts array, count:', response.length);
+        console.log('🏟️ All courts before filtering:', response);
 
+        // Filter out courts already in tournament
+        const filteredCourts = response.filter((court) => {
+          const isValid = court && typeof court.id !== 'undefined';
+          const isNotInTournament = !tournamentCourtIds.includes(
+            String(court.id)
+          );
+
+          console.log(
+            `Court ${court?.id || 'unknown'}: valid=${isValid}, notInTournament=${isNotInTournament}`
+          );
+
+          return isValid && isNotInTournament;
+        });
+
+        console.log('🎯 Filtered courts final result:', filteredCourts);
         setAvailableCourts(filteredCourts);
       } catch (error) {
+        console.error('❌ Error loading courts:', error);
         setAvailableCourts([]);
       } finally {
         setLoading(false);
@@ -214,15 +224,34 @@ export function AddCourtSidebar({
 
   // Function to ensure courts are valid for the dropdown
   const getProcessedCourts = () => {
-    if (!availableCourts || !Array.isArray(availableCourts)) return [];
+    console.log(
+      '🔄 Processing courts for dropdown, available courts count:',
+      availableCourts?.length
+    );
 
-    return availableCourts
-      .filter((court) => court && typeof court.id !== 'undefined') // Ensure valid courts with IDs
+    if (!availableCourts || !Array.isArray(availableCourts)) {
+      console.log('❌ availableCourts is not a valid array:', availableCourts);
+      return [];
+    }
+
+    const processed = availableCourts
+      .filter((court) => {
+        const isValid = court && typeof court.id !== 'undefined';
+        if (!isValid) {
+          console.log(`⚠️ Invalid court filtered out:`, court);
+        }
+        return isValid;
+      }) // Ensure valid courts with IDs
       .map((court) => ({
         id: court.id,
         name: court.name || `Court ${court.id}`,
         value: String(court.id)
       }));
+
+    console.log(
+      `✅ Final processed courts for dropdown: ${processed.length} courts`
+    );
+    return processed;
   };
 
   // Get processed courts
