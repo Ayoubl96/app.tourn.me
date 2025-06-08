@@ -24,7 +24,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   showLevel = true
 }) => {
   // Convert player level (1-7) to percentage (0-100)
-  const levelPercentage = (player.level / 7) * 100;
+  const levelPercentage = (player.level / 700) * 100;
 
   return (
     <div className='flex w-full flex-col'>
@@ -40,7 +40,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           {showLevel && (
             <div className='flex items-center gap-1'>
               <span className='text-xs text-muted-foreground'>
-                Level: {player.level}
+                Level: {player.level / 100}
               </span>
             </div>
           )}
