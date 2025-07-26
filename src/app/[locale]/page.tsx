@@ -1,13 +1,34 @@
-import { Metadata } from 'next';
-import SignInViewPage from '@/features/auth/components/sigin-view';
+import { redirect } from '@/lib/navigation';
+import { auth } from '@/lib/auth';
+import { defaultLocale, locales } from '@/config/locales';
+import { unstable_setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title:
-    'Tourn.me | trasforma la gestione dei tornei di padel: crea tornei personalizzati, abbina i giocatori in base al loro livello e automatizza tutto il resto. Più semplicità, maggiore efficienza e zero stress per te!',
-  description:
-    'Tourn.me | trasforma la gestione dei tornei di padel: crea tornei personalizzati, abbina i giocatori in base al loro livello e automatizza tutto il resto. Più semplicità, maggiore efficienza e zero stress per te!'
+// Generate static params for locales
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+type PageProps = {
+  params: Promise<{ locale: string }>;
 };
 
-export default async function Page() {
-  return <SignInViewPage />;
+export default async function Page({ params }: PageProps) {
+  // Await params and validate locale
+  const { locale } = await params;
+
+  // Validate that the incoming locale is valid
+  if (!locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Enable static rendering by setting the request locale
+  unstable_setRequestLocale(locale);
+
+  const session = await auth();
+  if (session?.user) {
+    redirect('/dashboard');
+  } else {
+    redirect('/signin');
+  }
 }

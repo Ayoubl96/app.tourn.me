@@ -2,7 +2,6 @@ import FormCardSkeleton from '@/components/form-card-skeleton';
 import PageContainer from '@/components/layout/page-container';
 import { Suspense } from 'react';
 import ProductViewPage from '@/features/products/components/product-view-page';
-import { setRequestLocale } from 'next-intl/server';
 import { Metadata } from 'next';
 
 // Define a simple static metadata that doesn't rely on translations
@@ -20,9 +19,6 @@ type PageProps = {
 export default async function Page(props: PageProps) {
   // Await the params before accessing any properties
   const params = await props.params;
-
-  // Enable static rendering with the awaited locale
-  setRequestLocale(params.locale);
 
   // Extract productId after awaiting params
   const { productId } = params;

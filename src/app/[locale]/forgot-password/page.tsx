@@ -5,12 +5,35 @@ import { Label } from '@/components/ui/label';
 import { Link } from '@/lib/navigation';
 import AuthSideImage from '@/features/auth/components/auth-side-image';
 import AuthHeader from '@/features/auth/components/auth-header';
+import { notFound } from 'next/navigation';
+import { locales } from '@/config/locales';
+import { unstable_setRequestLocale } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: 'Forgot Password | tourn.me'
 };
 
-export default function ForgotPasswordPage() {
+// Generate static params for locales
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ForgotPasswordPage({ params }: PageProps) {
+  // Await params and validate locale
+  const { locale } = await params;
+
+  // Validate that the incoming locale is valid
+  if (!locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Enable static rendering by setting the request locale
+  unstable_setRequestLocale(locale);
+
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <AuthHeader variant='forgot-password' />

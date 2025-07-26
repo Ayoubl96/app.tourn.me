@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import SignInViewPage from '@/features/auth/components/sigin-view';
+import { notFound } from 'next/navigation';
+import { locales } from '@/config/locales';
+import { unstable_setRequestLocale } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title:
@@ -8,23 +11,28 @@ export const metadata: Metadata = {
     'trasforma la gestione dei tornei di padel: crea tornei personalizzati, abbina i giocatori in base al loro livello e automatizza tutto il resto. Più semplicità, maggiore efficienza e zero stress per te!'
 };
 
-export default async function Page() {
+// Generate static params for locales
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function Page({ params }: PageProps) {
+  // Await params and validate locale
+  const { locale } = await params;
+
+  // Validate that the incoming locale is valid
+  if (!locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Enable static rendering by setting the request locale
+  unstable_setRequestLocale(locale);
+
   let stars = 3000; // Default value
 
-  try {
-    const response = await fetch(
-      'https://api.github.com/repos/kiranism/next-shadcn-dashboard-starter',
-      {
-        next: { revalidate: 3600 }
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      stars = data.stargazers_count || stars; // Update stars if API response is valid
-    }
-  } catch (error) {
-    console.error('Error fetching GitHub stars:', error);
-  }
   return <SignInViewPage stars={stars} />;
 }

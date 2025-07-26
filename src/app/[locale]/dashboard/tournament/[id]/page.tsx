@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import PageContainer from '@/components/layout/page-container';
 import TournamentClientPage from './TournamentClientPage';
-import { getLocale } from 'next-intl/server';
 import { defaultLocale } from '@/config/locales';
 
 export const metadata: Metadata = {

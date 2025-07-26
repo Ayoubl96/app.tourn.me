@@ -9,12 +9,12 @@ import { locales, defaultLocale } from './config/locales';
 import NextAuth from 'next-auth';
 import authConfig from '@/lib/auth.config';
 
-// Create the internationalization middleware
+// Create the internationalization middleware with proper configuration
 const intlMiddleware = createIntlMiddleware({
   locales,
   defaultLocale,
-  localePrefix: 'as-needed', // 'always' | 'as-needed' | 'never'
-  localeDetection: true // Enable locale detection based on browser settings
+  localePrefix: 'always', // This ensures consistent locale handling
+  localeDetection: true
 });
 
 // Auth middleware setup
@@ -49,10 +49,7 @@ export default async function middleware(request: NextRequest) {
 
         // Create redirect URL with proper locale
         const locale = localeFromPath || defaultLocale;
-        const signInUrl = new URL(
-          `/${locale === defaultLocale ? 'signin' : `${locale}/signin`}`,
-          request.url
-        );
+        const signInUrl = new URL(`/${locale}/signin`, request.url);
         return NextResponse.redirect(signInUrl);
       }
     }
@@ -72,9 +69,6 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Include all paths except api routes, static files, and files with extensions
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|not-found).*)',
-    // Also match specific locale routes
-    '/',
-    '/(en|it|es)/:path*'
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|not-found).*)'
   ]
 };

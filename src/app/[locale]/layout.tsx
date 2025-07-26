@@ -1,9 +1,10 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { locales, defaultLocale } from '@/config/locales';
-import { auth } from '@/lib/auth';
+import { unstable_setRequestLocale } from 'next-intl/server';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { notFound } from 'next/navigation';
 import '../globals.css';
 
 export const metadata: Metadata = {
@@ -22,20 +23,18 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: any;
+  params: Promise<{ locale: string }>;
 }) {
-  // Simple direct approach with proper awaiting of params
-  let locale = defaultLocale;
+  // Await params properly
+  const { locale } = await params;
 
-  try {
-    // Await params before accessing its properties
-    const resolvedParams = await params;
-    // Now safely access the locale property
-    locale = resolvedParams?.locale || defaultLocale;
-  } catch (error) {
-    console.error('Error accessing locale:', error);
-    // Keep using defaultLocale
+  // Validate that the incoming locale is valid
+  if (!locales.includes(locale as any)) {
+    notFound();
   }
+
+  // Enable static rendering by setting the request locale
+  unstable_setRequestLocale(locale);
 
   // Load messages for the locale
   let messages;
