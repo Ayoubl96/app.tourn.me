@@ -14,19 +14,23 @@ import {
 import { COUNTRIES_DATA } from '../utils/validation';
 import { CountryData } from '@/api/auth/types';
 
-interface CountrySelectorProps {
+type PrefixType = 'phone' | 'vat';
+
+interface FlexibleCountrySelectorProps {
   value: string;
   onValueChange: (value: string) => void;
+  type: PrefixType;
   disabled?: boolean;
   placeholder?: string;
 }
 
-export default function CountrySelector({
+export default function FlexibleCountrySelector({
   value,
   onValueChange,
+  type,
   disabled = false,
   placeholder
-}: CountrySelectorProps) {
+}: FlexibleCountrySelectorProps) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -35,17 +39,33 @@ export default function CountrySelector({
     (country) => country.code === value
   );
 
+  const getDisplayPrefix = (country: CountryData) => {
+    return type === 'phone' ? country.phonePrefix : country.vatPrefix;
+  };
+
+  const getDefaultPlaceholder = () => {
+    return type === 'phone'
+      ? t('Registration.selectCountryCode')
+      : t('Registration.selectVatCountry');
+  };
+
   const filteredCountries = useMemo(() => {
-    if (!searchValue) return COUNTRIES_DATA;
+    // Filter out countries that don't have the required prefix type
+    const countriesWithPrefix = COUNTRIES_DATA.filter((country) => {
+      const prefix = getDisplayPrefix(country);
+      return prefix && prefix.length > 0;
+    });
+
+    if (!searchValue) return countriesWithPrefix;
 
     const search = searchValue.toLowerCase();
-    return COUNTRIES_DATA.filter(
+    return countriesWithPrefix.filter(
       (country) =>
         country.country.toLowerCase().includes(search) ||
         country.code.toLowerCase().includes(search) ||
-        country.phonePrefix.includes(search)
+        getDisplayPrefix(country)?.toLowerCase().includes(search)
     );
-  }, [searchValue]);
+  }, [searchValue, type]);
 
   const handleSelect = (countryCode: string) => {
     onValueChange(countryCode);
@@ -67,13 +87,18 @@ export default function CountrySelector({
             {selectedCountry ? (
               <>
                 <span className='text-lg'>{selectedCountry.flag}</span>
-                <span className='font-mono text-sm'>
-                  {selectedCountry.phonePrefix}
+                <span
+                  className={cn(
+                    'text-sm',
+                    type === 'phone' ? 'font-mono' : 'font-semibold'
+                  )}
+                >
+                  {getDisplayPrefix(selectedCountry)}
                 </span>
               </>
             ) : (
               <span className='text-muted-foreground'>
-                {placeholder || t('Registration.selectCountryCode')}
+                {placeholder || getDefaultPlaceholder()}
               </span>
             )}
           </div>
@@ -97,33 +122,44 @@ export default function CountrySelector({
             </div>
           ) : (
             <div className='p-1'>
-              {filteredCountries.map((country) => (
-                <div
-                  key={country.code}
-                  className={cn(
-                    'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                    value === country.code && 'bg-accent text-accent-foreground'
-                  )}
-                  onClick={() => handleSelect(country.code)}
-                >
-                  <div className='flex min-w-0 flex-1 items-center gap-3'>
-                    <span className='flex-shrink-0 text-lg'>
-                      {country.flag}
-                    </span>
-                    <div className='min-w-0 flex-1'>
-                      <div className='truncate font-medium'>
-                        {country.country}
+              {filteredCountries.map((country) => {
+                const displayPrefix = getDisplayPrefix(country);
+                if (!displayPrefix) return null;
+
+                return (
+                  <div
+                    key={country.code}
+                    className={cn(
+                      'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                      value === country.code &&
+                        'bg-accent text-accent-foreground'
+                    )}
+                    onClick={() => handleSelect(country.code)}
+                  >
+                    <div className='flex min-w-0 flex-1 items-center gap-3'>
+                      <span className='flex-shrink-0 text-lg'>
+                        {country.flag}
+                      </span>
+                      <div className='min-w-0 flex-1'>
+                        <div className='truncate font-medium'>
+                          {country.country}
+                        </div>
                       </div>
+                      <span
+                        className={cn(
+                          'flex-shrink-0 text-sm text-muted-foreground',
+                          type === 'phone' ? 'font-mono' : 'font-semibold'
+                        )}
+                      >
+                        {displayPrefix}
+                      </span>
                     </div>
-                    <span className='flex-shrink-0 font-mono text-sm text-muted-foreground'>
-                      {country.phonePrefix}
-                    </span>
+                    {value === country.code && (
+                      <Check className='ml-2 h-4 w-4 flex-shrink-0' />
+                    )}
                   </div>
-                  {value === country.code && (
-                    <Check className='ml-2 h-4 w-4 flex-shrink-0' />
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

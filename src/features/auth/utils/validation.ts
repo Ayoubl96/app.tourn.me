@@ -1,7 +1,7 @@
 import {
   PasswordStrength,
   PasswordValidation,
-  CountryCode
+  CountryData
 } from '@/api/auth/types';
 
 /**
@@ -93,73 +93,6 @@ export function getPasswordStrengthColor(strength: PasswordStrength): string {
 }
 
 /**
- * Common country codes for phone numbers
- */
-export const COUNTRY_CODES: CountryCode[] = [
-  { code: 'US', country: 'United States', prefix: '+1', flag: '🇺🇸' },
-  { code: 'GB', country: 'United Kingdom', prefix: '+44', flag: '🇬🇧' },
-  { code: 'ES', country: 'Spain', prefix: '+34', flag: '🇪🇸' },
-  { code: 'IT', country: 'Italy', prefix: '+39', flag: '🇮🇹' },
-  { code: 'FR', country: 'France', prefix: '+33', flag: '🇫🇷' },
-  { code: 'DE', country: 'Germany', prefix: '+49', flag: '🇩🇪' },
-  { code: 'PT', country: 'Portugal', prefix: '+351', flag: '🇵🇹' },
-  { code: 'NL', country: 'Netherlands', prefix: '+31', flag: '🇳🇱' },
-  { code: 'BE', country: 'Belgium', prefix: '+32', flag: '🇧🇪' },
-  { code: 'CH', country: 'Switzerland', prefix: '+41', flag: '🇨🇭' },
-  { code: 'AT', country: 'Austria', prefix: '+43', flag: '🇦🇹' },
-  { code: 'SE', country: 'Sweden', prefix: '+46', flag: '🇸🇪' },
-  { code: 'NO', country: 'Norway', prefix: '+47', flag: '🇳🇴' },
-  { code: 'DK', country: 'Denmark', prefix: '+45', flag: '🇩🇰' },
-  { code: 'FI', country: 'Finland', prefix: '+358', flag: '🇫🇮' },
-  { code: 'IE', country: 'Ireland', prefix: '+353', flag: '🇮🇪' },
-  { code: 'GR', country: 'Greece', prefix: '+30', flag: '🇬🇷' },
-  { code: 'PL', country: 'Poland', prefix: '+48', flag: '🇵🇱' },
-  { code: 'CZ', country: 'Czech Republic', prefix: '+420', flag: '🇨🇿' },
-  { code: 'HU', country: 'Hungary', prefix: '+36', flag: '🇭🇺' },
-  { code: 'HR', country: 'Croatia', prefix: '+385', flag: '🇭🇷' },
-  { code: 'SI', country: 'Slovenia', prefix: '+386', flag: '🇸🇮' },
-  { code: 'SK', country: 'Slovakia', prefix: '+421', flag: '🇸🇰' },
-  { code: 'BG', country: 'Bulgaria', prefix: '+359', flag: '🇧🇬' },
-  { code: 'RO', country: 'Romania', prefix: '+40', flag: '🇷🇴' },
-  { code: 'LT', country: 'Lithuania', prefix: '+370', flag: '🇱🇹' },
-  { code: 'LV', country: 'Latvia', prefix: '+371', flag: '🇱🇻' },
-  { code: 'EE', country: 'Estonia', prefix: '+372', flag: '🇪🇪' },
-  { code: 'CY', country: 'Cyprus', prefix: '+357', flag: '🇨🇾' },
-  { code: 'MT', country: 'Malta', prefix: '+356', flag: '🇲🇹' },
-  { code: 'LU', country: 'Luxembourg', prefix: '+352', flag: '🇱🇺' },
-  { code: 'MX', country: 'Mexico', prefix: '+52', flag: '🇲🇽' },
-  { code: 'CA', country: 'Canada', prefix: '+1', flag: '🇨🇦' },
-  { code: 'BR', country: 'Brazil', prefix: '+55', flag: '🇧🇷' },
-  { code: 'AR', country: 'Argentina', prefix: '+54', flag: '🇦🇷' },
-  { code: 'CL', country: 'Chile', prefix: '+56', flag: '🇨🇱' },
-  { code: 'CO', country: 'Colombia', prefix: '+57', flag: '🇨🇴' },
-  { code: 'PE', country: 'Peru', prefix: '+51', flag: '🇵🇪' },
-  { code: 'UY', country: 'Uruguay', prefix: '+598', flag: '🇺🇾' },
-  { code: 'AU', country: 'Australia', prefix: '+61', flag: '🇦🇺' },
-  { code: 'NZ', country: 'New Zealand', prefix: '+64', flag: '🇳🇿' },
-  { code: 'JP', country: 'Japan', prefix: '+81', flag: '🇯🇵' },
-  { code: 'KR', country: 'South Korea', prefix: '+82', flag: '🇰🇷' },
-  { code: 'CN', country: 'China', prefix: '+86', flag: '🇨🇳' },
-  { code: 'IN', country: 'India', prefix: '+91', flag: '🇮🇳' },
-  { code: 'SG', country: 'Singapore', prefix: '+65', flag: '🇸🇬' },
-  { code: 'MY', country: 'Malaysia', prefix: '+60', flag: '🇲🇾' },
-  { code: 'TH', country: 'Thailand', prefix: '+66', flag: '🇹🇭' },
-  { code: 'ID', country: 'Indonesia', prefix: '+62', flag: '🇮🇩' },
-  { code: 'PH', country: 'Philippines', prefix: '+63', flag: '🇵🇭' },
-  { code: 'VN', country: 'Vietnam', prefix: '+84', flag: '🇻🇳' },
-  { code: 'AE', country: 'United Arab Emirates', prefix: '+971', flag: '🇦🇪' },
-  { code: 'SA', country: 'Saudi Arabia', prefix: '+966', flag: '🇸🇦' },
-  { code: 'EG', country: 'Egypt', prefix: '+20', flag: '🇪🇬' },
-  { code: 'ZA', country: 'South Africa', prefix: '+27', flag: '🇿🇦' },
-  { code: 'MA', country: 'Morocco', prefix: '+212', flag: '🇲🇦' },
-  { code: 'TN', country: 'Tunisia', prefix: '+216', flag: '🇹🇳' },
-  { code: 'IL', country: 'Israel', prefix: '+972', flag: '🇮🇱' },
-  { code: 'TR', country: 'Turkey', prefix: '+90', flag: '🇹🇷' },
-  { code: 'RU', country: 'Russia', prefix: '+7', flag: '🇷🇺' },
-  { code: 'UA', country: 'Ukraine', prefix: '+380', flag: '🇺🇦' }
-];
-
-/**
  * Validates phone number format (basic validation)
  */
 export function validatePhoneNumber(
@@ -175,7 +108,7 @@ export function validatePhoneNumber(
   }
 
   // Country-specific validation (basic)
-  const country = COUNTRY_CODES.find((c) => c.code === countryCode);
+  const country = COUNTRIES_DATA.find((c) => c.code === countryCode);
   if (!country) return false;
 
   // Simple validation based on common patterns
@@ -207,11 +140,11 @@ export function formatPhoneNumber(
   countryCode: string
 ): string {
   const cleanNumber = phoneNumber.replace(/\D/g, '');
-  const country = COUNTRY_CODES.find((c) => c.code === countryCode);
+  const country = COUNTRIES_DATA.find((c) => c.code === countryCode);
 
   if (!country) return phoneNumber;
 
-  return `${country.prefix} ${cleanNumber}`;
+  return `${country.phonePrefix} ${cleanNumber}`;
 }
 
 /**
@@ -222,9 +155,540 @@ export function combinePhoneNumber(
   countryCode: string
 ): string {
   const cleanNumber = phoneNumber.replace(/\D/g, '');
-  const country = COUNTRY_CODES.find((c) => c.code === countryCode);
+  const country = COUNTRIES_DATA.find((c) => c.code === countryCode);
 
   if (!country) return phoneNumber;
 
-  return `${country.prefix}${cleanNumber}`;
+  return `${country.phonePrefix}${cleanNumber}`;
+}
+
+/**
+ * Validates VAT number format (basic validation)
+ */
+export function validateVatNumber(
+  vatNumber: string,
+  countryCode: string
+): boolean {
+  // Remove all non-alphanumeric characters
+  const cleanVat = vatNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+  // Basic length validation
+  if (cleanVat.length < 4 || cleanVat.length > 20) {
+    return false;
+  }
+
+  // Country-specific validation (basic patterns)
+  switch (countryCode) {
+    case 'DE': // Germany - 9 digits
+      return /^\d{9}$/.test(cleanVat);
+    case 'FR': // France - 2 letters + 9 digits or 11 digits
+      return /^[A-Z]{2}\d{9}$/.test(cleanVat) || /^\d{11}$/.test(cleanVat);
+    case 'IT': // Italy - 11 digits
+      return /^\d{11}$/.test(cleanVat);
+    case 'ES': // Spain - 1 letter + 7 digits + 1 letter or 8 digits + 1 letter
+      return (
+        /^[A-Z]\d{7}[A-Z]$/.test(cleanVat) || /^\d{8}[A-Z]$/.test(cleanVat)
+      );
+    case 'NL': // Netherlands - 12 digits with B in between
+      return /^\d{9}B\d{2}$/.test(cleanVat);
+    case 'BE': // Belgium - 10 digits
+      return /^\d{10}$/.test(cleanVat);
+    case 'GB': // UK - 9 or 12 digits
+      return /^\d{9}$/.test(cleanVat) || /^\d{12}$/.test(cleanVat);
+    case 'AT': // Austria - 8 digits
+      return /^\d{8}$/.test(cleanVat);
+    case 'PT': // Portugal - 9 digits
+      return /^\d{9}$/.test(cleanVat);
+    case 'SE': // Sweden - 12 digits
+      return /^\d{12}$/.test(cleanVat);
+    case 'DK': // Denmark - 8 digits
+      return /^\d{8}$/.test(cleanVat);
+    case 'FI': // Finland - 8 digits
+      return /^\d{8}$/.test(cleanVat);
+    case 'NO': // Norway - 9 digits + "MVA"
+      return /^\d{9}MVA$/.test(cleanVat) || /^\d{9}$/.test(cleanVat);
+    case 'CH': // Switzerland - 6 digits
+      return /^\d{6}$/.test(cleanVat);
+    case 'PL': // Poland - 10 digits
+      return /^\d{10}$/.test(cleanVat);
+    case 'CZ': // Czech Republic - 8-10 digits
+      return /^\d{8,10}$/.test(cleanVat);
+    case 'HU': // Hungary - 8 digits
+      return /^\d{8}$/.test(cleanVat);
+    case 'US': // United States - EIN format XX-XXXXXXX
+      return /^\d{2}\d{7}$/.test(cleanVat);
+    default:
+      // General validation for other countries - alphanumeric, 4-20 characters
+      return /^[A-Z0-9]{4,20}$/.test(cleanVat);
+  }
+}
+
+/**
+ * Formats VAT number for display
+ */
+export function formatVatNumber(
+  vatNumber: string,
+  countryCode: string
+): string {
+  const cleanVat = vatNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const country = COUNTRIES_DATA.find((c) => c.code === countryCode);
+  const prefix = country?.vatPrefix;
+
+  if (!prefix) return vatNumber;
+
+  return `${prefix}${cleanVat}`;
+}
+
+/**
+ * Merged country data with both phone and VAT prefixes
+ */
+export const COUNTRIES_DATA: CountryData[] = [
+  {
+    code: 'US',
+    country: 'United States',
+    phonePrefix: '+1',
+    vatPrefix: 'US',
+    flag: '🇺🇸'
+  },
+  {
+    code: 'GB',
+    country: 'United Kingdom',
+    phonePrefix: '+44',
+    vatPrefix: 'GB',
+    flag: '🇬🇧'
+  },
+  {
+    code: 'ES',
+    country: 'Spain',
+    phonePrefix: '+34',
+    vatPrefix: 'ES',
+    flag: '🇪🇸'
+  },
+  {
+    code: 'IT',
+    country: 'Italy',
+    phonePrefix: '+39',
+    vatPrefix: 'IT',
+    flag: '🇮🇹'
+  },
+  {
+    code: 'FR',
+    country: 'France',
+    phonePrefix: '+33',
+    vatPrefix: 'FR',
+    flag: '🇫🇷'
+  },
+  {
+    code: 'DE',
+    country: 'Germany',
+    phonePrefix: '+49',
+    vatPrefix: 'DE',
+    flag: '🇩🇪'
+  },
+  {
+    code: 'PT',
+    country: 'Portugal',
+    phonePrefix: '+351',
+    vatPrefix: 'PT',
+    flag: '🇵🇹'
+  },
+  {
+    code: 'NL',
+    country: 'Netherlands',
+    phonePrefix: '+31',
+    vatPrefix: 'NL',
+    flag: '🇳🇱'
+  },
+  {
+    code: 'BE',
+    country: 'Belgium',
+    phonePrefix: '+32',
+    vatPrefix: 'BE',
+    flag: '🇧🇪'
+  },
+  {
+    code: 'CH',
+    country: 'Switzerland',
+    phonePrefix: '+41',
+    vatPrefix: 'CHE',
+    flag: '🇨🇭'
+  },
+  {
+    code: 'AT',
+    country: 'Austria',
+    phonePrefix: '+43',
+    vatPrefix: 'ATU',
+    flag: '🇦🇹'
+  },
+  {
+    code: 'SE',
+    country: 'Sweden',
+    phonePrefix: '+46',
+    vatPrefix: 'SE',
+    flag: '🇸🇪'
+  },
+  {
+    code: 'NO',
+    country: 'Norway',
+    phonePrefix: '+47',
+    vatPrefix: 'NO',
+    flag: '🇳🇴'
+  },
+  {
+    code: 'DK',
+    country: 'Denmark',
+    phonePrefix: '+45',
+    vatPrefix: 'DK',
+    flag: '🇩🇰'
+  },
+  {
+    code: 'FI',
+    country: 'Finland',
+    phonePrefix: '+358',
+    vatPrefix: 'FI',
+    flag: '🇫🇮'
+  },
+  {
+    code: 'IE',
+    country: 'Ireland',
+    phonePrefix: '+353',
+    vatPrefix: 'IE',
+    flag: '🇮🇪'
+  },
+  {
+    code: 'GR',
+    country: 'Greece',
+    phonePrefix: '+30',
+    vatPrefix: 'EL',
+    flag: '🇬🇷'
+  },
+  {
+    code: 'PL',
+    country: 'Poland',
+    phonePrefix: '+48',
+    vatPrefix: 'PL',
+    flag: '🇵🇱'
+  },
+  {
+    code: 'CZ',
+    country: 'Czech Republic',
+    phonePrefix: '+420',
+    vatPrefix: 'CZ',
+    flag: '🇨🇿'
+  },
+  {
+    code: 'HU',
+    country: 'Hungary',
+    phonePrefix: '+36',
+    vatPrefix: 'HU',
+    flag: '🇭🇺'
+  },
+  {
+    code: 'HR',
+    country: 'Croatia',
+    phonePrefix: '+385',
+    vatPrefix: 'HR',
+    flag: '🇭🇷'
+  },
+  {
+    code: 'SI',
+    country: 'Slovenia',
+    phonePrefix: '+386',
+    vatPrefix: 'SI',
+    flag: '🇸🇮'
+  },
+  {
+    code: 'SK',
+    country: 'Slovakia',
+    phonePrefix: '+421',
+    vatPrefix: 'SK',
+    flag: '🇸🇰'
+  },
+  {
+    code: 'BG',
+    country: 'Bulgaria',
+    phonePrefix: '+359',
+    vatPrefix: 'BG',
+    flag: '🇧🇬'
+  },
+  {
+    code: 'RO',
+    country: 'Romania',
+    phonePrefix: '+40',
+    vatPrefix: 'RO',
+    flag: '🇷🇴'
+  },
+  {
+    code: 'LT',
+    country: 'Lithuania',
+    phonePrefix: '+370',
+    vatPrefix: 'LT',
+    flag: '🇱🇹'
+  },
+  {
+    code: 'LV',
+    country: 'Latvia',
+    phonePrefix: '+371',
+    vatPrefix: 'LV',
+    flag: '🇱🇻'
+  },
+  {
+    code: 'EE',
+    country: 'Estonia',
+    phonePrefix: '+372',
+    vatPrefix: 'EE',
+    flag: '🇪🇪'
+  },
+  {
+    code: 'CY',
+    country: 'Cyprus',
+    phonePrefix: '+357',
+    vatPrefix: 'CY',
+    flag: '🇨🇾'
+  },
+  {
+    code: 'MT',
+    country: 'Malta',
+    phonePrefix: '+356',
+    vatPrefix: 'MT',
+    flag: '🇲🇹'
+  },
+  {
+    code: 'LU',
+    country: 'Luxembourg',
+    phonePrefix: '+352',
+    vatPrefix: 'LU',
+    flag: '🇱🇺'
+  },
+  {
+    code: 'MX',
+    country: 'Mexico',
+    phonePrefix: '+52',
+    vatPrefix: 'MX',
+    flag: '🇲🇽'
+  },
+  {
+    code: 'CA',
+    country: 'Canada',
+    phonePrefix: '+1',
+    vatPrefix: 'CA',
+    flag: '🇨🇦'
+  },
+  {
+    code: 'BR',
+    country: 'Brazil',
+    phonePrefix: '+55',
+    vatPrefix: 'BR',
+    flag: '🇧🇷'
+  },
+  {
+    code: 'AR',
+    country: 'Argentina',
+    phonePrefix: '+54',
+    vatPrefix: 'AR',
+    flag: '🇦🇷'
+  },
+  {
+    code: 'CL',
+    country: 'Chile',
+    phonePrefix: '+56',
+    vatPrefix: 'CL',
+    flag: '🇨🇱'
+  },
+  {
+    code: 'CO',
+    country: 'Colombia',
+    phonePrefix: '+57',
+    vatPrefix: 'CO',
+    flag: '🇨🇴'
+  },
+  {
+    code: 'PE',
+    country: 'Peru',
+    phonePrefix: '+51',
+    vatPrefix: 'PE',
+    flag: '🇵🇪'
+  },
+  {
+    code: 'UY',
+    country: 'Uruguay',
+    phonePrefix: '+598',
+    vatPrefix: 'UY',
+    flag: '🇺🇾'
+  },
+  {
+    code: 'AU',
+    country: 'Australia',
+    phonePrefix: '+61',
+    vatPrefix: 'AU',
+    flag: '🇦🇺'
+  },
+  {
+    code: 'NZ',
+    country: 'New Zealand',
+    phonePrefix: '+64',
+    vatPrefix: 'NZ',
+    flag: '🇳🇿'
+  },
+  {
+    code: 'JP',
+    country: 'Japan',
+    phonePrefix: '+81',
+    vatPrefix: 'JP',
+    flag: '🇯🇵'
+  },
+  {
+    code: 'KR',
+    country: 'South Korea',
+    phonePrefix: '+82',
+    vatPrefix: 'KR',
+    flag: '🇰🇷'
+  },
+  {
+    code: 'CN',
+    country: 'China',
+    phonePrefix: '+86',
+    vatPrefix: 'CN',
+    flag: '🇨🇳'
+  },
+  {
+    code: 'IN',
+    country: 'India',
+    phonePrefix: '+91',
+    vatPrefix: 'IN',
+    flag: '🇮🇳'
+  },
+  {
+    code: 'SG',
+    country: 'Singapore',
+    phonePrefix: '+65',
+    vatPrefix: 'SG',
+    flag: '🇸🇬'
+  },
+  {
+    code: 'MY',
+    country: 'Malaysia',
+    phonePrefix: '+60',
+    vatPrefix: 'MY',
+    flag: '🇲🇾'
+  },
+  {
+    code: 'TH',
+    country: 'Thailand',
+    phonePrefix: '+66',
+    vatPrefix: 'TH',
+    flag: '🇹🇭'
+  },
+  {
+    code: 'ID',
+    country: 'Indonesia',
+    phonePrefix: '+62',
+    vatPrefix: 'ID',
+    flag: '🇮🇩'
+  },
+  {
+    code: 'PH',
+    country: 'Philippines',
+    phonePrefix: '+63',
+    vatPrefix: 'PH',
+    flag: '🇵🇭'
+  },
+  {
+    code: 'VN',
+    country: 'Vietnam',
+    phonePrefix: '+84',
+    vatPrefix: 'VN',
+    flag: '🇻🇳'
+  },
+  {
+    code: 'AE',
+    country: 'United Arab Emirates',
+    phonePrefix: '+971',
+    vatPrefix: 'AE',
+    flag: '🇦🇪'
+  },
+  {
+    code: 'SA',
+    country: 'Saudi Arabia',
+    phonePrefix: '+966',
+    vatPrefix: 'SA',
+    flag: '🇸🇦'
+  },
+  {
+    code: 'EG',
+    country: 'Egypt',
+    phonePrefix: '+20',
+    vatPrefix: 'EG',
+    flag: '🇪🇬'
+  },
+  {
+    code: 'ZA',
+    country: 'South Africa',
+    phonePrefix: '+27',
+    vatPrefix: 'ZA',
+    flag: '🇿🇦'
+  },
+  {
+    code: 'MA',
+    country: 'Morocco',
+    phonePrefix: '+212',
+    vatPrefix: 'MA',
+    flag: '🇲🇦'
+  },
+  {
+    code: 'TN',
+    country: 'Tunisia',
+    phonePrefix: '+216',
+    vatPrefix: 'TN',
+    flag: '🇹🇳'
+  },
+  {
+    code: 'IL',
+    country: 'Israel',
+    phonePrefix: '+972',
+    vatPrefix: 'IL',
+    flag: '🇮🇱'
+  },
+  {
+    code: 'TR',
+    country: 'Turkey',
+    phonePrefix: '+90',
+    vatPrefix: 'TR',
+    flag: '🇹🇷'
+  },
+  {
+    code: 'RU',
+    country: 'Russia',
+    phonePrefix: '+7',
+    vatPrefix: 'RU',
+    flag: '🇷🇺'
+  },
+  {
+    code: 'UA',
+    country: 'Ukraine',
+    phonePrefix: '+380',
+    vatPrefix: 'UA',
+    flag: '🇺🇦'
+  }
+];
+
+/**
+ * Combines country VAT prefix with VAT number
+ */
+export function combineVatNumber(
+  vatNumber: string,
+  countryCode: string
+): string {
+  const cleanVat = vatNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const country = COUNTRIES_DATA.find((c) => c.code === countryCode);
+  const prefix = country?.vatPrefix;
+
+  if (!prefix || !cleanVat) return cleanVat;
+
+  // Check if the VAT number already has the prefix
+  if (cleanVat.startsWith(prefix)) {
+    return cleanVat;
+  }
+
+  return `${prefix}${cleanVat}`;
 }

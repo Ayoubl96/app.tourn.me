@@ -22,13 +22,15 @@ import {
 } from '@/api/auth/types';
 import { initiateRegistration } from '@/api/auth';
 import {
-  COUNTRY_CODES,
   validatePassword,
   validatePhoneNumber,
-  combinePhoneNumber
+  combinePhoneNumber,
+  validateVatNumber,
+  combineVatNumber,
+  COUNTRIES_DATA
 } from '../utils/validation';
 import PasswordStrengthIndicator from './password-strength-indicator';
-import CountrySelector from './country-selector';
+import FlexibleCountrySelector from './flexible-country-selector';
 
 interface RegistrationFormProps {
   onSuccess: (email: string, expirationTime: number) => void;
@@ -71,7 +73,11 @@ export default function RegistrationForm({
         .min(1, { message: t('Errors.requiredPhoneNumber') }),
       country_code: z
         .string()
-        .min(1, { message: t('Errors.requiredCountryCode') })
+        .min(1, { message: t('Errors.requiredCountryCode') }),
+      vat_number: z.string().min(1, { message: t('Errors.requiredVatNumber') }),
+      vat_country_code: z
+        .string()
+        .min(1, { message: t('Errors.requiredVatCountryCode') })
     })
     .refine((data) => data.email === data.confirmEmail, {
       message: t('Errors.emailsMustMatch'),
@@ -87,6 +93,13 @@ export default function RegistrationForm({
         message: t('Errors.invalidPhoneNumber'),
         path: ['phone_number']
       }
+    )
+    .refine(
+      (data) => validateVatNumber(data.vat_number, data.vat_country_code),
+      {
+        message: t('Errors.invalidVatNumber'),
+        path: ['vat_number']
+      }
     );
 
   type RegistrationFormValue = z.infer<typeof formSchema>;
@@ -99,7 +112,9 @@ export default function RegistrationForm({
     name: '',
     address: '',
     phone_number: '',
-    country_code: '' // Default to Italy
+    country_code: '', // Default to Italy
+    vat_number: '',
+    vat_country_code: ''
   };
 
   const form = useForm<RegistrationFormValue>({
@@ -124,13 +139,20 @@ export default function RegistrationForm({
           data.country_code
         );
 
+        // Combine VAT number with country prefix
+        const fullVatNumber = combineVatNumber(
+          data.vat_number,
+          data.vat_country_code
+        );
+
         // Prepare API data
         const apiData: RegistrationApiData = {
           email: data.email,
           password: data.password,
           name: data.name,
           address: data.address,
-          phone_number: fullPhoneNumber
+          phone_number: fullPhoneNumber,
+          vat_number: fullVatNumber
         };
 
         // Initiate registration
@@ -302,6 +324,78 @@ export default function RegistrationForm({
           )}
         />
 
+        {/* VAT Number */}
+        <div className='space-y-2'>
+          <FormLabel>{t('Registration.vatNumberLabel')}</FormLabel>
+          <div className='grid grid-cols-2 gap-2'>
+            <FormField
+              control={form.control}
+              name='vat_country_code'
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FlexibleCountrySelector
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      type='vat'
+                      disabled={loading}
+                      placeholder={t('Registration.selectCountryCode')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='vat_number'
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className='relative'>
+                      {(() => {
+                        const vatCountryCode = form.watch('vat_country_code');
+                        const country = COUNTRIES_DATA.find(
+                          (c) => c.code === vatCountryCode
+                        );
+                        const vatPrefix = country?.vatPrefix;
+
+                        return vatPrefix ? (
+                          <span className='absolute left-3 top-1/2 -translate-y-1/2 rounded bg-muted px-1 text-sm text-muted-foreground'>
+                            {vatPrefix}
+                          </span>
+                        ) : null;
+                      })()}
+                      <Input
+                        type='text'
+                        placeholder={t('Registration.vatNumberPlaceholder')}
+                        disabled={loading}
+                        className={(() => {
+                          const vatCountryCode = form.watch('vat_country_code');
+                          const country = COUNTRIES_DATA.find(
+                            (c) => c.code === vatCountryCode
+                          );
+                          return country?.vatPrefix ? 'pl-16' : '';
+                        })()}
+                        {...field}
+                        onChange={(e) => {
+                          // Allow alphanumeric characters and some formatting
+                          const value = e.target.value
+                            .replace(/[^a-zA-Z0-9\-\s]/g, '')
+                            .toUpperCase();
+                          field.onChange(value);
+                        }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
         {/* Phone Number */}
         <div className='space-y-2'>
           <FormLabel>{t('Registration.phoneLabel')}</FormLabel>
@@ -312,9 +406,10 @@ export default function RegistrationForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <CountrySelector
+                    <FlexibleCountrySelector
                       value={field.value}
                       onValueChange={field.onChange}
+                      type='phone'
                       disabled={loading}
                       placeholder={t('Registration.selectCountryCode')}
                     />

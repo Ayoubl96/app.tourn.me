@@ -56,6 +56,17 @@ export interface CountryCode {
 }
 
 /**
+ * Extended country data with both phone and VAT prefixes
+ */
+export interface CountryData {
+  code: string;
+  country: string;
+  phonePrefix: string;
+  vatPrefix?: string;
+  flag: string;
+}
+
+/**
  * Registration form data (including confirmations)
  */
 export interface RegistrationFormData {
@@ -67,6 +78,7 @@ export interface RegistrationFormData {
   address: string;
   phone_number: string;
   country_code: string;
+  vat_number: string;
 }
 
 /**
@@ -78,6 +90,7 @@ export interface RegistrationApiData {
   name: string;
   address: string;
   phone_number: string; // This will be country_code + phone_number combined
+  vat_number: string; // This will be country_vat_prefix + vat_number combined
 }
 
 /**
