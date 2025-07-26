@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import UserAuthForm from './user-auth-form';
-import { Logo } from '@/components/ui/logo';
+import AuthSideImage from './auth-side-image';
 
 export default function SignInViewPage({ stars }: { stars?: number }) {
   const t = useTranslations('Auth');
@@ -21,18 +21,7 @@ export default function SignInViewPage({ stars }: { stars?: number }) {
       >
         {t('login')}
       </Link>
-      <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
-        <div className='absolute inset-0 bg-zinc-900' />
-        <div className='relative z-20 flex items-center text-lg font-medium'>
-          <Logo width={120} height={32} className='mr-2' />
-        </div>
-        <div className='relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>&ldquo;{t('testimonial')}&rdquo;</p>
-            <footer className='text-sm'>{t('author')}</footer>
-          </blockquote>
-        </div>
-      </div>
+      <AuthSideImage />
       <div className='flex h-full items-center p-4 lg:p-8'>
         <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
           <div className='flex flex-col space-y-2 text-center'>

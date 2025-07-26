@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Link } from '@/lib/navigation';
-import { Logo } from '@/components/ui/logo';
 import { CheckCircle } from 'lucide-react';
 import { RegistrationStep } from '@/api/auth/types';
 import RegistrationForm from './registration-form';
 import EmailVerification from './email-verification';
+import AuthSideImage from './auth-side-image';
 
 export default function RegistrationViewPage() {
   const t = useTranslations();
@@ -147,23 +147,8 @@ export default function RegistrationViewPage() {
         {t('Auth.login')}
       </Link>
 
-      {/* Left side - testimonial/branding */}
-      <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
-        <div className='absolute inset-0 bg-zinc-900' />
-        <div className='relative z-20 flex items-center text-lg font-medium'>
-          <Logo width={120} height={32} className='mr-2' />
-        </div>
-        <div className='relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>
-              &ldquo;{t('Registration.testimonial')}&rdquo;
-            </p>
-            <footer className='text-sm'>
-              {t('Registration.testimonialAuthor')}
-            </footer>
-          </blockquote>
-        </div>
-      </div>
+      {/* Left side - emotional images */}
+      <AuthSideImage />
 
       {/* Right side - registration form */}
       <div className='flex h-full items-center p-4 lg:p-8'>
