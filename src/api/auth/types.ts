@@ -159,6 +159,8 @@ export interface PasswordValidation {
   hasMinLength: boolean;
   hasNumber: boolean;
   hasLetter: boolean;
+  hasLowerCase: boolean;
+  hasUpperCase: boolean;
   hasSpecialChar: boolean;
   score: number;
 }

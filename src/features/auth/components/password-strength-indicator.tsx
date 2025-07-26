@@ -39,9 +39,14 @@ export default function PasswordStrengthIndicator({
       key: 'hasNumber'
     },
     {
-      label: t('Registration.passwordHasLetter'),
-      met: validation.hasLetter,
-      key: 'hasLetter'
+      label: t('Registration.passwordHasLowerCase'),
+      met: validation.hasLowerCase,
+      key: 'hasLowerCase'
+    },
+    {
+      label: t('Registration.passwordHasUpperCase'),
+      met: validation.hasUpperCase,
+      key: 'hasUpperCase'
     },
     {
       label: t('Registration.passwordHasSpecialChar'),

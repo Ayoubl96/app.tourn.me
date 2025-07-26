@@ -56,10 +56,12 @@ export default function RegistrationForm({
             return (
               validation.hasNumber &&
               validation.hasLetter &&
+              validation.hasUpperCase &&
+              validation.hasLowerCase &&
               validation.hasSpecialChar
             );
           },
-          { message: t('Errors.passwordRequirements') }
+          { message: t('Errors.passwordRequirementsDetailed') }
         ),
       confirmPassword: z.string(),
       name: z.string().min(1, { message: t('Errors.requiredCompanyName') }),

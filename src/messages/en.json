@@ -599,6 +599,8 @@
     "passwordMinLength": "At least 8 characters",
     "passwordHasNumber": "Contains a number",
     "passwordHasLetter": "Contains a letter",
+    "passwordHasLowerCase": "Contains a lowercase letter",
+    "passwordHasUpperCase": "Contains an uppercase letter",
     "passwordHasSpecialChar": "Contains a special character",
     "passwordTooWeak": "Password is too weak. Please use a stronger password."
   },
@@ -656,6 +658,7 @@
     "emailsMustMatch": "Email addresses must match",
     "passwordsMustMatch": "Passwords must match",
     "passwordRequirements": "Password must contain at least one number, letter, and special character",
+    "passwordRequirementsDetailed": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     "invalidPhoneNumber": "Invalid phone number for selected country",
     "failedToLoad": "Failed to load data",
     "somethingWentWrong": "Something went wrong",

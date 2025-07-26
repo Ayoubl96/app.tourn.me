@@ -10,7 +10,9 @@ import {
 export function validatePassword(password: string): PasswordValidation {
   const hasMinLength = password.length >= 8;
   const hasNumber = /\d/.test(password);
-  const hasLetter = /[a-zA-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLetter = hasLowerCase || hasUpperCase;
   const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
 
   // Calculate score based on criteria
@@ -22,7 +24,7 @@ export function validatePassword(password: string): PasswordValidation {
 
   // Additional scoring for length and complexity
   if (password.length >= 12) score += 1;
-  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+  if (hasUpperCase && hasLowerCase) score += 1;
 
   // Determine strength level
   let strength: PasswordStrength;
@@ -43,6 +45,8 @@ export function validatePassword(password: string): PasswordValidation {
     hasMinLength,
     hasNumber,
     hasLetter,
+    hasLowerCase,
+    hasUpperCase,
     hasSpecialChar,
     score: Math.min(score, 5)
   };

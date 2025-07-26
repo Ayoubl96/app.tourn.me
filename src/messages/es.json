@@ -600,6 +600,8 @@
     "passwordMinLength": "Al menos 8 caracteres",
     "passwordHasNumber": "Contiene un número",
     "passwordHasLetter": "Contiene una letra",
+    "passwordHasLowerCase": "Contiene una letra minúscula",
+    "passwordHasUpperCase": "Contiene una letra mayúscula",
     "passwordHasSpecialChar": "Contiene un carácter especial",
     "passwordTooWeak": "La contraseña es muy débil. Por favor usa una contraseña más fuerte."
   },
@@ -657,6 +659,7 @@
     "emailsMustMatch": "Las direcciones de email deben coincidir",
     "passwordsMustMatch": "Las contraseñas deben coincidir",
     "passwordRequirements": "La contraseña debe contener al menos un número, una letra y un carácter especial",
+    "passwordRequirementsDetailed": "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial",
     "invalidPhoneNumber": "Número de teléfono inválido para el país seleccionado",
     "failedToLoad": "Error al cargar datos",
     "somethingWentWrong": "Algo salió mal",
