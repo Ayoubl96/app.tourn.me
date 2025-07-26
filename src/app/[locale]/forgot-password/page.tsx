@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from '@/lib/navigation';
 import AuthSideImage from '@/features/auth/components/auth-side-image';
+import AuthHeader from '@/features/auth/components/auth-header';
 
 export const metadata: Metadata = {
   title: 'Forgot Password | tourn.me'
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage() {
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
+      <AuthHeader variant='forgot-password' />
       <AuthSideImage />
       <div className='flex h-full items-center p-4 lg:p-8'>
         <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>

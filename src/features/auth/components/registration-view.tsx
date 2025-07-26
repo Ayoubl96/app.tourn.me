@@ -11,6 +11,7 @@ import { RegistrationStep } from '@/api/auth/types';
 import RegistrationForm from './registration-form';
 import EmailVerification from './email-verification';
 import AuthSideImage from './auth-side-image';
+import AuthHeader from './auth-header';
 
 export default function RegistrationViewPage() {
   const t = useTranslations();
@@ -136,16 +137,8 @@ export default function RegistrationViewPage() {
 
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-      {/* Header with sign in link */}
-      <Link
-        href='/signin'
-        className={cn(
-          buttonVariants({ variant: 'ghost' }),
-          'absolute right-4 top-4 md:right-8 md:top-8'
-        )}
-      >
-        {t('Auth.login')}
-      </Link>
+      {/* Header with theme toggle and navigation */}
+      <AuthHeader variant='register' />
 
       {/* Left side - emotional images */}
       <AuthSideImage />
