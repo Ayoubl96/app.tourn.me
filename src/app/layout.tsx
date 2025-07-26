@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     'management',
     'competition',
     'sports',
-    'esports',
+    'padel',
     'bracket'
   ],
   authors: [{ name: 'tourn.me Team' }],
