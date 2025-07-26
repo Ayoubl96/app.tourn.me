@@ -60,7 +60,7 @@ export function Logo({
   }
 
   const isDark = resolvedTheme === 'dark';
-  const logoSrc = isDark ? '/logo_white.svg' : '/logo_black.svg';
+  const logoSrc = isDark ? '/logo.svg' : '/logo.svg';
 
   return (
     <Image
