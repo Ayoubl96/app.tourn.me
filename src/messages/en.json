@@ -668,6 +668,8 @@
     "tournamentContextError": "Tournament context must be used within a TournamentProvider",
     "failedToAssignCouple": "Failed to assign couple to group",
     "failedToRemoveCouple": "Failed to remove couple from group",
-    "failedToAutoAssign": "Failed to auto-assign couples to groups"
+    "failedToAutoAssign": "Failed to auto-assign couples to groups",
+    "authenticationFailed": "Invalid username or password. Please try again.",
+    "signInError": "An error occurred during sign in. Please try again."
   }
 }

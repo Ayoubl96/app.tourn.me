@@ -43,13 +43,35 @@ export default function UserAuthForm() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    startTransition(() => {
-      signIn('credentials', {
-        username: data.username,
-        password: data.password,
-        callbackUrl: callbackUrl ?? '/dashboard'
-      });
-      toast.success(t('Auth.signInSuccess'));
+    startTransition(async () => {
+      try {
+        const result = await signIn('credentials', {
+          username: data.username,
+          password: data.password,
+          redirect: false
+        });
+
+        if (result?.error) {
+          // Authentication failed
+          if (result.error === 'CredentialsSignin') {
+            toast.error(t('Errors.authenticationFailed'));
+          } else {
+            toast.error(t('Errors.signInError'));
+          }
+        } else if (result?.ok) {
+          // Authentication successful
+          toast.success(t('Auth.signInSuccess'));
+          // Redirect manually since we set redirect: false
+          window.location.href = callbackUrl ?? '/dashboard';
+        } else {
+          // Unexpected result
+          toast.error(t('Errors.signInError'));
+        }
+      } catch (error) {
+        // Network or other errors
+        console.error('Sign in error:', error);
+        toast.error(t('Errors.signInError'));
+      }
     });
   };
 

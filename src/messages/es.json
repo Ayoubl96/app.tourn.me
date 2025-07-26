@@ -669,6 +669,8 @@
     "tournamentContextError": "El contexto del torneo debe usarse dentro de un TournamentProvider",
     "failedToAssignCouple": "Error al asignar pareja al grupo",
     "failedToRemoveCouple": "Error al remover pareja del grupo",
-    "failedToAutoAssign": "Error al auto-asignar parejas a grupos"
+    "failedToAutoAssign": "Error al auto-asignar parejas a los grupos",
+    "authenticationFailed": "Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.",
+    "signInError": "Ocurrió un error durante el inicio de sesión. Por favor, inténtalo de nuevo."
   }
 }
