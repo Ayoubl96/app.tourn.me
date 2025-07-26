@@ -7,6 +7,7 @@ import { Link } from '@/lib/navigation';
 import UserAuthForm from './user-auth-form';
 import AuthSideImage from './auth-side-image';
 import AuthHeader from './auth-header';
+import TermsAndPrivacyLinks from './terms-and-privacy-links';
 
 export default function SignInViewPage({ stars }: { stars?: number }) {
   const t = useTranslations('Auth');
@@ -54,23 +55,7 @@ export default function SignInViewPage({ stars }: { stars?: number }) {
             </Link>
           </div>
 
-          <p className='px-8 text-center text-sm text-muted-foreground'>
-            {t('termsIntro')}{' '}
-            <Link
-              href='/terms'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              {t('termsOfService')}
-            </Link>{' '}
-            {t('and')}{' '}
-            <Link
-              href='/privacy'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              {t('privacyPolicy')}
-            </Link>
-            .
-          </p>
+          <TermsAndPrivacyLinks translationPrefix='' />
         </div>
       </div>
     </div>

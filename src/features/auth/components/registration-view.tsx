@@ -12,6 +12,7 @@ import RegistrationForm from './registration-form';
 import EmailVerification from './email-verification';
 import AuthSideImage from './auth-side-image';
 import AuthHeader from './auth-header';
+import TermsAndPrivacyLinks from './terms-and-privacy-links';
 
 export default function RegistrationViewPage() {
   const t = useTranslations();
@@ -195,25 +196,7 @@ export default function RegistrationViewPage() {
           {renderCurrentStep()}
 
           {/* Terms and privacy */}
-          {currentStep === RegistrationStep.FORM && (
-            <p className='px-8 text-center text-sm text-muted-foreground'>
-              {t('Auth.termsIntro')}{' '}
-              <Link
-                href='/terms'
-                className='underline underline-offset-4 hover:text-primary'
-              >
-                {t('Auth.termsOfService')}
-              </Link>{' '}
-              {t('Auth.and')}{' '}
-              <Link
-                href='/privacy'
-                className='underline underline-offset-4 hover:text-primary'
-              >
-                {t('Auth.privacyPolicy')}
-              </Link>
-              .
-            </p>
-          )}
+          {currentStep === RegistrationStep.FORM && <TermsAndPrivacyLinks />}
 
           {/* Already have account link */}
           {currentStep === RegistrationStep.FORM && (
