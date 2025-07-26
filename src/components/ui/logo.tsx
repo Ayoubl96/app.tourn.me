@@ -69,6 +69,7 @@ export function Logo({
       width={width}
       height={height}
       className={`object-contain ${className}`}
+      style={{ width: width, height: 'auto' }}
       priority
       onError={() => setImageError(true)}
     />
