@@ -25,6 +25,7 @@ export interface CompanyProfile {
   address: string;
   email: string;
   phone_number: string;
+  vat_number?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -41,6 +42,7 @@ export interface AuthenticatedUser {
   address: string;
   email: string;
   phone_number: string;
+  vat_number?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -259,4 +261,41 @@ export interface PasswordResetState {
   attemptsRemaining: number;
   errorMessage: string;
   successMessage: string;
+}
+
+/**
+ * Company update request (partial updates supported)
+ */
+export interface CompanyUpdateRequest {
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
+  vat_number?: string;
+}
+
+/**
+ * Company update response (same as CompanyProfile but with updated fields)
+ */
+export interface CompanyUpdateResponse extends CompanyProfile {
+  players_count?: number | null;
+  courts_count?: number | null;
+  tournaments_count?: number | null;
+}
+
+/**
+ * Company password change request
+ */
+export interface CompanyPasswordChangeRequest {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+/**
+ * Company password change response
+ */
+export interface CompanyPasswordChangeResponse {
+  success: boolean;
+  message: string;
 }

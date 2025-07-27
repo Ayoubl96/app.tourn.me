@@ -9,7 +9,9 @@ export {
   initiatePasswordReset,
   verifyPasswordResetCode,
   completePasswordReset,
-  checkPasswordResetTokenStatus
+  checkPasswordResetTokenStatus,
+  updateCompanyInfo,
+  changeCompanyPassword
 } from './api';
 
 export type {
@@ -38,5 +40,9 @@ export type {
   PasswordResetCompleteResponse,
   PasswordResetTokenStatusResponse,
   PasswordResetStep,
-  PasswordResetState
+  PasswordResetState,
+  CompanyUpdateRequest,
+  CompanyUpdateResponse,
+  CompanyPasswordChangeRequest,
+  CompanyPasswordChangeResponse
 } from './types';

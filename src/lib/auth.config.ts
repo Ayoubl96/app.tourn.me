@@ -19,7 +19,9 @@ declare module 'next-auth' {
       address: string;
       email: string;
       phone_number: string;
+      vat_number: string;
       created_at: string;
+      updated_at?: string;
     };
   }
 }
@@ -91,7 +93,9 @@ const authConfig = {
               address: userData.address,
               email: userData.email,
               phone_number: userData.phone_number,
-              created_at: userData.created_at
+              vat_number: (userData as any).vat_number || '',
+              created_at: userData.created_at,
+              updated_at: userData.updated_at
             } as AuthenticatedUser & { refreshToken: string };
           } else {
             console.error('Login failed: No access token');

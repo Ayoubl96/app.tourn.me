@@ -17,7 +17,11 @@ import {
   PasswordResetVerifyResponse,
   PasswordResetCompleteRequest,
   PasswordResetCompleteResponse,
-  PasswordResetTokenStatusResponse
+  PasswordResetTokenStatusResponse,
+  CompanyUpdateRequest,
+  CompanyUpdateResponse,
+  CompanyPasswordChangeRequest,
+  CompanyPasswordChangeResponse
 } from './types';
 
 /**
@@ -59,7 +63,7 @@ export async function login(
  * Get the current user/company profile - client-side version
  */
 export async function getProfile(callApi: ApiCaller): Promise<CompanyProfile> {
-  const response = await callApi('/companies/me/');
+  const response = await callApi('/companies/me');
   return handleApiResponse<CompanyProfile>(response);
 }
 
@@ -283,4 +287,36 @@ export async function checkPasswordResetTokenStatus(
   );
 
   return handleApiResponse<PasswordResetTokenStatusResponse>(response);
+}
+
+/**
+ * Update company information (client-side only)
+ * PATCH /companies/me
+ */
+export async function updateCompanyInfo(
+  data: CompanyUpdateRequest,
+  apiCaller: ApiCaller
+): Promise<CompanyUpdateResponse> {
+  const response = await apiCaller('/companies/me', {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  });
+
+  return handleApiResponse<CompanyUpdateResponse>(response);
+}
+
+/**
+ * Change company password (client-side only)
+ * POST /companies/me/change-password
+ */
+export async function changeCompanyPassword(
+  data: CompanyPasswordChangeRequest,
+  apiCaller: ApiCaller
+): Promise<CompanyPasswordChangeResponse> {
+  const response = await apiCaller('/companies/me/change-password', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+
+  return handleApiResponse<CompanyPasswordChangeResponse>(response);
 }
