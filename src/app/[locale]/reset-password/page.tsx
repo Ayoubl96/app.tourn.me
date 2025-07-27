@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { locales } from '@/config/locales';
 import { unstable_setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
-import PasswordResetView from '@/features/auth/components/password-reset-view';
+import ResetPasswordTokenView from '@/features/auth/components/reset-password-token-view';
 
 // Generate static params for locales
 export function generateStaticParams() {
@@ -12,6 +12,7 @@ export function generateStaticParams() {
 
 type PageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ token?: string }>;
 };
 
 export async function generateMetadata({
@@ -26,9 +27,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function ForgotPasswordPage({ params }: PageProps) {
+export default async function ResetPasswordPage({
+  params,
+  searchParams
+}: PageProps) {
   // Await params and validate locale
   const { locale } = await params;
+  const { token } = await searchParams;
 
   // Validate that the incoming locale is valid
   if (!locales.includes(locale as any)) {
@@ -38,5 +43,5 @@ export default async function ForgotPasswordPage({ params }: PageProps) {
   // Enable static rendering by setting the request locale
   unstable_setRequestLocale(locale);
 
-  return <PasswordResetView />;
+  return <ResetPasswordTokenView token={token} />;
 }

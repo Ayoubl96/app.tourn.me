@@ -10,7 +10,14 @@ import {
   RegistrationVerifyRequest,
   RegistrationVerifyResponse,
   ResendVerificationRequest,
-  ResendVerificationResponse
+  ResendVerificationResponse,
+  PasswordResetInitiateRequest,
+  PasswordResetInitiateResponse,
+  PasswordResetVerifyRequest,
+  PasswordResetVerifyResponse,
+  PasswordResetCompleteRequest,
+  PasswordResetCompleteResponse,
+  PasswordResetTokenStatusResponse
 } from './types';
 
 /**
@@ -176,30 +183,104 @@ export async function verifyRegistration(
 }
 
 /**
- * Resend verification code
+ * Resend verification code for registration
  */
 export async function resendVerificationCode(
-  resendData: ResendVerificationRequest
+  data: ResendVerificationRequest
 ): Promise<ResendVerificationResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-  const response = await fetch(`${baseUrl}/register/resend`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(resendData)
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/registration/resend`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  );
 
-  if (!response.ok) {
-    const errorData = await response
-      .json()
-      .catch(() => ({ message: 'Failed to resend verification code' }));
-    throw new Error(
-      errorData.detail ||
-        errorData.message ||
-        'Failed to resend verification code'
-    );
-  }
+  return handleApiResponse<ResendVerificationResponse>(response);
+}
 
-  return response.json();
+/**
+ * Password Reset API Functions
+ */
+
+/**
+ * Initiate password reset - sends verification code to email
+ */
+export async function initiatePasswordReset(
+  data: PasswordResetInitiateRequest
+): Promise<PasswordResetInitiateResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/password-reset/initiate`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  );
+
+  return handleApiResponse<PasswordResetInitiateResponse>(response);
+}
+
+/**
+ * Verify password reset code and get reset token
+ */
+export async function verifyPasswordResetCode(
+  data: PasswordResetVerifyRequest
+): Promise<PasswordResetVerifyResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/password-reset/verify`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  );
+
+  return handleApiResponse<PasswordResetVerifyResponse>(response);
+}
+
+/**
+ * Complete password reset with new password
+ */
+export async function completePasswordReset(
+  data: PasswordResetCompleteRequest
+): Promise<PasswordResetCompleteResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/password-reset/complete`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  );
+
+  return handleApiResponse<PasswordResetCompleteResponse>(response);
+}
+
+/**
+ * Check password reset token status (for email links)
+ */
+export async function checkPasswordResetTokenStatus(
+  token: string
+): Promise<PasswordResetTokenStatusResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/password-reset/status/${token}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+
+  return handleApiResponse<PasswordResetTokenStatusResponse>(response);
 }

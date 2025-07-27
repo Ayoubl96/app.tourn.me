@@ -177,3 +177,86 @@ export interface PasswordValidation {
   hasSpecialChar: boolean;
   score: number;
 }
+
+/**
+ * Password Reset Types
+ */
+
+/**
+ * Password reset initiation request
+ */
+export interface PasswordResetInitiateRequest {
+  email: string;
+}
+
+/**
+ * Password reset initiation response
+ */
+export interface PasswordResetInitiateResponse {
+  message: string;
+  expires_in_minutes: number;
+}
+
+/**
+ * Password reset verification request
+ */
+export interface PasswordResetVerifyRequest {
+  email: string;
+  code: string;
+}
+
+/**
+ * Password reset verification response
+ */
+export interface PasswordResetVerifyResponse {
+  message: string;
+  reset_token: string;
+}
+
+/**
+ * Password reset completion request
+ */
+export interface PasswordResetCompleteRequest {
+  token: string;
+  new_password: string;
+}
+
+/**
+ * Password reset completion response
+ */
+export interface PasswordResetCompleteResponse {
+  message: string;
+}
+
+/**
+ * Password reset token status request (for email links)
+ */
+export interface PasswordResetTokenStatusResponse {
+  valid: boolean;
+  message: string;
+}
+
+/**
+ * Password reset step enum
+ */
+export enum PasswordResetStep {
+  INITIATE = 'initiate',
+  CODE_SENT = 'code_sent',
+  VERIFY_CODE = 'verify_code',
+  SET_PASSWORD = 'set_password',
+  COMPLETED = 'completed',
+  ERROR = 'error'
+}
+
+/**
+ * Password reset state
+ */
+export interface PasswordResetState {
+  step: PasswordResetStep;
+  email: string;
+  resetToken: string;
+  expirationTime: number;
+  attemptsRemaining: number;
+  errorMessage: string;
+  successMessage: string;
+}
