@@ -78,7 +78,7 @@ export const GenerateMatchesDialog: React.FC<GenerateMatchesDialogProps> = ({
           </DialogTitle>
           <DialogDescription>
             {t('generateMatchesFor', { defaultValue: 'Generate matches for' })}{' '}
-            "{stage.name}"
+            &quot;{stage.name}&quot;
           </DialogDescription>
         </DialogHeader>
 
