@@ -125,7 +125,7 @@ export const groupMatchesByCourt = (
     }
   });
 
-  // Note: Individual views will apply getPriorityMatches to each court's matches
+  // Note: Individual views will use getOrderedMatches which relies on backend ordering
   // This function just groups them, sorting is handled by the consuming components
 
   return matchesByCourt;

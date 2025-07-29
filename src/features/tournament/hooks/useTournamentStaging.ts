@@ -23,14 +23,9 @@ import {
   scheduleMatch,
   unscheduleMatch,
   autoScheduleMatches,
-  fetchCourtAvailability,
-  fetchTournamentMatches,
-  fetchStageMatches,
-  fetchGroupMatches,
-  fetchBracketMatches,
-  fetchMatchById,
-  updateMatch
+  fetchCourtAvailability
 } from '@/api/tournaments/api';
+import { useMatchService } from './useMatchService';
 import {
   TournamentStage,
   TournamentGroup,
@@ -44,7 +39,6 @@ import {
   StageType,
   BracketType,
   CourtAvailability,
-  StagingMatch,
   AutoAssignCouplesParams,
   ScheduleMatchParams,
   AutoScheduleMatchesParams
@@ -61,6 +55,12 @@ export const useTournamentStaging = ({
   autoLoad = true
 }: UseTournamentStagingOptions) => {
   const callApi = useApi();
+
+  // Use the new centralized match service
+  const matchService = useMatchService({
+    tournamentId,
+    autoLoadTournamentInfo: true
+  });
 
   // State
   const [isLoading, setIsLoading] = useState(false);
@@ -95,9 +95,7 @@ export const useTournamentStaging = ({
     null
   );
   const [deleteGroupConfirmOpen, setDeleteGroupConfirmOpen] = useState(false);
-  const [matches, setMatches] = useState<StagingMatch[]>([]);
-  const [isLoadingMatches, setIsLoadingMatches] = useState(false);
-  const [isUpdatingMatch, setIsUpdatingMatch] = useState(false);
+  // Note: matches, isLoadingMatches, isUpdatingMatch are now handled by matchService
 
   // Fetch stages
   const fetchStages = useCallback(async () => {
@@ -734,135 +732,8 @@ export const useTournamentStaging = ({
     }
   }, [selectedStage, loadGroups, loadBrackets]);
 
-  // Fetch tournament matches
-  const loadTournamentMatches = useCallback(async () => {
-    setIsLoadingMatches(true);
-    setError(null);
-    try {
-      const data = await fetchTournamentMatches(callApi, tournamentId);
-      setMatches(data);
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load matches');
-      toast.error('Failed to load tournament matches');
-      return [];
-    } finally {
-      setIsLoadingMatches(false);
-    }
-  }, [callApi, tournamentId]);
-
-  // Fetch stage matches
-  const loadStageMatches = useCallback(
-    async (stageId: number) => {
-      setIsLoadingMatches(true);
-      setError(null);
-      try {
-        const data = await fetchStageMatches(callApi, stageId);
-        setMatches(data);
-        return data;
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load stage matches'
-        );
-        toast.error('Failed to load stage matches');
-        return [];
-      } finally {
-        setIsLoadingMatches(false);
-      }
-    },
-    [callApi]
-  );
-
-  // Fetch group matches
-  const loadGroupMatches = useCallback(
-    async (groupId: number) => {
-      setIsLoadingMatches(true);
-      setError(null);
-      try {
-        const data = await fetchGroupMatches(callApi, groupId);
-        setMatches(data);
-        return data;
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load group matches'
-        );
-        toast.error('Failed to load group matches');
-        return [];
-      } finally {
-        setIsLoadingMatches(false);
-      }
-    },
-    [callApi]
-  );
-
-  // Fetch bracket matches
-  const loadBracketMatches = useCallback(
-    async (bracketId: number) => {
-      setIsLoadingMatches(true);
-      setError(null);
-      try {
-        const data = await fetchBracketMatches(callApi, bracketId);
-        setMatches(data);
-        return data;
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load bracket matches'
-        );
-        toast.error('Failed to load bracket matches');
-        return [];
-      } finally {
-        setIsLoadingMatches(false);
-      }
-    },
-    [callApi]
-  );
-
-  // Fetch match by ID
-  const loadMatchById = useCallback(
-    async (matchId: number) => {
-      setIsLoadingMatches(true);
-      setError(null);
-      try {
-        const data = await fetchMatchById(callApi, matchId);
-        return data;
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load match details'
-        );
-        toast.error('Failed to load match details');
-        return null;
-      } finally {
-        setIsLoadingMatches(false);
-      }
-    },
-    [callApi]
-  );
-
-  // Update match results
-  const handleUpdateMatch = useCallback(
-    async (matchId: number, matchData: Partial<StagingMatch>) => {
-      setIsUpdatingMatch(true);
-      setError(null);
-      try {
-        const updatedMatch = await updateMatch(callApi, matchId, matchData);
-
-        // Update the matches array if the updated match is in it
-        setMatches((prev) =>
-          prev.map((match) => (match.id === matchId ? updatedMatch : match))
-        );
-
-        toast.success('Match updated successfully');
-        return updatedMatch;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update match');
-        toast.error('Failed to update match results');
-        return null;
-      } finally {
-        setIsUpdatingMatch(false);
-      }
-    },
-    [callApi]
-  );
+  // Match-related functions are now handled by matchService
+  // Use: matchService.loadTournamentMatches, matchService.loadStageMatches, etc.
 
   return {
     // Data
@@ -873,7 +744,10 @@ export const useTournamentStaging = ({
     groupStandings,
     groupCouples,
     courtAvailability,
-    matches,
+
+    // Match-related data from matchService
+    matches: matchService.matches,
+    matchOrderInfo: matchService.matchOrderInfo,
 
     // Loading states
     isLoading,
@@ -883,8 +757,11 @@ export const useTournamentStaging = ({
     isCreatingBracket,
     isGeneratingMatches,
     isSchedulingMatches,
-    isLoadingMatches,
-    isUpdatingMatch,
+
+    // Match-related loading states from matchService
+    isLoadingMatches: matchService.isLoading,
+    isUpdatingMatch: matchService.isUpdatingMatch,
+    isCalculatingOrder: matchService.isCalculatingOrder,
 
     // Actions
     setSelectedStage,
@@ -922,11 +799,23 @@ export const useTournamentStaging = ({
     setGroupToDelete,
     deleteGroupConfirmOpen,
     setDeleteGroupConfirmOpen,
-    loadTournamentMatches,
-    loadStageMatches,
-    loadGroupMatches,
-    loadBracketMatches,
-    loadMatchById,
-    handleUpdateMatch
+    // Match-related actions from matchService
+    loadTournamentMatches: matchService.loadTournamentMatches,
+    loadStageMatches: matchService.loadStageMatches,
+    loadGroupMatches: matchService.loadGroupMatches,
+    loadBracketMatches: matchService.loadBracketMatches,
+    loadMatchById: matchService.loadMatchById,
+    handleUpdateMatch: matchService.updateMatchData,
+    calculateTournamentOrder: matchService.calculateTournamentOrder,
+    calculateStageOrder: matchService.calculateStageOrder,
+
+    // Enhanced match state helpers
+    getLiveMatches: matchService.getLiveMatches,
+    getNextMatches: matchService.getNextMatches,
+    getAllPendingMatches: matchService.getAllPendingMatches,
+    getCompletedMatchesByStage: matchService.getCompletedMatchesByStage,
+    getTournamentProgress: matchService.getTournamentProgress,
+    getCourtInfo: matchService.getCourtInfo,
+    getStageInfo: matchService.getStageInfo
   };
 };

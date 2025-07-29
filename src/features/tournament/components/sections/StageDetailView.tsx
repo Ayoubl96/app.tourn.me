@@ -36,7 +36,7 @@ import { useTournamentStaging } from '@/features/tournament/hooks/useTournamentS
 import { fetchStageGroups, fetchStageBrackets } from '@/api/tournaments/api';
 import { useApi } from '@/hooks/useApi';
 import { IntegratedGroupManagement } from './groups/IntegratedGroupManagement';
-import { MatchManagement } from './matches/MatchManagement';
+import { StageMatches } from './StageMatches';
 import { StageStandings } from './StageStandings';
 
 interface StageDetailViewProps {
@@ -267,13 +267,7 @@ export function StageDetailView({
 
         {/* Matches Tab Content */}
         <TabsContent value='matches' className='space-y-6'>
-          <MatchManagement
-            stageId={stage.id}
-            stageType={stage.stage_type}
-            tournamentId={tournament.id}
-            stageGroups={stageGroups}
-            stageBrackets={stageBrackets}
-          />
+          <StageMatches stage={stage} tournament={tournament} />
         </TabsContent>
       </Tabs>
     </div>

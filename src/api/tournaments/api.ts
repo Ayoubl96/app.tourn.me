@@ -28,7 +28,11 @@ import {
   CourtAvailability,
   AutoScheduleMatchesParams,
   StagingMatch,
-  TournamentStandingsResponse
+  TournamentStandingsResponse,
+  MatchOrderingStrategy,
+  TournamentMatchOrderInfo,
+  CalculateMatchOrderRequest,
+  CalculateMatchOrderResponse
 } from './types';
 
 /**
@@ -722,6 +726,59 @@ export const updateMatch = async (
     body: JSON.stringify(matchData)
   });
   return handleApiResponse<StagingMatch>(response);
+};
+
+/**
+ * Match Ordering API functions
+ */
+
+// Calculate tournament match order
+export const calculateTournamentMatchOrder = async (
+  callApi: ApiCaller,
+  tournamentId: string | number,
+  request: CalculateMatchOrderRequest
+): Promise<CalculateMatchOrderResponse> => {
+  const response = await callApi(
+    `/staging/tournament/${tournamentId}/calculate-match-order?strategy=${request.strategy}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request)
+    }
+  );
+  return handleApiResponse<CalculateMatchOrderResponse>(response);
+};
+
+// Calculate stage match order
+export const calculateStageMatchOrder = async (
+  callApi: ApiCaller,
+  stageId: string | number,
+  request: CalculateMatchOrderRequest
+): Promise<CalculateMatchOrderResponse> => {
+  const response = await callApi(
+    `/staging/stage/${stageId}/calculate-match-order?strategy=${request.strategy}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request)
+    }
+  );
+  return handleApiResponse<CalculateMatchOrderResponse>(response);
+};
+
+// Get tournament match order info
+export const getTournamentMatchOrderInfo = async (
+  callApi: ApiCaller,
+  tournamentId: string | number
+): Promise<TournamentMatchOrderInfo> => {
+  const response = await callApi(
+    `/staging/tournament/${tournamentId}/match-order-info`
+  );
+  return handleApiResponse<TournamentMatchOrderInfo>(response);
 };
 
 /**

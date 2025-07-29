@@ -29,7 +29,7 @@ import { PlayersAndTeams } from '@/features/tournament/components/sections/Playe
 import { TournamentCourts } from '@/features/tournament/components/sections/TournamentCourts';
 import { TournamentStaging } from '@/features/tournament/components/sections/TournamentStaging';
 import { TournamentAllStandings } from '@/features/tournament/components/sections/TournamentAllStandings';
-import { TournamentAllMatches } from '@/features/tournament/components/sections/TournamentAllMatches';
+import { TournamentMatches } from '@/features/tournament/components/sections/TournamentMatches';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
@@ -246,7 +246,7 @@ export default function TournamentClientPage({
 
           {/* Matches Tab Content */}
           <TabsContent value='matches' className='space-y-6'>
-            <TournamentAllMatches tournament={tournament} />
+            <TournamentMatches tournament={tournament} />
           </TabsContent>
         </Tabs>
       </TournamentProvider>

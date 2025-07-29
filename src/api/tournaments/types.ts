@@ -286,6 +286,13 @@ export interface StagingMatch {
   is_time_limited: boolean;
   time_limit_minutes: number | null;
   match_result_status: MatchResultStatus;
+  // New ordering fields from intelligent match ordering system
+  display_order: number | null;
+  order_in_stage: number | null;
+  order_in_group: number | null;
+  bracket_position: number | null;
+  round_number: number | null;
+  priority_score: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -446,4 +453,70 @@ export interface TournamentStandingsResponse {
   group_name: string;
   stats: TournamentStandingStat[];
   last_updated: string;
+}
+
+/**
+ * Match Ordering Strategy types
+ */
+export type MatchOrderingStrategy =
+  | 'balanced_load'
+  | 'court_efficient'
+  | 'time_sequential'
+  | 'group_clustered';
+
+/**
+ * Tournament Match Order Info Response (Enhanced)
+ */
+export interface TournamentMatchOrderInfo {
+  tournament_id: number;
+  tournament_name: string;
+  progress_percentage: number;
+
+  // Dynamic match categorization (updates as matches complete)
+  live_matches: StagingMatch[];
+  next_matches: StagingMatch[];
+  all_pending_matches: StagingMatch[];
+  completed_matches_by_stage: Record<string, StagingMatch[]>;
+
+  // Comprehensive progress tracking
+  quick_stats: {
+    matches_in_progress: number;
+    matches_waiting: number;
+    matches_remaining: number;
+    matches_completed: number;
+    estimated_completion: string;
+  };
+
+  // Enhanced court and stage information
+  courts: any[]; // Detailed court info with availability
+  stages: any[]; // Complete stage configuration
+
+  // Legacy fields for backward compatibility
+  total_matches: number;
+  pending_matches: number;
+  completed_matches: number;
+  total_courts: number;
+  total_stages: number;
+  current_strategy: MatchOrderingStrategy | null;
+  last_calculated: string | null;
+  last_updated: string;
+}
+
+/**
+ * Calculate Match Order Request
+ */
+export interface CalculateMatchOrderRequest {
+  strategy: MatchOrderingStrategy;
+  force_recalculate?: boolean;
+}
+
+/**
+ * Calculate Match Order Response
+ */
+export interface CalculateMatchOrderResponse {
+  success: boolean;
+  total_matches_ordered: number;
+  strategy_used: MatchOrderingStrategy;
+  calculation_time_ms: number;
+  message: string;
 }
