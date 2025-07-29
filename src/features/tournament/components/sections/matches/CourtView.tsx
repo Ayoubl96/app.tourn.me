@@ -48,7 +48,7 @@ export const CourtView: React.FC<CourtViewProps> = ({
   if (courtKeys.length === 0) {
     return (
       <EmptyState
-        icon={() => <MapPin className='h-8 w-8' />}
+        icon={<MapPin className='h-8 w-8' />}
         title={t('noMatchesFound', { defaultValue: 'No matches found' })}
         description={t('noMatchesFoundDescription', {
           defaultValue: 'No matches available to display by court.'
