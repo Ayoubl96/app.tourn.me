@@ -10,6 +10,7 @@
 export * from './tournaments';
 export * from './players';
 export * from './courts';
+export * from './dashboard';
 export * from './auth';
 export * from './common/types';
 

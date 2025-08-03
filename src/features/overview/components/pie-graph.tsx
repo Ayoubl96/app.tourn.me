@@ -18,50 +18,89 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart';
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 287, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 190, fill: 'var(--color-other)' }
-];
+import { RealTimeTournamentProgress } from '@/api/dashboard';
+interface PieGraphProps {
+  data?: RealTimeTournamentProgress;
+}
 
 const chartConfig = {
-  visitors: {
-    label: 'Visitors'
+  matches: {
+    label: 'Matches'
   },
-  chrome: {
-    label: 'Chrome',
+  completed: {
+    label: 'Completed',
     color: 'hsl(var(--chart-1))'
   },
-  safari: {
-    label: 'Safari',
+  scheduled: {
+    label: 'Scheduled',
     color: 'hsl(var(--chart-2))'
   },
-  firefox: {
-    label: 'Firefox',
+  in_progress: {
+    label: 'In Progress',
     color: 'hsl(var(--chart-3))'
   },
-  edge: {
-    label: 'Edge',
+  pending: {
+    label: 'Pending',
     color: 'hsl(var(--chart-4))'
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))'
   }
 } satisfies ChartConfig;
 
-export function PieGraph() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
+export function PieGraph({ data }: PieGraphProps) {
+  const chartData = React.useMemo(() => {
+    if (!data?.match_status_distribution) {
+      return [];
+    }
+
+    const { match_status_distribution } = data;
+    return [
+      {
+        status: 'completed',
+        matches: match_status_distribution.completed,
+        fill: 'var(--color-completed)'
+      },
+      {
+        status: 'scheduled',
+        matches: match_status_distribution.scheduled,
+        fill: 'var(--color-scheduled)'
+      },
+      {
+        status: 'in_progress',
+        matches: match_status_distribution.in_progress,
+        fill: 'var(--color-in_progress)'
+      },
+      {
+        status: 'pending',
+        matches: match_status_distribution.pending,
+        fill: 'var(--color-pending)'
+      }
+    ].filter((item) => item.matches > 0);
+  }, [data]);
+
+  const totalMatches = React.useMemo(() => {
+    return chartData.reduce((acc, curr) => acc + curr.matches, 0);
+  }, [chartData]);
+
+  if (!data) {
+    return (
+      <Card className='flex flex-col'>
+        <CardHeader className='items-center pb-0'>
+          <CardTitle>Match Status Distribution</CardTitle>
+          <CardDescription>Loading match status data...</CardDescription>
+        </CardHeader>
+        <CardContent className='flex-1 pb-0'>
+          <div className='flex h-[360px] items-center justify-center text-muted-foreground'>
+            Loading...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className='flex flex-col'>
       <CardHeader className='items-center pb-0'>
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Match Status Distribution</CardTitle>
+        <CardDescription>Current tournament match statuses</CardDescription>
       </CardHeader>
       <CardContent className='flex-1 pb-0'>
         <ChartContainer
@@ -75,8 +114,8 @@ export function PieGraph() {
             />
             <Pie
               data={chartData}
-              dataKey='visitors'
-              nameKey='browser'
+              dataKey='matches'
+              nameKey='status'
               innerRadius={60}
               strokeWidth={5}
             >
@@ -95,14 +134,14 @@ export function PieGraph() {
                           y={viewBox.cy}
                           className='fill-foreground text-3xl font-bold'
                         >
-                          {totalVisitors.toLocaleString()}
+                          {totalMatches.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className='fill-muted-foreground'
                         >
-                          Visitors
+                          Matches
                         </tspan>
                       </text>
                     );
@@ -115,10 +154,10 @@ export function PieGraph() {
       </CardContent>
       <CardFooter className='flex-col gap-2 text-sm'>
         <div className='flex items-center gap-2 font-medium leading-none'>
-          Trending up by 5.2% this month <TrendingUp className='h-4 w-4' />
+          Real-time match tracking <TrendingUp className='h-4 w-4' />
         </div>
         <div className='leading-none text-muted-foreground'>
-          Showing total visitors for the last 6 months
+          Current status of all tournament matches
         </div>
       </CardFooter>
     </Card>
