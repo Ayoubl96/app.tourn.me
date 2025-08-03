@@ -18,12 +18,16 @@ import {
   AlertCircle,
   CheckCircle2
 } from 'lucide-react';
+import { Link } from '@/lib/navigation';
+import { useTranslations } from 'next-intl';
 
 interface OperationalAlertsProps {
   data: OperationalDashboard;
 }
 
 export function OperationalAlerts({ data }: OperationalAlertsProps) {
+  const t = useTranslations('DashboardOverview.operationalAlerts');
+
   const hasAlerts =
     data.system_alerts.court_conflicts > 0 ||
     data.system_alerts.incomplete_matches > 0 ||
@@ -40,11 +44,9 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
             ) : (
               <CheckCircle2 className='h-5 w-5 text-green-600' />
             )}
-            System Status
+            {t('systemStatus')}
           </CardTitle>
-          <CardDescription>
-            Current system alerts and notifications
-          </CardDescription>
+          <CardDescription>{t('systemStatusDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
@@ -53,7 +55,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 {data.system_alerts.court_conflicts}
               </div>
               <div className='text-xs text-muted-foreground'>
-                Court Conflicts
+                {t('courtConflicts')}
               </div>
             </div>
             <div className='text-center'>
@@ -61,7 +63,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 {data.system_alerts.incomplete_matches}
               </div>
               <div className='text-xs text-muted-foreground'>
-                Incomplete Matches
+                {t('incompleteMatches')}
               </div>
             </div>
             <div className='text-center'>
@@ -69,7 +71,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 {data.system_alerts.upcoming_deadlines}
               </div>
               <div className='text-xs text-muted-foreground'>
-                Upcoming Deadlines
+                {t('upcomingDeadlines')}
               </div>
             </div>
             <div className='text-center'>
@@ -77,7 +79,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 {data.system_alerts.matches_next_24h}
               </div>
               <div className='text-xs text-muted-foreground'>
-                Next 24h Matches
+                {t('matchesNext24h')}
               </div>
             </div>
           </div>
@@ -90,11 +92,9 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-amber-600'>
               <AlertTriangle className='h-5 w-5' />
-              Court Conflicts
+              {t('courtConflicts')}
             </CardTitle>
-            <CardDescription>
-              Courts with scheduling conflicts that need attention
-            </CardDescription>
+            <CardDescription>{t('courtConflictsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-3'>
             {data.court_conflicts.map((conflict) => (
@@ -102,7 +102,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 <AlertCircle className='h-4 w-4' />
                 <AlertDescription>
                   <strong>{conflict.court_name}</strong> has{' '}
-                  {conflict.conflict_matches.length} overlapping matches:
+                  {conflict.conflict_matches.length} {t('overlappingMatches')}:
                   <div className='mt-2 space-y-1'>
                     {conflict.conflict_matches.map((match) => (
                       <div
@@ -127,16 +127,14 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <Calendar className='h-5 w-5 text-blue-600' />
-            Upcoming Matches (24h)
+            {t('upcomingMatches24h')}
           </CardTitle>
-          <CardDescription>
-            Matches scheduled for the next 24 hours
-          </CardDescription>
+          <CardDescription>{t('upcomingMatchesDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           {data.upcoming_matches_24h.length === 0 ? (
             <div className='py-6 text-center text-muted-foreground'>
-              No matches scheduled for the next 24 hours
+              {t('noMatchesScheduled')}
             </div>
           ) : (
             <div className='space-y-3'>
@@ -147,14 +145,19 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 >
                   <div className='flex-1'>
                     <div className='text-sm font-medium'>
-                      {match.tournament_name}
+                      <Link
+                        href={`/dashboard/tournament/${match.tournament_id}`}
+                        className='cursor-pointer hover:text-blue-600 hover:underline'
+                      >
+                        {match.tournament_name}
+                      </Link>
                     </div>
                     <div className='text-sm text-muted-foreground'>
                       {match.couple1_name} vs {match.couple2_name}
                     </div>
                   </div>
                   <div className='flex items-center gap-2 text-sm'>
-                    {match.scheduled_start && (
+                    {match.scheduled_start ? (
                       <div className='flex items-center gap-1'>
                         <Clock className='h-3 w-3' />
                         {new Date(match.scheduled_start).toLocaleTimeString(
@@ -164,6 +167,11 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                             minute: '2-digit'
                           }
                         )}
+                      </div>
+                    ) : (
+                      <div className='flex items-center gap-1 text-orange-600'>
+                        <Clock className='h-3 w-3' />
+                        {t('unscheduled')}
                       </div>
                     )}
                     {match.court_name && (
@@ -194,10 +202,10 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-red-600'>
               <AlertTriangle className='h-5 w-5' />
-              Tournament Deadlines
+              {t('tournamentDeadlines')}
             </CardTitle>
             <CardDescription>
-              Tournaments approaching their end dates
+              {t('tournamentDeadlinesDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-3'>
@@ -207,7 +215,14 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                 className='flex items-center justify-between rounded-lg border p-3'
               >
                 <div>
-                  <div className='font-medium'>{deadline.tournament_name}</div>
+                  <div className='font-medium'>
+                    <Link
+                      href={`/dashboard/tournament/${deadline.tournament_id}`}
+                      className='cursor-pointer hover:text-blue-600 hover:underline'
+                    >
+                      {deadline.tournament_name}
+                    </Link>
+                  </div>
                   <div className='text-sm text-muted-foreground'>
                     Ends on {new Date(deadline.end_date).toLocaleDateString()}
                   </div>
@@ -217,7 +232,7 @@ export function OperationalAlerts({ data }: OperationalAlertsProps) {
                     deadline.days_remaining <= 3 ? 'destructive' : 'secondary'
                   }
                 >
-                  {deadline.days_remaining} days left
+                  {t('daysLeft', { days: deadline.days_remaining })}
                 </Badge>
               </div>
             ))}

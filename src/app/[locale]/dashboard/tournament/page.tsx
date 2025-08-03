@@ -1,13 +1,13 @@
 import { auth } from '@/lib/auth';
 import { redirect } from '@/lib/navigation';
 
-export default async function Dashboard() {
+export default async function Tournament() {
   const session = await auth();
 
   if (!session?.user) {
     return redirect('/');
   }
 
-  // Redirect to dashboard overview
-  return redirect('/dashboard/overview');
+  // Redirect to tournament overview within dashboard
+  return redirect('/dashboard/tournament/overview');
 }

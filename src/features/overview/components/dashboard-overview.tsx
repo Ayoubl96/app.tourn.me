@@ -1,8 +1,8 @@
 'use client';
 
 import { useDashboard } from '@/hooks/useDashboard';
+import { useTranslations } from 'next-intl';
 import { MetricCards } from './metric-cards';
-import { BarGraph } from './bar-graph';
 import { PieGraph } from './pie-graph';
 import { AreaGraph } from './area-graph';
 import { TournamentHighlights } from './tournament-highlights';
@@ -13,6 +13,7 @@ import { AlertCircle } from 'lucide-react';
 
 export function DashboardOverview() {
   const { data, loading, error } = useDashboard();
+  const t = useTranslations('DashboardOverview');
 
   if (error) {
     return (
@@ -20,7 +21,7 @@ export function DashboardOverview() {
         <CardHeader>
           <CardTitle className='flex items-center gap-2 text-red-600'>
             <AlertCircle className='h-5 w-5' />
-            Error Loading Dashboard
+            {t('errorLoadingDashboard')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -32,7 +33,7 @@ export function DashboardOverview() {
 
   if (loading || !data) {
     return (
-      <div className='flex flex-1 flex-col space-y-2'>
+      <div className='space-y-6'>
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -66,7 +67,7 @@ export function DashboardOverview() {
   }
 
   return (
-    <div className='flex flex-1 flex-col space-y-2'>
+    <div className='space-y-6'>
       {/* Metric Cards */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <MetricCards data={data.tournament_management} />
@@ -74,26 +75,22 @@ export function DashboardOverview() {
 
       {/* Charts Grid */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
-        {/* Matches per Day Chart */}
-        <div className='col-span-4'>
-          <BarGraph data={data.match_court_analytics} />
-        </div>
-
         {/* Tournament Highlights */}
-        <div className='col-span-4 md:col-span-3'>
+        <div className='col-span-4'>
           <TournamentHighlights
             progressData={data.real_time_progress}
             timelineData={data.tournament_management.tournament_timeline}
+            tournamentDetails={data.tournament_management.tournament_details}
           />
         </div>
 
         {/* Player Level Distribution */}
-        <div className='col-span-4'>
+        <div className='col-span-4 md:col-span-3'>
           <AreaGraph data={data.player_performance} />
         </div>
 
         {/* Match Status Distribution */}
-        <div className='col-span-4 md:col-span-3'>
+        <div className='col-span-4'>
           <PieGraph data={data.real_time_progress} />
         </div>
       </div>

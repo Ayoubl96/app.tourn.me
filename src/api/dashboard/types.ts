@@ -14,13 +14,15 @@ export interface TournamentManagementOverview {
   active_tournaments: number;
   upcoming_tournaments: number;
   completed_this_month: number;
-  total_registered_players: number;
+  total_registered_players: number; // 🆕 All-time total
+  current_month_players: number; // 🆕 This month only
   player_change: number;
   player_change_percentage: number;
-  matches_played_today: number;
+  matches_played_this_month: number; // 🔄 Changed from daily
   pending_matches: number;
-  court_utilization_rate: number;
+  tournament_capacity_utilization: number; // 🔄 Much better metric!
   tournament_timeline: TournamentTimelineItem[];
+  tournament_details: TournamentDetails; // 🆕 New section
 }
 
 export interface TournamentTimelineItem {
@@ -30,6 +32,39 @@ export interface TournamentTimelineItem {
   end_date: string; // ISO date
   players_number: number;
   status: 'active' | 'upcoming' | 'completed';
+}
+
+// 🆕 New Tournament Details Section
+export interface TournamentDetails {
+  next_tournament: NextTournament | null;
+  live_tournaments: LiveTournament[];
+  tournaments_ending_soon: TournamentEndingSoon[];
+}
+
+export interface NextTournament {
+  id: number;
+  name: string;
+  start_date: string; // ISO date
+  days_until_start: number;
+  registered_players: number;
+  max_capacity: number;
+}
+
+export interface LiveTournament {
+  id: number;
+  name: string;
+  start_date: string; // ISO datetime
+  end_date: string; // ISO datetime
+  days_running: number;
+  // Note: completion_percentage and active_matches are in tournament_progress, not here
+}
+
+export interface TournamentEndingSoon {
+  id: number;
+  name: string;
+  end_date: string; // ISO datetime
+  days_remaining: number;
+  completion_percentage?: number; // 0-100, optional as it might be in tournament_progress
 }
 
 // Real-Time Tournament Progress
@@ -42,7 +77,7 @@ export interface RealTimeTournamentProgress {
 export interface TournamentProgress {
   tournament_id: number;
   tournament_name: string;
-  completion_percentage: number; // 0-100
+  completion_percentage: number; // 0-100 (can be float like 10.0)
   total_matches: number;
   completed_matches: number;
   stages_progress: StageProgress[];
@@ -52,7 +87,7 @@ export interface StageProgress {
   stage_id: number;
   stage_name: string;
   stage_type: 'group' | 'elimination';
-  completion_percentage: number;
+  completion_percentage: number; // 0-100 (can be float like 10.0)
   order: number;
 }
 
@@ -66,16 +101,16 @@ export interface MatchStatusDistribution {
 export interface TopCouple {
   couple_id: number;
   couple_name: string;
-  tournament_name: string;
+  tournament_name: string; // No tournament_id in actual API response
   matches_played: number;
   matches_won: number;
-  win_rate: number; // 0-100 percentage
+  win_rate: number; // 0-100 percentage (can be float like 100.0)
   total_points: number;
 }
 
 // Match & Court Analytics
 export interface MatchCourtAnalytics {
-  matches_per_day_30d: Record<string, number>; // date -> count
+  // 🗑️ Removed matches_per_day_30d
   average_match_duration_minutes: number;
   court_efficiency_matches_per_court_per_day: number;
   peak_playing_hours: Record<string, number>; // hour -> count
@@ -128,12 +163,16 @@ export interface OperationalDashboard {
 }
 
 export interface UpcomingMatch {
+  tournament_id: number;
   match_id: number;
   tournament_name: string;
   couple1_name: string;
   couple2_name: string;
-  scheduled_start: string | null; // ISO datetime
+  scheduled_start: string | null; // ISO datetime or null for unscheduled
   court_name: string | null;
+  is_scheduled: boolean;
+  tournament_start: string; // ISO datetime
+  status: string; // e.g., 'unscheduled', 'scheduled'
 }
 
 export interface CourtConflict {
@@ -143,7 +182,7 @@ export interface CourtConflict {
 
 export interface ConflictMatch {
   match_id: number;
-  tournament: string;
+  tournament: string; // No tournament_id in actual response
   start_time: string; // ISO datetime
   end_time: string; // ISO datetime
 }

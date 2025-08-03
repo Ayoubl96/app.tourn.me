@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AreaGraph } from './area-graph';
-import { BarGraph } from './bar-graph';
 import { PieGraph } from './pie-graph';
 import { RecentSales } from './recent-sales';
 
@@ -137,10 +136,7 @@ export default function OverViewPage() {
               </Card>
             </div>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
-              <div className='col-span-4'>
-                <BarGraph />
-              </div>
-              <Card className='col-span-4 md:col-span-3'>
+              <Card className='col-span-4'>
                 <CardHeader>
                   <CardTitle>Recent Sales</CardTitle>
                   <CardDescription>

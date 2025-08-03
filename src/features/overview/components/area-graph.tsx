@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 import {
   Card,
@@ -31,16 +32,20 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function AreaGraph({ data }: AreaGraphProps) {
+  const t = useTranslations('AreaGraph');
   const chartData = React.useMemo(() => {
     if (!data?.player_level_distribution) {
       return [];
     }
 
     return Object.entries(data.player_level_distribution)
-      .map(([level, count]) => ({
-        level: `Level ${level}`,
-        players: count
-      }))
+      .map(([level, count]) => {
+        const levelNum = Number(level);
+        return {
+          level: `Level ${levelNum / 100}`, // Divide level by 100 to get proper level values
+          players: count
+        };
+      })
       .sort((a, b) => {
         const levelA = parseInt(a.level.replace('Level ', ''));
         const levelB = parseInt(b.level.replace('Level ', ''));
@@ -57,7 +62,7 @@ export function AreaGraph({ data }: AreaGraphProps) {
         </CardHeader>
         <CardContent>
           <div className='flex h-[310px] items-center justify-center text-muted-foreground'>
-            Loading...
+            {t('loadingData')}
           </div>
         </CardContent>
       </Card>

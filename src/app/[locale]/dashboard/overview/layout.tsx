@@ -24,10 +24,12 @@ export default async function OverViewLayout({ params }: { params?: any }) {
 
   return (
     <PageContainer>
-      <div className='mb-4 flex items-center justify-between space-y-2'>
-        <OverViewClient />
+      <div className='flex w-full flex-col'>
+        <div className='mb-6'>
+          <OverViewClient />
+        </div>
+        <DashboardOverview />
       </div>
-      <DashboardOverview />
     </PageContainer>
   );
 }
