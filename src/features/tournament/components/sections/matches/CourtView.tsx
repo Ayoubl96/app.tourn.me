@@ -8,22 +8,39 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { MatchCard } from './MatchCard';
+import { useCourtName } from '../../../hooks/useCourtName';
 import { EmptyState } from '../../shared/EmptyState';
 
 interface CourtViewProps {
   matches: StagingMatch[];
   getCoupleName: (id: number) => string;
-  getCourtName: (courtId: number | null) => string;
   onMatchUpdate: () => void;
+  /** Optional court data sources for enhanced court name resolution */
+  courtDataSources?: {
+    stageCourts?: Array<{ id: number; court_name?: string; name?: string }>;
+    tournamentCourts?: Array<{
+      id: number;
+      court_name?: string;
+      name?: string;
+    }>;
+    additionalCourts?: Array<{
+      id: number;
+      court_name?: string;
+      name?: string;
+    }>;
+  };
 }
 
 export const CourtView: React.FC<CourtViewProps> = ({
   matches,
   getCoupleName,
-  getCourtName,
-  onMatchUpdate
+  onMatchUpdate,
+  courtDataSources
 }) => {
   const t = useTranslations('Dashboard');
+
+  // Initialize court name hook
+  const { getCourtName } = useCourtName(courtDataSources || {});
 
   // Group matches by court
   const matchesByCourt = matches.reduce(
@@ -100,8 +117,8 @@ export const CourtView: React.FC<CourtViewProps> = ({
                       key={match.id}
                       match={match}
                       getCoupleName={getCoupleName}
-                      getCourtName={getCourtName}
                       onMatchUpdate={onMatchUpdate}
+                      courtDataSources={courtDataSources}
                     />
                   ))}
               </div>

@@ -31,6 +31,7 @@ import {
   TournamentStandingsResponse,
   MatchOrderingStrategy,
   TournamentMatchOrderInfo,
+  StageMatchOrderInfo,
   CalculateMatchOrderRequest,
   CalculateMatchOrderResponse
 } from './types';
@@ -679,10 +680,13 @@ export const fetchTournamentMatches = async (
 // Fetch all matches for a stage
 export const fetchStageMatches = async (
   callApi: ApiCaller,
-  stageId: string | number
-): Promise<StagingMatch[]> => {
-  const response = await callApi(`/staging/stage/${stageId}/matches`);
-  return handleApiResponse<StagingMatch[]>(response);
+  stageId: string | number,
+  tournament_id: string | number
+): Promise<StageMatchOrderInfo> => {
+  const response = await callApi(
+    `/staging/tournament/${tournament_id}/stage/${stageId}/match-order-info`
+  );
+  return handleApiResponse<StageMatchOrderInfo>(response);
 };
 
 // Fetch all matches for a group

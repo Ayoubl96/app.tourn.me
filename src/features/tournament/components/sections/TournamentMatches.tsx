@@ -6,13 +6,8 @@ import { Tournament } from '@/api/tournaments/types';
 import { useTournamentContext } from '@/features/tournament/context/TournamentContext';
 import { useApi } from '@/hooks/useApi';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -21,7 +16,6 @@ import {
   Clock,
   CheckCircle,
   Calendar,
-  MapPin,
   Trophy,
   Loader2,
   RefreshCw,
@@ -35,6 +29,9 @@ import {
 } from '@/api/tournaments/types';
 import { EmptyState } from '../shared/EmptyState';
 import { MatchResultEntry } from './matches/MatchResultEntry';
+import { useCourtName } from '../../hooks/useCourtName';
+import { EnhancedMatchCard } from '../shared/EnhancedMatchCard';
+import { MatchAccordionLayout } from '../shared/MatchAccordionLayout';
 
 interface TournamentMatchesProps {
   tournament: Tournament;
@@ -58,6 +55,11 @@ export const TournamentMatches: React.FC<TournamentMatchesProps> = ({
   const [showAccordion, setShowAccordion] = useState(true);
   const [selectedMatch, setSelectedMatch] = useState<StagingMatch | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
+
+  // Initialize court name hook with tournament courts data
+  const { getCourtName } = useCourtName({
+    tournamentCourts: matchOrderInfo?.courts || []
+  });
 
   // Load tournament matches with order info
   const loadMatches = async () => {
@@ -153,264 +155,29 @@ export const TournamentMatches: React.FC<TournamentMatchesProps> = ({
     return true;
   };
 
-  // Enhanced match card component with result entry functionality
-  const EnhancedMatchCard = ({ match }: { match: StagingMatch }) => {
-    const getStatusInfo = () => {
-      switch (match.match_result_status) {
-        case 'pending':
-          if (
-            match.court_id &&
-            match.scheduled_start &&
-            new Date(match.scheduled_start) <= new Date()
-          ) {
-            return {
-              label: t('live', { defaultValue: 'Live' }),
-              variant: 'destructive' as const,
-              canEdit: true
-            };
-          }
-          return {
-            label: t('upcoming', { defaultValue: 'Upcoming' }),
-            variant: 'secondary' as const,
-            canEdit: true
-          };
-        case 'completed':
-          return {
-            label: t('completed', { defaultValue: 'Completed' }),
-            variant: 'default' as const,
-            canEdit: true
-          };
-        case 'time_expired':
-          return {
-            label: t('timeExpired', { defaultValue: 'Time Expired' }),
-            variant: 'destructive' as const,
-            canEdit: true
-          };
-        case 'forfeited':
-          return {
-            label: t('forfeited', { defaultValue: 'Forfeited' }),
-            variant: 'outline' as const,
-            canEdit: true
-          };
-        default:
-          return {
-            label: t('unknown', { defaultValue: 'Unknown' }),
-            variant: 'secondary' as const,
-            canEdit: false
-          };
-      }
-    };
-
-    const statusInfo = getStatusInfo();
-    const hasResult = match.games && match.games.length > 0;
-
-    return (
-      <Card className='w-full'>
-        <CardHeader className='pb-3'>
-          <div className='flex items-center justify-between'>
-            <CardTitle className='text-lg font-semibold'>
-              {getCoupleName(match.couple1_id)}{' '}
-              {t('vs', { defaultValue: 'vs' })}{' '}
-              {getCoupleName(match.couple2_id)}
-            </CardTitle>
-            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className='space-y-3'>
-            {/* Match details */}
-            <div className='flex items-center gap-4 text-sm text-muted-foreground'>
-              {match.court_id && (
-                <div className='flex items-center gap-1'>
-                  <MapPin className='h-3 w-3' />
-                  {t('court', { defaultValue: 'Court' })} {match.court_id}
-                </div>
-              )}
-              {match.scheduled_start && (
-                <div className='flex items-center gap-1'>
-                  <Calendar className='h-3 w-3' />
-                  {new Date(match.scheduled_start).toLocaleString()}
-                </div>
-              )}
-            </div>
-
-            {/* Game results if available */}
-            {hasResult && (
-              <div className='space-y-2'>
-                <h4 className='text-sm font-medium'>
-                  {t('gameScores', { defaultValue: 'Game Scores' })}
-                </h4>
-                <div className='grid gap-1'>
-                  {match.games?.map((game, index) => (
-                    <div
-                      key={index}
-                      className='flex items-center justify-between text-sm'
-                    >
-                      <span>
-                        {t('game', { defaultValue: 'Game' })} {game.game_number}
-                      </span>
-                      <span className='font-mono'>
-                        {game.couple1_score} - {game.couple2_score}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {match.winner_couple_id && (
-                  <div className='flex items-center gap-2 text-sm font-medium text-green-600'>
-                    <Trophy className='h-3 w-3' />
-                    {t('winner', { defaultValue: 'Winner' })}:{' '}
-                    {getCoupleName(match.winner_couple_id)}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Action button */}
-            {statusInfo.canEdit && (
-              <Button
-                onClick={() => handleMatchResultEntry(match)}
-                variant='outline'
-                size='sm'
-                className='w-full'
-              >
-                {hasResult
-                  ? t('editResult', { defaultValue: 'Edit Result' })
-                  : t('enterResult', { defaultValue: 'Enter Result' })}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
   // Render match list
   const renderMatchList = (matches: StagingMatch[]) => (
     <div className='grid gap-4'>
       {matches.map((match) => (
-        <EnhancedMatchCard key={match.id} match={match} />
+        <EnhancedMatchCard
+          key={match.id}
+          match={match}
+          getCoupleName={getCoupleName}
+          onMatchResultEntry={handleMatchResultEntry}
+          showGroupName={true}
+          courtDataSources={{ tournamentCourts: matchOrderInfo?.courts || [] }}
+        />
       ))}
     </div>
   );
 
-  // Render accordion view with two rows layout
-  const renderAccordionView = () => {
-    const { live, next, upcoming, completed } = matchesByStatus;
-
-    return (
-      <div className='space-y-6'>
-        {/* First Row: Live and Next matches */}
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {/* Live Matches */}
-          <div className='space-y-4'>
-            <Accordion
-              type='multiple'
-              defaultValue={live.length > 0 ? ['live'] : []}
-              className='w-full'
-            >
-              {live.length > 0 && (
-                <AccordionItem value='live'>
-                  <AccordionTrigger className='hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <Play className='h-4 w-4 text-red-500' />
-                      <span className='font-semibold'>
-                        {t('live', { defaultValue: 'Live' })}
-                      </span>
-                      <Badge variant='destructive' className='text-xs'>
-                        {live.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='pt-4'>
-                    {renderMatchList(live)}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </div>
-
-          {/* Next Matches */}
-          <div className='space-y-4'>
-            <Accordion
-              type='multiple'
-              defaultValue={next.length > 0 ? ['next'] : []}
-              className='w-full'
-            >
-              {next.length > 0 && (
-                <AccordionItem value='next'>
-                  <AccordionTrigger className='hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <Calendar className='h-4 w-4 text-orange-500' />
-                      <span className='font-semibold'>
-                        {t('next', { defaultValue: 'Next' })}
-                      </span>
-                      <Badge variant='secondary' className='text-xs'>
-                        {next.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='pt-4'>
-                    {renderMatchList(next)}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </div>
-        </div>
-
-        {/* Second Row: Upcoming and Completed matches */}
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {/* Upcoming Matches */}
-          <div className='space-y-4'>
-            <Accordion type='multiple' defaultValue={[]} className='w-full'>
-              {upcoming.length > 0 && (
-                <AccordionItem value='upcoming'>
-                  <AccordionTrigger className='hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <Clock className='h-4 w-4 text-blue-500' />
-                      <span className='font-semibold'>
-                        {t('upcoming', { defaultValue: 'Upcoming' })}
-                      </span>
-                      <Badge variant='secondary' className='text-xs'>
-                        {upcoming.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='pt-4'>
-                    {renderMatchList(upcoming)}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </div>
-
-          {/* Completed Matches */}
-          <div className='space-y-4'>
-            <Accordion type='multiple' defaultValue={[]} className='w-full'>
-              {completed.length > 0 && (
-                <AccordionItem value='completed'>
-                  <AccordionTrigger className='hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <CheckCircle className='h-4 w-4 text-green-500' />
-                      <span className='font-semibold'>
-                        {t('completed', { defaultValue: 'Completed' })}
-                      </span>
-                      <Badge variant='secondary' className='text-xs'>
-                        {completed.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='pt-4'>
-                    {renderMatchList(completed)}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // Render accordion view using shared layout component
+  const renderAccordionView = () => (
+    <MatchAccordionLayout
+      matches={matchesByStatus}
+      renderMatchList={renderMatchList}
+    />
+  );
 
   // Loading state
   if (isLoading) {

@@ -295,6 +295,14 @@ export interface StagingMatch {
   priority_score: number | null;
   created_at: string;
   updated_at: string;
+  group_name: string | null;
+  courts: Array<{
+    id: number;
+    tournament_court_id: number;
+    availability_start: string;
+    availability_end: string;
+    court_name: string;
+  }>;
 }
 
 /**
@@ -500,6 +508,57 @@ export interface TournamentMatchOrderInfo {
   current_strategy: MatchOrderingStrategy | null;
   last_calculated: string | null;
   last_updated: string;
+}
+
+/**
+ * Stage Match Order Info Response
+ */
+export interface StageMatchOrderInfo {
+  tournament_id: number;
+  tournament_name: string;
+  tournament_start_date: string;
+  tournament_end_date: string;
+  stage_id: number;
+  stage_name: string;
+  stage_type: string;
+  stage_order: number;
+  stage_config: any;
+  total_courts: number;
+  total_matches_in_stage: number;
+  total_groups_in_stage: number;
+  completed_matches_count: number;
+  pending_matches_count: number;
+  progress_percentage: number;
+
+  // Match categorization
+  live_matches: StagingMatch[];
+  next_matches: StagingMatch[];
+  all_pending_matches: StagingMatch[];
+  completed_matches_by_group: Record<string, StagingMatch[]>;
+
+  // Additional information
+  courts: Array<{
+    id: number;
+    tournament_court_id: number;
+    availability_start: string;
+    availability_end: string;
+    court_name: string;
+  }>;
+  groups: Array<{
+    id: number;
+    name: string;
+    stage_id: number;
+  }>;
+
+  ordering_strategy_used: string;
+  last_updated: string;
+  quick_stats: {
+    matches_in_progress: number;
+    matches_waiting: number;
+    matches_remaining: number;
+    matches_completed: number;
+    estimated_completion: string;
+  };
 }
 
 /**

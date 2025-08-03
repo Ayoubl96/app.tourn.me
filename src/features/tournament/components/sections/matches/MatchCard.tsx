@@ -18,22 +18,39 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { MatchResultEntry } from './MatchResultEntry';
+import { useCourtName } from '../../../hooks/useCourtName';
 
 interface MatchCardProps {
   match: StagingMatch;
   getCoupleName: (id: number) => string;
-  getCourtName: (courtId: number | null) => string;
   onMatchUpdate: () => void;
+  /** Optional court data sources for enhanced court name resolution */
+  courtDataSources?: {
+    stageCourts?: Array<{ id: number; court_name?: string; name?: string }>;
+    tournamentCourts?: Array<{
+      id: number;
+      court_name?: string;
+      name?: string;
+    }>;
+    additionalCourts?: Array<{
+      id: number;
+      court_name?: string;
+      name?: string;
+    }>;
+  };
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({
   match,
   getCoupleName,
-  getCourtName,
-  onMatchUpdate
+  onMatchUpdate,
+  courtDataSources
 }) => {
   const t = useTranslations('Dashboard');
   const [showResultEntry, setShowResultEntry] = useState(false);
+
+  // Initialize court name hook
+  const { getCourtName } = useCourtName(courtDataSources || {});
 
   // Get match status info
   const getMatchStatusInfo = () => {
