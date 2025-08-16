@@ -7,7 +7,6 @@ import { redirect } from '@/lib/navigation';
 import { cookies, headers } from 'next/headers';
 import LanguageSwitcher from '@/components/language-switcher';
 import type { Metadata } from 'next';
-import { defaultLocale } from '@/config/locales';
 
 export const metadata: Metadata = {
   title: 'Tourn.me - Tournament Management',
@@ -24,9 +23,8 @@ export default async function DashboardLayout({
     const session = await auth();
 
     if (!session?.user) {
-      // Get the locale from the URL path
-      // Instead of relying on headers for locale, we'll determine it from the URL
-      return redirect(`/${defaultLocale}`);
+      // Redirect to signin page, maintaining the current locale
+      return redirect('/signin');
     }
 
     // Persisting the sidebar state in the cookie.
@@ -48,7 +46,7 @@ export default async function DashboardLayout({
     );
   } catch (error) {
     console.error('Error in dashboard layout:', error);
-    // In case of error, redirect to home
-    return redirect(`/${defaultLocale}`);
+    // In case of error, redirect to signin
+    return redirect('/signin');
   }
 }

@@ -17,12 +17,13 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/navigation';
+import { Link, useRouter } from '@/lib/navigation';
 
 export default function UserAuthForm() {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
+  const router = useRouter();
   const [loading, startTransition] = useTransition();
 
   const formSchema = z.object({
@@ -62,7 +63,12 @@ export default function UserAuthForm() {
           // Authentication successful
           toast.success(t('Auth.signInSuccess'));
           // Redirect manually since we set redirect: false
-          window.location.href = callbackUrl ?? '/dashboard';
+          // Use the router from next-intl which handles locale automatically
+          if (callbackUrl) {
+            window.location.href = callbackUrl;
+          } else {
+            router.push('/dashboard');
+          }
         } else {
           // Unexpected result
           toast.error(t('Errors.signInError'));

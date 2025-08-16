@@ -10,24 +10,16 @@ const PADEL_IMAGES = [
     alt: 'Padel tournament excitement'
   },
   {
-    src: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&h=1200&fit=crop&crop=center',
-    alt: 'Padel court aerial view'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=1200&fit=crop&crop=center',
+    src: 'https://pplx-res.cloudinary.com/image/upload/v1755360128/pplx_project_search_images/c31a868c6bb9473401c86de669fde12937c84c33.png',
     alt: 'Padel players in action'
   },
   {
-    src: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=800&h=1200&fit=crop&crop=center',
+    src: 'https://pplx-res.cloudinary.com/image/upload/v1755360241/pplx_project_search_images/2531b95a72bd3e0b40003029347b6add3b2952c2.png',
     alt: 'Intense padel match moment'
   },
   {
-    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=1200&fit=crop&crop=center',
+    src: 'https://pplx-res.cloudinary.com/image/upload/v1755360241/pplx_project_search_images/cbe20c50556bfee14f4cedcbbd0c3a276f1bdb52.png',
     alt: 'Padel doubles team'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=1200&fit=crop&crop=center',
-    alt: 'Professional padel training'
   }
 ];
 

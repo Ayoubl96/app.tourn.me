@@ -50,6 +50,48 @@ const getSignInPage = (req: Request) => {
 };
 
 const authConfig = {
+  session: {
+    strategy: 'jwt' as const,
+    maxAge: 30 * 24 * 60 * 60 // 30 days
+  },
+  useSecureCookies: process.env.NODE_ENV === 'production',
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? `__Secure-next-auth.session-token`
+          : `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    },
+    callbackUrl: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? `__Secure-next-auth.callback-url`
+          : `next-auth.callback-url`,
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    },
+    csrfToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? `__Host-next-auth.csrf-token`
+          : `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
@@ -117,6 +159,18 @@ const authConfig = {
     newUser: '/dashboard' // Redirect new users to the dashboard
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // If the url is a relative path, make it absolute
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // If it's an absolute URL to the same origin, allow it
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // Otherwise, redirect to dashboard
+      return `${baseUrl}/en/dashboard`;
+    },
     async jwt({ token, user }) {
       // 1) On initial sign in:
       if (user && (user as any).token) {

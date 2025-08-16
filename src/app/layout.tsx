@@ -3,7 +3,7 @@ import Providers from '@/components/layout/providers';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { Lato } from 'next/font/google';
+import { Play } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
   }
 };
 
-const lato = Lato({
+const play = Play({
   subsets: ['latin'],
-  weight: ['400', '700', '900'],
+  weight: ['400', '700'],
   display: 'swap'
 });
 
@@ -58,7 +58,7 @@ export default async function RootLayout({
 }) {
   const session = await auth();
   return (
-    <html lang='en' className={`${lato.className}`} suppressHydrationWarning>
+    <html lang='en' className={`${play.className}`} suppressHydrationWarning>
       <body>
         <NextTopLoader showSpinner={false} />
         <Providers session={session}>{children}</Providers>
