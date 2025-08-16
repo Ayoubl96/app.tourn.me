@@ -22,14 +22,17 @@ export function Plugins() {
   ); // Add dependency on floatingAnchorElem
 
   return (
-    <div className='relative'>
+    <div className='relative flex flex-1 flex-col'>
       {/* toolbar plugins */}
-      <div className='relative'>
+      <div className='relative flex flex-1 flex-col'>
         <RichTextPlugin
           contentEditable={
-            <div className=''>
-              <div className='' ref={onRef}>
-                <ContentEditable placeholder={'Start typing ...'} />
+            <div className='h-full flex-1'>
+              <div className='h-full' ref={onRef}>
+                <ContentEditable
+                  placeholder={'Start typing ...'}
+                  minHeight='400px'
+                />
               </div>
             </div>
           }

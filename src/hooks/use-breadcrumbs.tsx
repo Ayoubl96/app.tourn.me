@@ -74,9 +74,7 @@ export function useBreadcrumbs() {
         // Store in cache for future use
         tournamentNamesCache.set(tournamentId, tournament.name);
         setTournamentName(tournament.name);
-      } catch (error) {
-        console.error('Error fetching tournament name:', error);
-      }
+      } catch (error) {}
     };
 
     fetchTournamentData();

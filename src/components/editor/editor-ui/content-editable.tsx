@@ -5,19 +5,22 @@ type Props = {
   placeholder: string;
   className?: string;
   placeholderClassName?: string;
+  minHeight?: string;
 };
 
 export function ContentEditable({
   placeholder,
   className,
-  placeholderClassName
+  placeholderClassName,
+  minHeight = '220px'
 }: Props): JSX.Element {
   return (
     <LexicalContentEditable
       className={
         className ??
-        `ContentEditable__root relative block min-h-full overflow-auto px-8 py-4 focus:outline-none`
+        `ContentEditable__root block overflow-auto px-8 py-4 focus:outline-none`
       }
+      style={{ minHeight: minHeight }}
       aria-placeholder={placeholder}
       placeholder={
         <div
